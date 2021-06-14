@@ -28,3 +28,17 @@ git commit <changed_files>
 
 git push
 
+Later:
+I think the failure of "master" has to do with recent changes. It is now
+git commit origin main
+
+
+The cycle is thus
+git pull origin master
+
+
+git add <newfiles>
+git commit <changed_files>
+
+git push origin main
+
