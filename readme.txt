@@ -16,3 +16,15 @@ doesn't seem to work, but
 git push
 seems to work.
 
+
+
+Later: 
+The editing cycle that seems to work is
+git pull origin master
+
+
+git add <newfiles>
+git commit <changed_files>
+
+git push
+
