@@ -7,5 +7,9 @@ double x, y, z;
 
 x=y=z=0.;
 
+for (t=0.; t<=max_t; t+=deltat) {
+}
+
+
 return(0);
 }
