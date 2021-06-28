@@ -31,6 +31,9 @@
  * grep EVENT BrownianParticle_ref.dat | sed 's/.*EVENT //' > BrownianParticle_ref.txt
  * gnuplot> sp 'BrownianParticle_ref.txt' u 5:6:7
  *
+ * ./BrownianParticle -p 1.001 > BrownianParticle_ref2.dat
+ * ... has a large number of particles arriving at the point closest to the origin.
+ *
  * Validation:
  * Look at the histogram of column 5, that's the x-coordinate at arrival.
  * How does that compare to theory?
