@@ -171,19 +171,19 @@ rng=gsl_rng_alloc(gsl_rng_taus2);
 gsl_rng_set(rng, SEED);
 
 
-#define PRINT_PARAM(a,f) printf("#Info: %s: " f "\n", #a, a)
+#define PRINT_PARAM(a,o, f) printf("#Info: %s: %s " f "\n", #a, o, a)
 
 
 param_cutoff_squared=param_cutoff*param_cutoff;
 param_sphere_radius_squared=param_sphere_radius*param_sphere_radius;
-PRINT_PARAM(param_num_iterations, "%lli");
-PRINT_PARAM(param_sigma, "%g");
-PRINT_PARAM(param_cutoff, "%g");
-PRINT_PARAM(param_cutoff_squared, "%g");
-PRINT_PARAM(param_sphere_radius, "%g");
-PRINT_PARAM(param_sphere_radius_squared, "%g");
-PRINT_PARAM(param_sphere_posx, "%g");
-PRINT_PARAM(param_seed, "%lu");
+PRINT_PARAM(param_num_iterations, "-N", "%lli");
+PRINT_PARAM(param_sigma, "-s", "%g");
+PRINT_PARAM(param_cutoff, "-c", "%g");
+PRINT_PARAM(param_cutoff_squared, "", "%g");
+PRINT_PARAM(param_sphere_radius, "", "%g");
+PRINT_PARAM(param_sphere_radius_squared, "", "%g");
+PRINT_PARAM(param_sphere_posx, "-p", "%g");
+PRINT_PARAM(param_seed, "-S", "%lu");
 
 
 
@@ -199,11 +199,13 @@ for (iteration=1LL; iteration<=param_num_iterations; iteration++) {
     z+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
 
 
+
     origin_distance2 = sphere_distance2 = distance_from_x_axis2 = y*y+z*z;
     origin_distance2+=x*x;
 
     sphere_distance2+=(x-param_sphere_posx)*(x-param_sphere_posx);
 
+    //printf("Particle %lli event %lli step %lli pos %g %g %g distances %g %g\n", iteration, event, steps, x, y, z, origin_distance2, sphere_distance2);
     if (sphere_distance2<param_sphere_radius_squared) {
       double theta, phi;
 
@@ -220,9 +222,13 @@ for (iteration=1LL; iteration<=param_num_iterations; iteration++) {
       event++;
 
       printf("# EVENT %lli %lli %10.20g %10.20g %10.20g %10.20g %10.20g %lli\n", event, iteration, theta, phi, x, y, z, steps);
+      /* Watch out, x is now relative to the origin of the sphere. It has been shifted by param_sphere_posx above. */
+      //x+=param_sphere_posx;
+      break;
     }
   }
-  printf("# PARTICLE %lli got lost to position %g %g %g after %lli steps at distance %g>%g.\n", iteration, x, y, z, steps, sqrt(origin_distance2), param_cutoff);
+  if (origin_distance2>param_cutoff_squared)
+    printf("# PARTICLE %lli got lost to position %g %g %g after %lli steps at distance %g>%g.\n", iteration, x, y, z, steps, sqrt(origin_distance2), param_cutoff);
 }
 
 postamble();
