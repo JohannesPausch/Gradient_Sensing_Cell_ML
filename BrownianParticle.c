@@ -108,6 +108,7 @@ int i;
 
 printf("# Info: Command: %s", argv[0]);
 for (i=1; i<argc; i++) printf(" \"%s\"", argv[i]);
+printf("\n");
 }
 
 
