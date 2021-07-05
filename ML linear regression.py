@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ##############DATA###########################
-data = np.loadtxt('/Users/Paula/Gradient_Sensing_Cell_ML-main/BrownianParticle_ref.txt',
+data = np.loadtxt('BrownianParticle_ref.txt',
 				delimiter=' ', 	# String used to separate values
 				usecols=[0,1,2,3,4,5,6,7], 	# Specify which columns to read
 				dtype=np.double) 		# The type of the resulting array
@@ -47,5 +47,5 @@ for i in range(0,numiter): #repeat until convergence
  
 ##########################VISUALS#############################################
 
-plt.plot(list(J),list(range(1,numiter+1)))
+plt.plot(J[0:3],range(1,4))
 plt.show()
