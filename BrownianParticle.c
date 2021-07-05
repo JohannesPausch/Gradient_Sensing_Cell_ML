@@ -77,6 +77,7 @@ double param_sigma=SIGMA;
 #define NUM_ITERATIONS (1000000LL)
 #endif
 long long int param_num_iterations=NUM_ITERATIONS;
+long long int param_num_events=0LL;
 
 /* Seed */
 #ifndef SEED
@@ -145,10 +146,13 @@ printf("# $Header$\n");
 /* Process ID. */
 printf("# Info: PID: %i\n", (int)getpid());
 
-while ((ch = getopt(argc, argv, "c:N:p:r:s:S:")) != -1) {
+while ((ch = getopt(argc, argv, "c:E:N:p:r:s:S:")) != -1) {
   switch (ch) {
     case'c':
       param_cutoff=strtod(optarg, NULL);
+      break;
+    case 'E':
+      param_num_events=strtoll(optarg, NULL, 10);
       break;
     case 'N':
       param_num_iterations=strtoll(optarg, NULL, 10);
@@ -176,6 +180,7 @@ gsl_rng_set(rng, SEED);
 
 param_cutoff_squared=param_cutoff*param_cutoff;
 param_sphere_radius_squared=param_sphere_radius*param_sphere_radius;
+PRINT_PARAM(param_num_events, "-E", "%lli");
 PRINT_PARAM(param_num_iterations, "-N", "%lli");
 PRINT_PARAM(param_sigma, "-s", "%g");
 PRINT_PARAM(param_cutoff, "-c", "%g");
@@ -187,7 +192,7 @@ PRINT_PARAM(param_seed, "-S", "%lu");
 
 
 
-for (iteration=1LL; iteration<=param_num_iterations; iteration++) {
+for (iteration=1LL; ((iteration<=param_num_iterations) &&   ( (param_num_events==0) ? (1) : (event<param_num_events))); iteration++) {
   x=y=z=0.;
   origin_distance2=0.;
   steps=0LL;
@@ -214,7 +219,8 @@ for (iteration=1LL; iteration<=param_num_iterations; iteration++) {
        * The azimuthal angle goes 0...\pi,
        * but atan returns 0..\pi/2 for 0..\infty
        * and then -\pi/2..0 for -\infty..-0 */
-      if ((x-=param_sphere_posx)!=0.) {
+      x=param_sphere_posx-x; /* Distance from sphere centre. */
+      if (x!=0.) {
         if ((theta=atan(sqrt(distance_from_x_axis2)/x))<0.) theta+=M_PI;
       } else theta=M_PI/2.;
       phi=atan2(y,z); /* phi=0 for y=0 */
@@ -223,7 +229,6 @@ for (iteration=1LL; iteration<=param_num_iterations; iteration++) {
 
       printf("# EVENT %lli %lli %10.20g %10.20g %10.20g %10.20g %10.20g %lli\n", event, iteration, theta, phi, x, y, z, steps);
       /* Watch out, x is now relative to the origin of the sphere. It has been shifted by param_sphere_posx above. */
-      //x+=param_sphere_posx;
       break;
     }
   }
