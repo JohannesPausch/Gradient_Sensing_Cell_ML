@@ -11,7 +11,7 @@ import scipy.linalg
 #from random_3d_rotation import *
 
 ############## DATA origin source ###########################
-data = np.loadtxt('/Users/Paula/Gradient_Sensing_Cell_ML-main/BrownianParticle_ref.txt',
+data = np.loadtxt('BrownianParticle_RUNRUN01/BrownianParticle_RUNRUN01_1_1000_P01_20210705_173431.txt',
 				delimiter=' ', 	# String used to separate values
 				usecols=[0,1,2,3,4,5,6,7], 	# Specify which columns to read
 				dtype=np.double) 		# The type of the resulting array
