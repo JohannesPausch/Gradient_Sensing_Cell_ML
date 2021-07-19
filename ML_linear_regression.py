@@ -22,7 +22,7 @@ numtrain=len(theta_data)+1
 Ydata=np.zeros((1,2)) #origin source
 Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1),np.transpose(phi_data).reshape(1,numtrain-1))))
 ####################FUNCTIONS###################################
-  
+  #Spyder still doesn't let me use modules in the editor
 def analyticalreg(x,y): 
     #method to solve for beta analytically
     #(X^tX)^-1X^ty
@@ -48,10 +48,15 @@ def reshapevalues(theta,phi):
 
 ##################### SET UP VARIABLES  ######################
 
-# A sweep is done with the window of size "groupsize" and going down the rows of matrix Xdata with step 1 row
-# The row 0 is not rotated and row 1 is the random rotation of row 0,
-# the rest of the rows correspond to randomly rotated variables
-# of the selected window, to avoid singular matrix in the linear regression further down.
+# A sweep is done with the window of size "groupsize" that goes down the rows of matrix Xdata with step 1 row.
+
+# Xtot is a matrix of size: (number of groups) x (2*groupsize+1). The 2*groupsize+1 is the column dimension since 
+# each row takes all the data of a group and organizes it in the following way using the reshapevalues function: 
+# theta_1 phi_1 theta_2 phi_2... theta(2*groupsize) phi_(2*groupsize). In the end a 1 is added as the first variable of each row
+# to account for the intercept.
+
+# In Xtot, the row 0 is not rotated and row 1 is the random rotation of row 0,
+# the rest of the rows correspond to randomly rotated variables of the selected window of Xdata.
 
 groupsize=40
 
