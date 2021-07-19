@@ -1,30 +1,26 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import special_ortho_group
 import scipy.linalg
  
-#from analytical import *
-#from CostFunction import *
-#from GradDescent import *
+#from analyticalreg import *
+#from reshapevalues import *
 #from random_3d_rotation import *
+
 ############## DATA origin source ###########################
 data = np.loadtxt('/Users/Paula/Gradient_Sensing_Cell_ML-main/BrownianParticle_ref.txt',
 				delimiter=' ', 	# String used to separate values
 				usecols=[0,1,2,3,4,5,6,7], 	# Specify which columns to read
 				dtype=np.double) 		# The type of the resulting array
-event=data[:,0]
-iteration=data[:,1]
-theta=data[:,2]
-phi=data[:,3]
-z=data[:,4] #x before
-y=data[:,5] #y
-x=data[:,6] #z
-t=data[:,7]
-numtrain=len(x)+1
+theta_data=data[:,2]
+phi_data=data[:,3]
+numtrain=len(theta_data)+1
 
-
-Y=np.zeros((1,2)) #origin source
-X=np.transpose(np.concatenate((np.transpose(theta).reshape(1,numtrain-1),np.transpose(phi).reshape(1,numtrain-1))))
+Ydata=np.zeros((1,2)) #origin source
+Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1),np.transpose(phi_data).reshape(1,numtrain-1))))
 ####################FUNCTIONS###################################
   
 def analyticalreg(x,y): 
@@ -45,51 +41,45 @@ def random_3d_rotation(theta,phi,use_seed=None):
 
 
 def reshapevalues(theta,phi):
-    X = np.empty((2*theta.size), dtype=theta.dtype) 
-    X[0::2]=theta
-    X[1::2]=phi
-    return X
+    result = np.empty((2*theta.size), dtype=theta.dtype) 
+    result[0::2]=theta
+    result[1::2]=phi
+    return result
 
 ##################### SET UP VARIABLES  ######################
+
+# A sweep is done with the window of size "groupsize" and going down the rows of matrix Xdata with step 1 row
+# The row 0 is not rotated and row 1 is the random rotation of row 0,
+# the rest of the rows correspond to randomly rotated variables
+# of the selected window, to avoid singular matrix in the linear regression further down.
+
 groupsize=40
 
-#sweep :
-
 for i in range(0,numtrain-1):
-    if (i+groupsize==numtrain-1):
+    if (i+groupsize>numtrain-1):
+        print(i+groupsize) #The window is larger than the actual rows left of the training matrix. 
         break
     else:
-        theta=X[i:i+groupsize,0]
-        phi=X[i:i+groupsize,1]
-        Yr=np.array(random_3d_rotation(Y[0,0],Y[0,1])).reshape(1,2)
+        theta=Xdata[i:i+groupsize,0]
+        phi=Xdata[i:i+groupsize,1]
+        Yrotdata=np.array(random_3d_rotation(Ydata[0,0],Ydata[0,1])).reshape(1,2)
         [rtheta,rphi]=random_3d_rotation(theta,phi)
-        Xr=reshapevalues(rtheta,rphi).reshape(1,2*groupsize)
+        Xrotdata=reshapevalues(rtheta,rphi).reshape(1,2*groupsize)
         if i==0:
-            Xi=reshapevalues(theta,phi).reshape(1,2*groupsize)
-            Xtot=np.concatenate((Xi,Xr))
-            Ytot= np.concatenate((Y, Yr))
+            Xinit=reshapevalues(theta,phi).reshape(1,2*groupsize)
+            Xtot=np.concatenate((Xinit,Xrotdata))
+            Ytot= np.concatenate((Ydata, Yrotdata))
         else: 
-            Xtot=np.concatenate((Xtot,Xr))
-            Ytot= np.concatenate((Ytot, Yr))
+            Xtot=np.concatenate((Xtot,Xrotdata))
+            Ytot= np.concatenate((Ytot, Yrotdata))
         
+#add intercept: 
+Xtot=np.insert(Xtot, 0, 1, axis=1)
+##################### Linear regression ############################################
 
-##################### regression ############################################
 
 beta= analyticalreg(Xtot, Ytot)
 
 
-#######################RUN ITERATIONS(Gradient descent)###############################################
-"""
-numiter = 1000
-beta = np.random.rand(4,1)  #weights for theta
-alpha = 1e-12#learning rate
-J=np.zeros((numiter,1))
-for i in range(0,numiter): #repeat until convergence
-    print(beta)
-    beta= GradDescent(alpha,beta,X,y1)
-    J[i,0]= CostFunction(beta,X,y1)
-""" 
-
 ##########################VISUALS#############################################
-
 
