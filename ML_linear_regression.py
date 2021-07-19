@@ -22,7 +22,7 @@ numtrain=len(theta_data)+1
 Ydata=np.zeros((1,2)) #origin source
 Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1),np.transpose(phi_data).reshape(1,numtrain-1))))
 ####################FUNCTIONS###################################
-  #Spyder still doesn't let me use modules in the editor
+  #Spyder doesn't let me use modules in the editor
 def analyticalreg(x,y): 
     #method to solve for beta analytically
     #(X^tX)^-1X^ty
