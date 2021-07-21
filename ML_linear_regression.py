@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import special_ortho_group
 import scipy.linalg
  
-#from analyticalreg import *
-#from reshapevalues import *
-#from random_3d_rotation import *
+from analyticalreg import *
+from reshapevalues import *
+from random_3d_rotation import *
 
 ############## DATA origin source ###########################
 data = np.loadtxt('BrownianParticle_RUNRUN01/BrownianParticle_RUNRUN01_1_1000_P01_20210705_173431.txt',
@@ -21,30 +19,6 @@ numtrain=len(theta_data)+1
 
 Ydata=np.zeros((1,2)) #origin source
 Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1),np.transpose(phi_data).reshape(1,numtrain-1))))
-####################FUNCTIONS###################################
-  #Spyder doesn't let me use modules in the editor
-def analyticalreg(x,y): 
-    #method to solve for beta analytically
-    #(X^tX)^-1X^ty
-    
-    return np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(x),x)),np.transpose(x)),y)
-
-def random_3d_rotation(theta,phi,use_seed=None):   
-    try:
-        np.random.seed(seed=use_seed)
-        y=np.matmul(special_ortho_group.rvs(3),np.array([np.cos(phi)*np.sin(theta),np.sin(phi)*np.sin(theta),np.cos(theta)]))#special_ortho_group.rvs(3)
-        return np.arccos(y[2]), np.mod(np.arctan2(y[1],y[0]),2*np.pi)
-    except ValueError:
-        if phi.shape != theta.shape:  print("Error in random_3d_rotation: Shapes of phi and theta don't match")
-        else: print("Unknown error in random_3d_rotation")
-        return theta,phi
-
-
-def reshapevalues(theta,phi):
-    result = np.empty((2*theta.size), dtype=theta.dtype) 
-    result[0::2]=theta
-    result[1::2]=phi
-    return result
 
 ##################### SET UP VARIABLES  ######################
 
@@ -85,6 +59,8 @@ Xtot=np.insert(Xtot, 0, 1, axis=1)
 
 beta= analyticalreg(Xtot, Ytot)
 
-
+print(beta[0:10])
+histotheta=plt.hist(beta[:,1])
+plt.show()
 ##########################VISUALS#############################################
 
