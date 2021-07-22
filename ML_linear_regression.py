@@ -67,8 +67,8 @@ for i in range(0,numtrain-1):
     else:
         theta=Xdata[i:i+groupsize,0]
         phi=Xdata[i:i+groupsize,1]
-        Yrotdata=np.array(random_3d_rotation(Ydata[0,0],Ydata[0,1])).reshape(1,2)
-        [rtheta,rphi]=random_3d_rotation(theta,phi)
+        Yrotdata=np.array(random_3d_rotation(Ydata[0,0],Ydata[0,1],i)).reshape(1,2)
+        [rtheta,rphi]=random_3d_rotation(theta,phi,i)
         Xrotdata=reshapevalues(rtheta,rphi).reshape(1,2*groupsize)
         if i==0:
             Xinit=reshapevalues(theta,phi).reshape(1,2*groupsize)
@@ -84,7 +84,8 @@ Xtot=np.insert(Xtot, 0, 1, axis=1)
 
 
 beta= analyticalreg(Xtot, Ytot)
-
-
+print(beta[0:10,:])
+plt.hist(beta[0::2,0])
+plt.savefig('betaHistogramm01.png')
 ##########################VISUALS#############################################
 
