@@ -60,10 +60,10 @@ double param_sphere_radius=SPHERE_RADIUS;
 double param_sphere_radius_squared=SPHERE_RADIUS*SPHERE_RADIUS;
 
 /* Position of the cell sphere along x-axis. */
-#ifndef SPHERE_POSX
-#define SPHERE_POSX (5.0)
+#ifndef SPHERE_POSZ
+#define SPHERE_POSZ (5.0)
 #endif
-double param_sphere_posx=SPHERE_POSX;
+double param_sphere_posz=SPHERE_POSZ;
 
 
 /* Diffusive step length, sigma=2D\Delta t in every direction. */
@@ -99,7 +99,7 @@ long long int iteration;
 long long int event=0LL;
 int ch;
 double origin_distance2; /* Variable names with a 2 at the end are squared, parameters have that suffix, to avoid problems by typos. */
-double sphere_distance2, distance_from_x_axis2;
+double sphere_distance2, distance_from_z_axis2;
 long long int steps;
 
 setlinebuf(stdout);
@@ -158,7 +158,7 @@ while ((ch = getopt(argc, argv, "c:E:N:p:r:s:S:")) != -1) {
       param_num_iterations=strtoll(optarg, NULL, 10);
       break;
     case 'p':
-      param_sphere_posx=strtod(optarg, NULL);
+      param_sphere_posz=strtod(optarg, NULL);
       break;
     case 's':
       param_sigma=strtod(optarg, NULL);
@@ -187,7 +187,7 @@ PRINT_PARAM(param_cutoff, "-c", "%g");
 PRINT_PARAM(param_cutoff_squared, "", "%g");
 PRINT_PARAM(param_sphere_radius, "", "%g");
 PRINT_PARAM(param_sphere_radius_squared, "", "%g");
-PRINT_PARAM(param_sphere_posx, "-p", "%g");
+PRINT_PARAM(param_sphere_posz, "-p", "%g");
 PRINT_PARAM(param_seed, "-S", "%lu");
 
 
@@ -205,10 +205,10 @@ for (iteration=1LL; ((iteration<=param_num_iterations) &&   ( (param_num_events=
 
 
 
-    origin_distance2 = sphere_distance2 = distance_from_x_axis2 = y*y+z*z;
-    origin_distance2+=x*x;
+    origin_distance2 = sphere_distance2 = distance_from_z_axis2 = y*y+x*x;
+    origin_distance2+=z*z;
 
-    sphere_distance2+=(x-param_sphere_posx)*(x-param_sphere_posx);
+    sphere_distance2+=(z-param_sphere_posz)*(z-param_sphere_posz);
 
     //printf("Particle %lli event %lli step %lli pos %g %g %g distances %g %g\n", iteration, event, steps, x, y, z, origin_distance2, sphere_distance2);
     if (sphere_distance2<param_sphere_radius_squared) {
@@ -219,16 +219,16 @@ for (iteration=1LL; ((iteration<=param_num_iterations) &&   ( (param_num_events=
        * The azimuthal angle goes 0...\pi,
        * but atan returns 0..\pi/2 for 0..\infty
        * and then -\pi/2..0 for -\infty..-0 */
-      x=param_sphere_posx-x; /* Distance from sphere centre. */
-      if (x!=0.) {
-        if ((theta=atan(sqrt(distance_from_x_axis2)/x))<0.) theta+=M_PI;
+      z=param_sphere_posz-z; /* Distance from sphere centre. */
+      if (z!=0.) {
+        if ((theta=atan(sqrt(distance_from_z_axis2)/z))<0.) theta+=M_PI;
       } else theta=M_PI/2.;
-      phi=atan2(y,z); /* phi=0 for y=0 */
+      phi=atan2(y,x); /* phi=0 for y=0 */
 
       event++;
 
       printf("# EVENT %lli %lli %10.20g %10.20g %10.20g %10.20g %10.20g %lli\n", event, iteration, theta, phi, x, y, z, steps);
-      /* Watch out, x is now relative to the origin of the sphere. It has been shifted by param_sphere_posx above. */
+      /* Watch out, z is now relative to the origin of the sphere. It has been shifted by param_sphere_posz above. */
       break;
     }
   }

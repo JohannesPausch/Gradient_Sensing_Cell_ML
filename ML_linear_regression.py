@@ -32,7 +32,7 @@ Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1
 # In Xtot, the row 0 is not rotated and row 1 is the random rotation of row 0,
 # the rest of the rows correspond to randomly rotated variables of the selected window of Xdata.
 
-groupsize=40
+groupsize=100
 
 for i in range(0,numtrain-1):
     if (i+groupsize>numtrain-1):
@@ -59,8 +59,10 @@ Xtot=np.insert(Xtot, 0, 1, axis=1)
 
 beta= analyticalreg(Xtot, Ytot)
 
-print(beta[0:10])
-histotheta=plt.hist(beta[:,1])
-plt.show()
-##########################VISUALS#############################################
 
+##########################VISUALS#############################################
+print(beta[0:10])
+plt.hist(beta[:,0])
+plt.show()
+plt.hist(beta[:,1])
+plt.show()
