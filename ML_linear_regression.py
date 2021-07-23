@@ -56,11 +56,10 @@ for i in range(0,numtrain-1):
 Xtot=np.insert(Xtot, 0, 1, axis=1)
 ##################### Linear regression ############################################
 
-
 beta= analyticalreg(Xtot, Ytot)
 
-
 ##########################VISUALS#############################################
+
 print(beta[0:10])
 plt.hist(beta[:,0])
 plt.show()
