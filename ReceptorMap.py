@@ -25,4 +25,4 @@ fig = plt.figure(figsize=(4,4))
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(x,y,z) 
 
-plt.show()
+plt.savefig('ReceptorMapOutput01.png')
