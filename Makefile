@@ -51,6 +51,10 @@ BrownianParticle_OBJS = BrownianParticle.o
 BrownianParticle: ${BrownianParticle_OBJS} Gradient_Sensing_Cell_ML_git_stamps.h
 	${CC} ${CFLAGS} ${OPTIM_LINK} ${EXTRA_CFLAGS} ${CONF_FLAGS} -o $@ ${BrownianParticle_OBJS} ${LIB} -lgsl
 
+BrownianParticle_fifo_OBJS = BrownianParticle_fifo.o
+BrownianParticle_fifo: ${BrownianParticle_fifo_OBJS} Gradient_Sensing_Cell_ML_git_stamps.h
+	${CC} ${CFLAGS} ${OPTIM_LINK} ${EXTRA_CFLAGS} ${CONF_FLAGS} -o $@ ${BrownianParticle_fifo_OBJS} ${LIB} -lgsl
+
 Gradient_Sensing_Cell_ML_git_stamps.h: .
 	./git_stamps.sh > Gradient_Sensing_Cell_ML_git_stamps.h
 
