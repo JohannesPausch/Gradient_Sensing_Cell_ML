@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import special_ortho_group
 import scipy.linalg
  
 from analyticalreg import *
@@ -8,7 +9,7 @@ from reshapevalues import *
 from random_3d_rotation import *
 
 ############## DATA origin source ###########################
-data = np.loadtxt('BrownianParticle_RUNRUN01/BrownianParticle_RUNRUN01_1_1000_P01_20210705_173431.txt',
+data = np.loadtxt('BrownianParticle_RUNRUN01/BrownianParticle_RUNRUN01_2_1000_P01_20210705_173431.txt',
 				delimiter=' ', 	# String used to separate values
 				usecols=[0,1,2,3,4,5,6,7], 	# Specify which columns to read
 				dtype=np.double) 		# The type of the resulting array
@@ -18,7 +19,6 @@ numtrain=len(theta_data)+1
 
 Ydata=np.zeros((1,2)) #origin source
 Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1),np.transpose(phi_data).reshape(1,numtrain-1))))
-
 ##################### SET UP VARIABLES  ######################
 
 # A sweep is done with the window of size "groupsize" that goes down the rows of matrix Xdata with step 1 row.
@@ -31,7 +31,7 @@ Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1
 # In Xtot, the row 0 is not rotated and row 1 is the random rotation of row 0,
 # the rest of the rows correspond to randomly rotated variables of the selected window of Xdata.
 
-groupsize=100
+groupsize=60
 
 for i in range(0,numtrain-1):
     if (i+groupsize>numtrain-1):
@@ -52,22 +52,12 @@ for i in range(0,numtrain-1):
             Ytot= np.concatenate((Ytot, Yrotdata))
         
 #add intercept: 
-Xtot=np.insert(Xtot, 0, 1, axis=1)
+#Xtot=np.insert(Xtot, 0, 1, axis=1)
 ##################### Linear regression ############################################
 
+print(Xtot.shape)
 beta= analyticalreg(Xtot, Ytot)
-#<<<<<<< HEAD
-
-##########################VISUALS#############################################
-
-print(beta[0:10])
-plt.hist(beta[:,0])
-plt.show()
-plt.hist(beta[:,1])
-plt.show()
-#=======
-#<<<<<<< HEAD
 print(beta[0:10,:])
 plt.hist(beta[0::2,0])
-plt.savefig('betaHistogramm01.png')
-
+plt.savefig('betaHistogramm02.png')
+#plt.hist(theta_data)
