@@ -3,7 +3,7 @@ import math
 from pprint import pprint
 from pointssphere import *
 import matplotlib.pyplot as plt
-from areareceptor import * 
+from haversine import * 
 from sphericaltransf import *
 ####################################
 #Distribution of receptors:
