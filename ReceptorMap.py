@@ -57,6 +57,5 @@ for i in range(0,receptornum):
 activation_receptor[finalindex] += 1
 """
 ####################################
-=======
+
 plt.savefig('ReceptorMapOutput01.png')
->>>>>>> c15e11e05947cd84aeb80a9b5065536d864a0ff9
