@@ -15,11 +15,34 @@
  *  + spits out signalling particles' positions on cell on another fifo
  *  + reads from stdin updated pos
  *
+ *  How to use this code
+ *
+ *  1) Compile 
+ *  make BrownianParticle_fifo
+ *  2) Create fifos 
  *  mkfifo SignalArrivals
  *  mkfifo CellPosition
+ *  3) Kick off code
  *  ./BrownianParticle_fifo -o SignalArrivals -i CellPosition
+ *  It expects to read the cell coordinate from the fifo CellPosition, then will write signal arrivals 
+ *  into SignalArrivals. 
+ *  CellPosition has format x y z
+ *  SignalArrivals has format x y z time
  *
- *  echo "1.0 1.0 1.0" >> CellPosition
+ *  To test, kick off the code in one terminal window and in another terminal window do
+ *  cat SignalArrivals &
+ *  and
+ *  cat -u >> CellPosition
+ *
+ *  The former command will read everything that can be read on SignalArrivals and write
+ *  it into the terminal. The latter will read from the terminal and write into CellPosition.
+ *  
+ *  I tested things by writing 
+ *  1 1 1
+ *  over and over. The newline "commits the text" to the fifo.
+ *
+ *
+ *
  */
 
 
