@@ -29,6 +29,8 @@ ax.scatter(x,y,z)
 
 plt.show()
 
+plt.savefig('ReceptorMapOutput01.png')
+
 """
 print("Evenly distributed points")
 x,y,z = regular_on_sphere_points(radius,points)
@@ -48,7 +50,7 @@ plt.show()
 MinDistance=0.05
 
 for i in range(0,receptornum):
-    finaldistance = 0
+    finaldistance = 100
     distance = haversine(radius,molecule_theta,molecule_phi,theta[i],phi[i])
     if distance < MinDistance and distance < finaldistance:
         finaldistance = distance
@@ -58,4 +60,4 @@ activation_receptor[finalindex] += 1
 """
 ####################################
 
-plt.savefig('ReceptorMapOutput01.png')
+
