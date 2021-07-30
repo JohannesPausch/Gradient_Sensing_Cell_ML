@@ -45,7 +45,8 @@ plt.show()
 ##############################################
 #Check whether a recetor is close to the molecule
 #activate closest receptor
-#need data of where the molecule hits
+#need data of where the molecules hit and then create another for loop for each
+#molecule
 """
 MinDistance=0.05
 
