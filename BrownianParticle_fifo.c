@@ -353,6 +353,7 @@ for (tm=0.; ;tm+=param_delta_t) {
     }
   }
 
+  #warning "Using i here as some sort of global object is poor style. The variable i is really one that is too frequently used..."
   for (i=0; i<active_particles; i++) {
     particle[i].x+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
     particle[i].y+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
@@ -401,10 +402,12 @@ for (tm=0.; ;tm+=param_delta_t) {
         /* Update the position of all particles and the source.
 	 * One update is superfluous, as particle[i] will be purged
 	 * anyway. */
+	{ int j;
 	for (j=0; j<active_particles; j++) {
 	  particle[j].x-=delta.x;
 	  particle[j].y-=delta.y;
 	  particle[j].z-=delta.z;
+	}
 	}
 	source.x-=delta.x;
 	source.y-=delta.y;
