@@ -5,6 +5,7 @@ from pointssphere import *
 import matplotlib.pyplot as plt
 from haversine import * 
 from sphericaltransf import *
+from mpl_toolkits.mplot3d import Axes3D
 ####################################
 #Distribution of receptors:
 
@@ -27,7 +28,7 @@ fig = plt.figure(figsize=(4,4))
 ax = fig.add_subplot(111, projection='3d')
 ax.scatter(x,y,z) 
 
-plt.show()
+#plt.show()
 
 plt.savefig('ReceptorMapOutput01.png')
 
