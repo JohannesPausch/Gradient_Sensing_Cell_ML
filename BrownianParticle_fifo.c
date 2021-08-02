@@ -398,6 +398,14 @@ for (tm=0.; ;tm+=param_delta_t) {
 	  fprintf(stderr, "Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	  exit(EXIT_FAILURE);
 	}
+        /* Update the position of all particles and the source.
+	 * One update is superfluous, as particle[i] will be purged
+	 * anyway. */
+	for (j=0; j<active_particles; j++) {
+	  particle[j].x-=delta.x;
+	  particle[j].y-=delta.y;
+	  particle[j].z-=delta.z;
+	}
 	source.x-=delta.x;
 	source.y-=delta.y;
 	source.z-=delta.z;
