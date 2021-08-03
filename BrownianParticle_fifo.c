@@ -280,7 +280,7 @@ printf("# $Header$\n");
 /* Process ID. */
 printf("# Info: PID: %i\n", (int)getpid());
 
-#define PRINT_PARAM(a,o, f) printf("#Info: %s: %s " f "\n", #a, o, a)
+#define PRINT_PARAM(a,o, f) printf("# Info: %s: %s " f "\n", #a, o, a)
 
 param_sigma=sqrt(2.*param_delta_t*param_diffusion);
 param_cutoff_squared=param_cutoff*param_cutoff;
@@ -299,7 +299,7 @@ PRINT_PARAM(param_seed, "-S", "%lu");
 PRINT_PARAM(param_input, "-i", "%s");
 PRINT_PARAM(param_output, "-o", "%s");
 
-printf("#Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
+printf("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
 
 if (param_output[0]) {
   if ((fout=fopen(param_output, "wt"))==NULL) {
@@ -353,7 +353,7 @@ for (tm=0.; ;tm+=param_delta_t) {
     }
   }
 
-  #warning "Using i here as some sort of global object is poor style. The variable i is really one that is too frequently used..."
+  //warning "Using i here as some sort of global object is poor style. The variable i is really one that is too frequently used..."
   for (i=0; i<active_particles; i++) {
     particle[i].x+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
     particle[i].y+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
@@ -473,6 +473,6 @@ GETRUSAGE_long(ru_nsignals);
 GETRUSAGE_long(ru_nvcsw);
 GETRUSAGE_long(ru_nivcsw);
 }
-printf("#Info: Good bye and thanks for all the fish.\n");
+printf("# Info: Good bye and thanks for all the fish.\n");
 }
 

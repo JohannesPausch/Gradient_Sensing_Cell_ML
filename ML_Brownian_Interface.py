@@ -4,7 +4,7 @@ from subprocess import Popen, PIPE
 separator = ' '
 
 def init_BrownianParticle(distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,training=None,iterations=None):
-    command = './BrownianParticle.o'
+    command = './BrownianParticle_fifo.o'
     if distance != None:
         command += ' -d '+str(distance)
     if rate != None:
@@ -22,10 +22,15 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,seed=None,cutof
     if training != None:
         command += ' -t y '
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
-    brownian_pipe.stdin.write(bytes(str(xpos)+separator+str(ypos)+separator+str(zpos)+'\n', 'UTF-8'))
-    brownian_pipe.stdin.flush()
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-    received = [float(x) for x in received]
+    while received[0] == '#':
+        received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    try: 
+        received = [float(x) for x in received]
+        print(received)
+    except:
+        print('not a float')
+        print(received)
     return brownian_pipe,received
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
@@ -35,9 +40,15 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
         brownian_pipe.stdin.write(bytes('\n', 'UTF-8'))
     brownian_pipe.stdin.flush()
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-    if received[0]=='SOURCE':
+    if received[0]=='#' and received[1] == 'SOURCE':
         return 'SOURCE FOUND'
-    received = [float(x) for x in received]
+    while received[0] == '#':
+        received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    try: 
+        received = [float(x) for x in received]
+    except:
+        print('not a float')
+        print(received)
     return received
 
 def stop_BrownianParticle(brownian_pipe):
