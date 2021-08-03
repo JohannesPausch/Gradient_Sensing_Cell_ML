@@ -74,8 +74,8 @@ mindistance = 0.05
 
 receptor_sphcoords,receptor_cartcoords, activation_receptors = init_Receptors(receptornum,radius)
 plot = visualize_Receptors(receptor_cartcoords,radius,mindistance)
-plot.show()
-
+#plot.show()
+plt.savefig('Receptor_visualization01.png')
 #plot2=visualize_MoleculeHit(radius,plot,0.1,0.1)
 #plot2.show()
 
