@@ -43,6 +43,15 @@
  *
  *
  *
+ * 29 July 2021.
+ * To be changed:
+ *  + Read initial x, y, z and orientation angles from command line.
+ *    No: Cell always at origin. Source position specified in command line.
+ *     Tell source spherical angles.
+ *  + Expect displacement x, y, z relative to cell coo sys on stdin.
+ *  + Write spherical coordinates (relative to cell coo system) to stdout.
+ *  + Write out "Source found" if source is found.
+ *
  */
 
 
@@ -81,6 +90,12 @@
  * double gsl_ran_gaussian_ziggurat(const gsl_rng *r, double sigma)
  */
 
+typedef struct {
+double x, y, z;
+double release_time;
+} particle_strct;
+
+
 
 /* Distance the cue particle has to diffusive before considered "lost". */
 #ifndef CUTOFF
@@ -88,6 +103,12 @@
 #endif
 double param_cutoff=CUTOFF;
 double param_cutoff_squared=CUTOFF*CUTOFF;
+
+#ifndef INITIAL_SOURCEPOS
+/* Terminating 0. is a time stamp without meaning. */
+#define INITIAL_SOURCEPOS {0., 0., 2., 0.}
+#endif
+particle_strct source=INITIAL_SOURCEPOS;
 
 /* Radius of the cell sphere. */ 
 #ifndef SPHERE_RADIUS
@@ -149,33 +170,26 @@ void postamble(void);
  * There are at most N signalling particles.
  */
 
-typedef struct {
-double x, y, z;
-double release_time;
-} particle_strct;
-
-
 int main(int argc, char *argv[])
 {
 int ch;
 double tm=0.;
 particle_strct *particle;
-particle_strct cell;
 FILE *fin, *fout;
 int active_particles, total_particles;
-double origin_distance2, sphere_distance2;
+double source_distance2, sphere_distance2;
 
 
 #define STRCPY(dst,src) strncpy(dst,src,sizeof(dst)-1); dst[sizeof(dst)-1]=(char)0
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:r:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:r:s:S:t:w:")) != -1) {
   switch (ch) {
-    case'c':
+    case 'c':
       param_cutoff=strtod(optarg, NULL);
       break;
-    case'd':
+    case 'd':
       param_diffusion=strtod(optarg, NULL);
       break;
     case 'i':
@@ -189,6 +203,22 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:r:S:t:w:")) != -1) {
       break;
     case 'r':
       param_release_rate=strtod(optarg, NULL);
+      break;
+    case 's':
+      {
+      char buffer[2048];
+      char *p;
+
+      strncpy(buffer, optarg, sizeof(buffer)-1);
+      buffer[sizeof(buffer)-1]=(char)0;
+
+      for (p=buffer; *p; p++) if ((*p==',') || (*p==';')) *p=' ';
+
+      if (sscanf(buffer, "%lg %lg %lg", &(source.x), &(source.y), &(source.z))!=3) {
+	fprintf(stderr, "Error: sscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	exit(EXIT_FAILURE);
+      }
+      }
       break;
     case 'S':
       param_seed=strtoul(optarg, NULL, 10);
@@ -269,6 +299,8 @@ PRINT_PARAM(param_seed, "-S", "%lu");
 PRINT_PARAM(param_input, "-i", "%s");
 PRINT_PARAM(param_output, "-o", "%s");
 
+printf("#Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
+
 if (param_output[0]) {
   if ((fout=fopen(param_output, "wt"))==NULL) {
     fprintf(stderr, "Cannot open file %s for writing. %i::%s\n", param_output, errno, strerror(errno));
@@ -294,16 +326,20 @@ MALLOC(particle, param_max_particles);
 active_particles=0;
 total_particles=0;
 
-#define CREATE_NEW_PARTICLE particle[active_particles].x=particle[active_particles].y=particle[active_particles].z=0.; particle[active_particles].release_time=tm; active_particles++; total_particles++;
+#define CREATE_NEW_PARTICLE { particle[active_particles].x=source.x; particle[active_particles].y=source.y; particle[active_particles].z=source.z; \
+      particle[active_particles].release_time=tm; active_particles++; total_particles++;\
+      printf("# Info: New particle created at time %g. Active: %i, Max: %i, Total: %i\n", tm, active_particles, param_max_particles, total_particles);}
 
 
 CREATE_NEW_PARTICLE;
 
+/*
 if (fscanf(fin, "%lg %lg %lg", &(cell.x), &(cell.y), &(cell.z))!=3) {
   fprintf(stderr, "Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
   exit(EXIT_FAILURE);
 }
 printf("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
+*/
 
 for (tm=0.; ;tm+=param_delta_t) {
   int i;
@@ -314,21 +350,24 @@ for (tm=0.; ;tm+=param_delta_t) {
       fprintf(stderr, "Warning: particle creation suppressed because active_particles=%i >= param_max_particles=%i.\n", active_particles, param_max_particles);
     } else {
       CREATE_NEW_PARTICLE;
-      printf("# Info: New particle created at time %g. Active: %i, Max: %i, Total: %i\n", tm, active_particles, param_max_particles, total_particles);
     }
   }
 
+  #warning "Using i here as some sort of global object is poor style. The variable i is really one that is too frequently used..."
   for (i=0; i<active_particles; i++) {
     particle[i].x+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
     particle[i].y+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
     particle[i].z+=gsl_ran_gaussian_ziggurat(rng, param_sigma);
-    origin_distance2 = particle[i].x*particle[i].x + particle[i].y*particle[i].y + particle[i].z*particle[i].z;
+    source_distance2 = 
+        (particle[i].x-source.x)*(particle[i].x-source.x) 
+      + (particle[i].y-source.y)*(particle[i].y-source.y) 
+      + (particle[i].z-source.z)*(particle[i].z-source.z);
 
 
-    if (origin_distance2>param_cutoff_squared) {
+    if (source_distance2>param_cutoff_squared) {
       printf("# Info: Loss. Particle %i of %i actives (max %i total generated %i) got lost to position %g %g %g at time %g at distance %g>%g having started at time %g.\n", 
 	i, active_particles, param_max_particles, total_particles,
-        particle[i].x, particle[i].y, particle[i].z, tm, sqrt(origin_distance2), param_cutoff, particle[i].release_time);
+        particle[i].x, particle[i].y, particle[i].z, tm, sqrt(source_distance2), param_cutoff, particle[i].release_time);
       active_particles--;
       particle[i]=particle[active_particles];
       /* This is a brutal way of dealing with active_particles-1, which has just been copied into i, to remove i: */
@@ -336,19 +375,54 @@ for (tm=0.; ;tm+=param_delta_t) {
       continue;
     }
 
-    sphere_distance2=(particle[i].x-cell.x)*(particle[i].x-cell.x) + (particle[i].y-cell.y)*(particle[i].y-cell.y) + (particle[i].z-cell.z)*(particle[i].z-cell.z);
+    sphere_distance2=particle[i].x*particle[i].x + particle[i].y*particle[i].y + particle[i].z*particle[i].z;
     if (sphere_distance2<param_sphere_radius_squared) {
       printf("# Info: Arrival. Particle %i of %i actives (max %i total generated %i) arrived at the cell at position %g %g %g at time %g at distance %g<%g having started at time %g.\n", 
         i, active_particles, param_max_particles, total_particles,
         particle[i].x, particle[i].y, particle[i].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[i].release_time);
       if (tm>param_warmup_time) {
-        fprintf(fout, "%g %g %g %g\n", particle[i].x, particle[i].y, particle[i].z, tm);
+        particle_strct delta;
+	double theta, phi;
+
+        //fprintf(fout, "%g %g %g %g\n", particle[i].x, particle[i].y, particle[i].z, tm);
+	// Coordinates are relative to cell, as the cell is at the origin
+	
+	if (particle[i].z!=0.) {
+	  if ((theta=atan(sqrt(particle[i].x*particle[i].x + particle[i].y*particle[i].y)/particle[i].z))<0.) theta+=M_PI;
+	} else theta=M_PI/2.;
+	phi=atan2(particle[i].y,particle[i].x); /* phi=0 for y=0 */
+	
+	fprintf(fout, "%g %g %g\n", theta, phi, tm);
+
 	/* It looks like when I terminate the fscanf string by a \n then it tries to gobble as much whitespace as possible, so it waits until no-whitespace? */
-        if (fscanf(fin, "%lg %lg %lg", &(cell.x), &(cell.y), &(cell.z))!=3) {
+        if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
 	  fprintf(stderr, "Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	  exit(EXIT_FAILURE);
 	}
-        printf("# Info: New cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
+        /* Update the position of all particles and the source.
+	 * One update is superfluous, as particle[i] will be purged
+	 * anyway. */
+	{ int j;
+	for (j=0; j<active_particles; j++) {
+	  particle[j].x-=delta.x;
+	  particle[j].y-=delta.y;
+	  particle[j].z-=delta.z;
+	}
+	}
+	source.x-=delta.x;
+	source.y-=delta.y;
+	source.z-=delta.z;
+
+        printf("# Info: New source position %g %g %g\n", (source.x), (source.y), (source.z));
+	/* The source is found if it resides within the cell. */
+        source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
+	if (source_distance2<param_sphere_radius_squared) {
+	  fprintf(fout, "HEUREKA!\n");
+	  printf("# Info: HEUREKA!\n");
+	  printf("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
+	  printf("# Info: Expecting SIGHUP.\n");
+	}
+
       }
       active_particles--;
       particle[i]=particle[active_particles];

@@ -59,7 +59,9 @@ def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistan
         return index_recept
     else: return -1
 
-"""def visualize_MoleculeHit(radius,plt,molecule_theta,molecule_phi):
+""" still needs work 
+
+def visualize_MoleculeHit(radius,plt,molecule_theta,molecule_phi):
     fig, ax = plt.subplots()
     ax.scatter(radius*np.cos(molecule_phi)*np.sin(molecule_theta),radius*np.sin(molecule_phi)*np.sin(molecule_theta),radius*np.cos(molecule_theta))
     return plt
@@ -82,4 +84,3 @@ plt.savefig('Receptor_visualization01.png')
 ind=activation_Receptors(0.1,0.1,receptor_sphcoords,radius,mindistance)
 print(ind)
 
-#Visualize receptors and transparent plot
