@@ -12,7 +12,7 @@
 /* This code generates N trajectories of Brownian particles.
  * They eminate from a source at the origin and proceeed until
  * their distances is greater than cutoff or until they hit the
- * surface of a sphere (center on x-axis at distance d radius r).
+ * surface of a sphere (center on z-axis at distance d radius r).
  *
  * The output is 
  * time coordinate

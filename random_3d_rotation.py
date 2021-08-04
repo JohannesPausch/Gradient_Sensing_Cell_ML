@@ -6,7 +6,7 @@ import numpy as np
 # numpy array of phi and theta can be used but must have the same shape
 # The used distribution on the space of rotations is the Haar measure, i.e. it is uniform on SO(3)
 # if the seed can be specified using use_seed. If not specfied, seeds will change automatically
-def random_3d_rotation(theta,phi,use_seed=None):   
+def random_3d_rotation(theta,phi, use_seed=None):   
     try:
         np.random.seed(seed=use_seed)
         y=np.matmul(special_ortho_group.rvs(3),np.array([np.cos(phi)*np.sin(theta),np.sin(phi)*np.sin(theta),np.cos(theta)]))#special_ortho_group.rvs(3)

@@ -8,15 +8,15 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
 
-def init_Receptors(receptornum, radius):
+def init_Receptors(receptornum, radius, seed=0):
 # Distribution of receptors:
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
-    x,y,z = random_on_sphere_points(radius,receptornum)
-    theta,phi= sphericaltransf(x,y,z) #same orientation as the phi and theta from the molecules?
-    receptor_sphcoords= np.concatenate(([theta],[phi])).T
-    receptor_cartcoords= np.concatenate(([x],[y],[z])).T
-    activation_receptors=np.zeros((receptornum))
+    x,y,z = random_on_sphere_points(radius,receptornum, seed=0)
+    theta,phi = cart2spherical_receptors(x,y,z) 
+    receptor_sphcoords = np.concatenate(([theta],[phi])).T
+    receptor_cartcoords = np.concatenate(([x],[y],[z])).T
+    activation_receptors = np.zeros((receptornum))
     return receptor_sphcoords,receptor_cartcoords, activation_receptors
 
 def visualize_Receptors(receptor_cartcoords,radius, mindistance):  
@@ -66,21 +66,5 @@ def visualize_MoleculeHit(radius,plt,molecule_theta,molecule_phi):
     ax.scatter(radius*np.cos(molecule_phi)*np.sin(molecule_theta),radius*np.sin(molecule_phi)*np.sin(molecule_theta),radius*np.cos(molecule_theta))
     return plt
 """
-########################
-#Try it out
-
-
-radius = 1
-receptornum = 10
-mindistance = 0.05
-
-receptor_sphcoords,receptor_cartcoords, activation_receptors = init_Receptors(receptornum,radius)
-plot = visualize_Receptors(receptor_cartcoords,radius,mindistance)
-#plot.show()
-plt.savefig('Receptor_visualization01.png')
-#plot2=visualize_MoleculeHit(radius,plot,0.1,0.1)
-#plot2.show()
-
-ind=activation_Receptors(0.1,0.1,receptor_sphcoords,radius,mindistance)
-print(ind)
+#######################
 

@@ -3,12 +3,14 @@ import math
 #This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 #Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
 
-def random_on_sphere_points(r,num):
+def random_on_sphere_points(r,num,seed=0):
     x = []
     y = []
     z = []
     for i in range(0,num):
+        random.seed(seed+i)
         zz =  random.uniform(-r,r)
+        random.seed(seed+i)
         phi = random.uniform(0,2*math.pi)
         xx = math.sqrt(r**2 - zz**2)*math.cos(phi)
         yy = math.sqrt(r**2 - zz**2)*math.sin(phi)
@@ -16,7 +18,6 @@ def random_on_sphere_points(r,num):
         y.append(yy)
         z.append(zz)
     return x,y,z
-
 def regular_on_sphere_points(r,num):
     x = []
     y = []
