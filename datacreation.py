@@ -2,10 +2,9 @@ import numpy as np
 from ReceptorMap import *
 from ML_Brownian_Interface import *
 import random_3d_rotation 
-import matlab.engine
 
 ############## Parameters for receptor map ###################
-def learn(
+def datacreate(
 receptornum = 10,
 recepsurface_ratio = 100, 
 particlenum = 20,
@@ -30,7 +29,7 @@ receptor_seed = 1):
 
 
 ### action #####
-# need to link matlab to python, not sure yet how
+# regular points - talia
 
 
 ########### LOOPs for data #################
@@ -43,11 +42,8 @@ receptor_seed = 1):
         #function to relate source coordinates to action direction -> make Y vector
         for r in radius_sphere:
             mindistance = radius_sphere/recepsurface_ratio
-            activation_array = np.zeros(receptornum)
             for distance in distance_from_source:
-                activation_array = np.zeros(receptornum)
                 for ra in rate:
-                    activation_array = np.zeros(receptornum)
                     for dif in diffusion_constants:
                         activation_array = np.zeros(receptornum)
                         for p in range(0,particlenum):
@@ -61,11 +57,7 @@ receptor_seed = 1):
                             received = update_BrownianParticle(brownian_pipe)# do we need this if it doesn't move?
                         #how to we organize the activation arrays?
                         #just a large matrix, all related to the same Y?
-                        activation_matrix = np.concatenate([activation_matrix],[activation_array]).T
-                    activation_matrix = np.concatenate([activation_matrix],[activation_array]).T
-                activation_matrix = np.concatenate([activation_matrix],[activation_array]).T
-            activation_matrix = np.concatenate([activation_matrix],[activation_array]).T
-        activation_matrix = np.concatenate([activation_matrix],[activation_array]).T
+                        activation_matrix = np.concatenate(([activation_matrix],[activation_array])).T
     X[s,:,:] = activation_matrix
     Y[s,:] = [source_theta_direction, source_phi_direction] #from action function
     return X, Y

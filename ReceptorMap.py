@@ -8,11 +8,11 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
 
-def init_Receptors(receptornum, radius, distribution, seed=0):
+def init_Receptors(radius, receptornum, seed=0):
 # Distribution of receptors:
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
-    x,y,z = random_on_sphere_points(radius,receptornum, seed=0)
+    x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
     theta,phi = cart2spherical_receptors(x,y,z) 
     receptor_sphcoords = np.concatenate(([theta],[phi])).T
     receptor_cartcoords = np.concatenate(([x],[y],[z])).T
@@ -34,17 +34,18 @@ def visualize_Receptors(receptor_cartcoords,radius, mindistance):
     x = radius*np.cos(u)*np.sin(v)
     y = radius*np.sin(u)*np.sin(v)
     z = radius*np.cos(v)
-    ax.set_xlim([-radius,radius])
-    ax.set_ylim([-radius,radius])
-    ax.set_zlim([-radius,radius])
+    
     ax.plot_surface(
-    x, y, z,  rstride=1, cstride=1, color='c', alpha=1, linewidth=0) #Plot cell surface
-    for i in range(0,10):
+    x, y, z,  rstride=1, cstride=1, color='c', alpha=0.2, linewidth=0) #Plot cell surface
+    #ax.scatter(receptor_cartcoords[:,0],receptor_cartcoords[:,1],receptor_cartcoords[:,2])
+    
+    for i in range(0,len(receptor_cartcoords)):
         normal=(receptor_cartcoords[i,0],receptor_cartcoords[i,1],receptor_cartcoords[i,2])
         p = Circle((0,0), mindistance, facecolor = 'r', alpha = .7, fill=True) #mindistance is small so arclength ~= radius of circle patch
         ax.add_patch(p)
         pathpatch_2d_to_3d(p, z = 0, normal = normal)
         pathpatch_translate(p, normal)
+    
     return plt
 
 def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistance):
@@ -58,13 +59,8 @@ def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistan
         index_recept=np.where(min(distance))
         return index_recept
     else: return -1
-
-""" still needs work 
-
-def visualize_MoleculeHit(radius,plt,molecule_theta,molecule_phi):
-    fig, ax = plt.subplots()
-    ax.scatter(radius*np.cos(molecule_phi)*np.sin(molecule_theta),radius*np.sin(molecule_phi)*np.sin(molecule_theta),radius*np.cos(molecule_theta))
-    return plt
-"""
 #######################
 
+#receptor_sphcoords,receptor_cartcoords, activation_receptors=init_Receptors(1,20)
+#plt=visualize_Receptors(receptor_cartcoords,1,0.05)
+#plt.show()

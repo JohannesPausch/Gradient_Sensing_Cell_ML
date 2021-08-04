@@ -1,10 +1,10 @@
 from ReceptorNeuralNetwork import *
-from ReceptorNeuralNetwork import *
+from datacreation import *
 import numpy as np
 
 
-    X, Y = learn()
-    
+    X, Y = datacreate()
+
     training_x, training_y, predict_x, predict_y = separate_train_set(X, Y)
     mlp = train(training_x, training_y, layers_tuple = (6,4), max_iterations=1000)
 
