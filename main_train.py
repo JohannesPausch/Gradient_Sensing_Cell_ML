@@ -1,4 +1,5 @@
 from ReceptorNeuralNetwork import *
+from ReceptorNeuralNetwork import *
 import numpy as np
 
 X = np.array() #this is a  no. samples x no. receptors array
