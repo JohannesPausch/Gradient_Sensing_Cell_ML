@@ -69,3 +69,5 @@ receptor_seed = 1):
     X[s,:,:] = activation_matrix
     Y[s,:] = [source_theta_direction, source_phi_direction] #from action function
     return X, Y
+
+

@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
 
-def init_Receptors(receptornum, radius, seed=0):
+def init_Receptors(receptornum, radius, distribution, seed=0):
 # Distribution of receptors:
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
