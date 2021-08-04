@@ -63,13 +63,5 @@ def load_neural_network(filename):
           
          
 
-if __name__ == '__main__':
 
-    X = 
-    Y = 
-    training_x, training_y, predict_x, predict_y = separate_train_set(X, Y)
-    mlp = train(training_x, training_y, layers_tuple = (6,4), max_iterations=1000)
 
-    save_neural_network(mlp, "MLPCLASSIFIER.sav")
-    restored_mlp = load_neural_network("MLPCLASSIFIER.sav")
-    test(restored_mlp, predict_x, predict_y)
