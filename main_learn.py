@@ -39,6 +39,7 @@ for s in range(0,sourcenum):
     sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s],source_phi[s])
     #function to relate source coordinates to action direction -> make Y vector
     for r in radius_sphere:
+        mindistance = radius_sphere/recepsurface_ratio
         for distance in distance_from_source:
             for ra in rate:
                 for dif in diffusion_constants:
