@@ -16,6 +16,7 @@ radiusnum = 10
 maxradius = 1
 ratenum = 10
 maxrate = 1
+receptor_seed=1
 
 source_theta = np.array(sourcenum)
 source_phi = np.array(sourcenum)
@@ -31,7 +32,6 @@ radius_sphere = np.linspace(0.1,maxradius,radiusnum)
 
 
 ########### LOOPs for data #################
-receptor_seed=1
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(receptornum,1,receptor_seed)
 
 for s in range(0,sourcenum):
