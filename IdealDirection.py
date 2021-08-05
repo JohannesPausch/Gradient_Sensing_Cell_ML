@@ -51,7 +51,7 @@ def eq_spaced_directions(radius, number):
     
 
 
-def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
+def ideal_direction(source_theta, source_phi, direction_sphcoords, radius,step):
     
     receptornum=len(direction_sphcoords)
     theta_source = np.full((receptornum,1), source_theta)
@@ -60,7 +60,9 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
 
     idx = np.where(distance == np.amin(distance))
     best_direction = direction_sphcoords[idx[0],:]
-    sph_vector_move = np.array([radius, best_direction]).T #this is the vector from the origin that the source should move in in r, theta, phi. 
+
+    sph_vector_move = [step]
+    sph_vector_move.append(best_direction) #this is the vector from the origin that the source should move in in r, theta, phi. 
     
     return sph_vector_move
     
@@ -68,11 +70,13 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
 if __name__ == '__main__':
     
     
-    source_theta = 
-    source_phi = 
+    source_theta = 0.89
+    source_phi = 1.5
+    radius = 1
+    step = 0.1
     direction_sphcoords, _ = regular_directions(1, 8)
 
-    direction_cell_moves = ideal_direction(source_theta, source_phi, direction_sphcoords, 1)
-    
+    direction_cell_moves = ideal_direction(source_theta, source_phi, direction_sphcoords, radius, step)
+    print(direction_cell_moves)
     
     
