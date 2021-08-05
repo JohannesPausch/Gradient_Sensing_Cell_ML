@@ -53,10 +53,10 @@ def eq_spaced_directions(radius, number):
 
 def ideal_direction(source_theta, source_phi, direction_sphcoords, radius,step):
     
-    receptornum=len(direction_sphcoords)
-    theta_source = np.full((receptornum,1), source_theta)
-    phi_source = np.full((receptornum,1), source_phi)
-    distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(receptornum,1), direction_sphcoords[:,1].reshape(receptornum,1))
+    directionnum=len(direction_sphcoords)
+    theta_source = np.full((directionnum,1), source_theta)
+    phi_source = np.full((directionnum,1), source_phi)
+    distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1))
 
     idx = np.where(distance == np.amin(distance))
     best_direction = direction_sphcoords[idx[0],:]
