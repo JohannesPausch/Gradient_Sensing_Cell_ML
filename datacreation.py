@@ -36,6 +36,7 @@ receptor_seed = 1):
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(receptornum,1,receptor_seed)
     activation_matrix = np.zeros(receptornum)
     X = np.zeros((sourcenum,receptornum,len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)*particlenum))
+   
     for s in range(0,sourcenum):
         source_theta[s],source_phi[s] = random_3d_rotation(cart2spherical_point(0,0,1),s)
         sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s],source_phi[s])
