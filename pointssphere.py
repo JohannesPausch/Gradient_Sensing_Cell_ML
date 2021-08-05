@@ -18,7 +18,7 @@ def random_on_sphere_points(r,num,seed=0):
         y.append(yy)
         z.append(zz)
     return x,y,z
-def regular_on_sphere_points(r,num):
+def regular_on_sphere_points(r,num): #for directions
     x = []
     y = []
     z = []
