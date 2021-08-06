@@ -53,18 +53,17 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     Y[idx[0]] = 1
   
     return Y
-    
 
-if __name__ == '__main__':
-    
-    
-    source_theta = 0.89
-    source_phi = 1.5
-    radius = 1
-    step = 0.1
-    direction_sphcoords, _ = regular_directions(1, 8)
+def pick_direction(m = 0,num = 20):
+    if m == 0:
+        return regular_directions(num)
+    elif m == 1:
+        return fibionaaci_directions(num)
+    elif m == 2:
+        return random_directions(num)
+    else:
+        raise ValueError("Method is not valid. Pick method to create directions of cell, m = 0 regular directions, m = 1 fibonacci , m = 2 random directions")
 
-    direction_cell_moves = ideal_direction(source_theta, source_phi, direction_sphcoords, radius)
-    print(direction_cell_moves)
+        
     
     

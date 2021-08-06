@@ -91,19 +91,22 @@ receptor_seed = 1):
                         brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,r,distance,ra,dif,s ) 
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters:training,cutoff,events,iterations? 
-                        count = 0 #count how many particles in one activation array measure
-                        while(count < particlenum):
+                        count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
+                        while(count <= particlenum):
                             theta_mol = received[0]
                             phi_mol = received[1]
                             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius_sphere[r],mindistance)
                             if ind == -1: pass
                             else: activation_array[ind] += 1
+                            
+                            if activation_matrix==np.zeros(receptornum): activation_matrix = activation_array
+                            else: 
+                                activation_matrix = np.concatenate(([activation_matrix],[activation_array]))
+                            Y = np.concatenate(([Y],[Y])).T
+
                             received = update_BrownianParticle(brownian_pipe)
                             count+=1
-                        if activation_matrix==np.zeros(receptornum): activation_matrix = activation_array
-                        else: 
-                            activation_matrix = np.concatenate(([activation_matrix],[activation_array]))
-                            Y = np.concatenate(([Y],[Y])).T
+
         X[s*len(activation_matrix),:] = activation_matrix #rows are each activation array
         Y[:,s*len(activation_matrix)] = Y # columns are source direction, corresponding to each activation array row
     return X, Y
