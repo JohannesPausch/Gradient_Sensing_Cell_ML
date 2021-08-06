@@ -1,10 +1,14 @@
 from ReceptorNeuralNetwork import *
 from datacreation import *
+from IdealDirection import *
 import numpy as np
 
 ######## data ##################
-  
-X, Y = datacreate()
+#direction picking for cell: 
+direction_sphcoords = pick_direction(0, 20)
+
+#create data
+X, Y = datacreate(direction_sphcoords)
 
 
 ###### train and test ##########
