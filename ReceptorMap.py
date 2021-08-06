@@ -56,7 +56,7 @@ def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistan
     phi_molecule = np.full((receptornum,1),mol_phi)
     distance = haversine(radius,theta_molecule,phi_molecule,receptor_sphcoords[:,0].reshape(receptornum,1),receptor_sphcoords[:,1].reshape(receptornum,1))
     if min(distance)<= mindistance:
-        index_recept=np.where(min(distance))
+        index_recept = np.where(distance == np.amin(distance))
         return index_recept
     else: return -1
 #######################
