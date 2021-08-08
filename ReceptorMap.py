@@ -1,4 +1,3 @@
-from numpy.core.fromnumeric import size
 from pointssphere import *
 import matplotlib.pyplot as plt
 from haversine import * 
