@@ -90,7 +90,7 @@ receptor_seed = 1):
                             #needs source position and radius to be included in parameters
                         brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,r,distance,ra,dif,s ) 
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
-                            #do we fix parameters:training,cutoff,events,iterations? 
+                            #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
                         while(count <= particlenum):
                             theta_mol = received[0]
