@@ -1,5 +1,5 @@
 from ReceptorNeuralNetwork import *
-from datacreation import *
+from DataCreation import *
 from IdealDirection import *
 import numpy as np
 
