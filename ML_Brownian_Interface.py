@@ -39,6 +39,9 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,use_seed=None,c
         print(received)
     return brownian_pipe,received
 
+def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
+    return np.random.rand(5)
+
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     if step_theta != None and step_phi != None:
         brownian_pipe.stdin.write(bytes(str(np.cos(step_phi)*np.sin(step_theta))+separator+str(np.sin(step_phi)*np.sin(step_theta))+separator+str(np.cos(step_theta))+'\n', 'UTF-8'))
@@ -56,6 +59,9 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
         print('not a float')
         print(received)
     return received
+
+def update_BrownianParticle_test(brownian_pipe,step_theta=None,step_phi=None):
+    return np.random.rand(5)
 
 def stop_BrownianParticle(brownian_pipe):
     brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
