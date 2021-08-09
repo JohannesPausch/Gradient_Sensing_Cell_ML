@@ -42,7 +42,7 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,radius=1,use_se
     return brownian_pipe,received
 
 def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
-    return np.random.rand(5)
+    return 1,np.random.rand(5)
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     if step_theta != None and step_phi != None:
