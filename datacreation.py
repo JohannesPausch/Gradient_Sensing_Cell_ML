@@ -88,7 +88,7 @@ receptor_seed = 1):
                     for dif in diffusion_constants:
                         activation_array = np.zeros(receptornum)
                             #needs source position and radius to be included in parameters?
-                        brownian_pipe,received = init_BrownianParticle_test(distance,ra,dif,s ) 
+                        brownian_pipe,received = init_BrownianParticle_test(r,distance,ra,dif,s ) 
                         Y = ideal_direction(received[3],received[4],direction_sphcoords, 1)
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
