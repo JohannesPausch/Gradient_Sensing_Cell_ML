@@ -7,7 +7,7 @@ import random_3d_rotation
 def datacreate(
 direction_sphcoords,
 receptornum = 10,
-recepsurface_ratio = 100, 
+recepsurface_ratio = 100,
 particlenum = 20,
 sourcenum = 10,
 random_yn  = 0,
@@ -76,10 +76,10 @@ receptor_seed = 1):
    
     for s in range(0,sourcenum-1):
         #pick source??
-        source_theta[s],source_phi[s] = random_3d_rotation(cart2spherical_point(0,0,1),s)
-        sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s],source_phi[s])
+        #source_theta[s],source_phi[s] = random_3d_rotation(cart2spherical_point(0,0,1),s)
+        #sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s],source_phi[s])
         #function to relate source coordinates to action direction -> make Y vector
-        Y = ideal_direction(source_theta[s],source_phi[s],direction_sphcoords, 1)
+        #Y = ideal_direction(source_theta[s],source_phi[s],direction_sphcoords, 1)
 
         for r in radius_sphere:
             mindistance = radius_sphere/recepsurface_ratio
@@ -87,8 +87,9 @@ receptor_seed = 1):
                 for ra in rate:
                     for dif in diffusion_constants:
                         activation_array = np.zeros(receptornum)
-                            #needs source position and radius to be included in parameters
-                        brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,r,distance,ra,dif,s ) 
+                            #needs source position and radius to be included in parameters?
+                        brownian_pipe,received = init_BrownianParticle_test(distance,ra,dif,s ) 
+                        Y = ideal_direction(received[3],received[4],direction_sphcoords, 1)
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
@@ -104,7 +105,7 @@ receptor_seed = 1):
                                 activation_matrix = np.concatenate(([activation_matrix],[activation_array]))
                             Y = np.concatenate(([Y],[Y])).T
 
-                            received = update_BrownianParticle(brownian_pipe)
+                            received = update_BrownianParticle_test(brownian_pipe)
                             count+=1
 
         X[s*len(activation_matrix),:] = activation_matrix #rows are each activation array
