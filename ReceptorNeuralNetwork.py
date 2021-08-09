@@ -1,8 +1,6 @@
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
-from sklearn.metrics import confusion_matrix
-
 import pickle
 
 def fit_mlp(X, Y, layers_tuple, max_iterations):
@@ -23,12 +21,10 @@ def predict(mlp: MLPClassifier, X):
     
     return y
 
-def accuracy(confusion_matrix):
-   #function to calculate the accuracy of our NN
-   diagonal_sum = confusion_matrix.trace()
-   sum_of_all_elements = confusion_matrix.sum()
-   
-   return diagonal_sum / sum_of_all_elements
+def accuracy(true_y, predicted_y):
+    true_y = list(true_y)
+    predicted_y = list(predicted_y)
+    return sum(x == y for x, y in zip(true_y, predicted_y))/len(true_y)
 
 def separate_train_set(X,Y):
     #if data is ordered use this to randomise it so every source position is trained on, then use first half of data to train the network
@@ -50,18 +46,47 @@ def train(training_x, training_y, layers_tuple, max_iterations):
 
 def test(mlp, predict_x, predict_y):
     pred = predict(mlp, predict_x)
-    cm = confusion_matrix(pred, predict_y)
-    print("Accuracy of MLPClassifier : ", accuracy(cm))
+    print("Accuracy of MLPClassifier : ", accuracy(predict_y, pred))
+    print("Probabilities of each direction : ", direction_probabilities(mlp, predict_x))
     
-def save_neural_network(mlp, filename):
+def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None):
+    filename = 'MLPClassifier'
+    if distance != None:
+        filename += ' -d '+str(distance)
+    if rate != None:
+        filename += ' -r '+str(rate)
+    if seed != None:
+        filename += ' -S '+str(seed)
+    if cutoff != None:
+        filename += ' -c '+str(cutoff)
+    if events != None:
+        filename += ' -E '+str(events)
+    if iterations != None:
+        filename += ' -N '+str(iterations)
+    if diffusion != None:
+        filename += ' -s '+str(diffusion)
     pickle.dump(mlp, open(filename, 'wb'))
+    return filename
     
     
 def load_neural_network(filename):
     restored_mlp = pickle.load(open(filename, 'rb'))
     return restored_mlp
           
-         
+def direction_probabilities(mlp, X):
+    return mlp.predict_proba(X)
+           
 
+if __name__ == '__main__':
+     # new main for paula to use with dynamic filename, corrected accuracy function and proba of each class function
 
+    X =
+    Y = 
+    training_x, training_y, predict_x, predict_y = separate_train_set(X, Y)
+    mlp = train(training_x, training_y, layers_tuple = (6,4), max_iterations=1000)
 
+    filename = save_neural_network(mlp, distance=10,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None)
+    restored_mlp = load_neural_network(filename)
+    print(filename)
+    
+    test(restored_mlp, predict_x, predict_y)
