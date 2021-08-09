@@ -96,7 +96,7 @@ receptor_seed = 1):
                         while(count <= particlenum):
                             theta_mol = received[0]
                             phi_mol = received[1]
-                            ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius_sphere[r],mindistance)
+                            ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
                             if ind == -1: pass
                             else: activation_array[ind] += 1
                             
