@@ -1,18 +1,25 @@
 # communication between python ML and c-code BrownianParticle.c 
 
+from os import error
 from subprocess import Popen, PIPE
 from scipy.stats import special_ortho_group
 import numpy as np
 separator = ' '
 
-def init_BrownianParticle(distance=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
+def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,iterations=None):
     command = './BrownianParticle_fifo.o'
     if use_seed != None:
         command += ' -S '+str(use_seed)
         np.random.seed(seed=use_seed)
-    if distance != None:
-        y=np.matmul(special_ortho_group.rvs(3),np.array([distance,0,0]))
-        command += ' -s '+str(y[0])+separator+str(y[1])+separator+str(y[2])
+    if xpos != None:
+        command += ' -s '+str(xpos)+','+str(ypos)+','+str(zpos)
+    else:
+        if cutoff != None:
+            y=np.matmul(special_ortho_group.rvs(3),np.array([radius+(cutoff-radius)*np.random.rand(1),0,0]))
+            command += ' -s '+str(y[0])+','+str(y[1])+','+str(y[2])
+        else:
+            y=np.matmul(special_ortho_group.rvs(3),np.array([radius+radius*np.random.rand(1),0,0]))
+            command += ' -s '+str(y[0])+','+str(y[1])+','+str(y[2])
     if rate != None:
         command += ' -r '+str(rate)
     if cutoff != None:
@@ -23,8 +30,6 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,radius=1,use_se
         command += ' -N '+str(iterations)
     if diffusion != None:
         command += ' -d '+str(diffusion)
-    if training != None:
-        command += ' -t y '
     if radius != 1:
         command += ' -rad '+str(radius)
     print('used command: '+command)
@@ -32,17 +37,20 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,radius=1,use_se
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     while received[0] == '#':
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-        print(received)
     try: 
         received = [float(x) for x in received]
-        print(received)
     except:
-        print('not a float')
+        print('Error: not a float')
         print(received)
     return brownian_pipe,received
 
 def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
-    return 1,np.random.rand(5)
+    return 1,np.random.rand(3)
+
+def stop_BrownianParticle(brownian_pipe):
+    brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
+    brownian_pipe.stdin.flush()
+    return
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     if step_theta != None and step_phi != None:
@@ -51,21 +59,32 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
         brownian_pipe.stdin.write(bytes('0'+separator+'0'+separator+'0\n', 'UTF-8'))
     brownian_pipe.stdin.flush()
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-    if received[0]=='#' and received[1] == 'HEUREKA':
+    if received[0]=='HEUREKA':
+        stop_BrownianParticle(brownian_pipe)
         return 'SOURCE FOUND'
+    elif received[0] == 'Error:':
+        error_string = received[0]
+        for x in received:
+            error_string += x
+        print(error_string)
+        return np.array([0,0,0])
+    elif received[3] == 'source':
+        source_x,source_y,source_z = [float(received[5]),float(received[6]),float(received[7])]
+        radius = np.sqrt(source_x*source_x+source_y*source_y+source_z*source_z)
+        source_theta,source_phi=np.arccos(source_z/radius), np.mod(np.arctan2(source_y,source_x),2*np.pi)
     while received[0] == '#':
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     try: 
         received = [float(x) for x in received]
     except:
         print('not a float')
-        print(received)
-    return received
+        error_string = received[0]
+        for x in received:
+            error_string += x
+        print(error_string)
+    return received,[source_theta,source_phi]
 
 def update_BrownianParticle_test(brownian_pipe,step_theta=None,step_phi=None):
-    return np.random.rand(5)
+    return np.random.rand(3)
 
-def stop_BrownianParticle(brownian_pipe):
-    brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
-    brownian_pipe.stdin.flush()
-    return
+
