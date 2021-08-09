@@ -5,7 +5,7 @@ from scipy.stats import special_ortho_group
 import numpy as np
 separator = ' '
 
-def init_BrownianParticle(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
+def init_BrownianParticle(distance=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
     command = './BrownianParticle_fifo.o'
     if use_seed != None:
         command += ' -S '+str(use_seed)
@@ -25,6 +25,8 @@ def init_BrownianParticle(distance=None,rate=None,diffusion=None,use_seed=None,c
         command += ' -d '+str(diffusion)
     if training != None:
         command += ' -t y '
+    if radius != 1:
+        command += ' -rad '+str(radius)
     print('used command: '+command)
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
