@@ -82,7 +82,7 @@ receptor_seed = 1):
         #Y = ideal_direction(source_theta[s],source_phi[s],direction_sphcoords, 1)
 
         for r in radius_sphere:
-            mindistance = radius_sphere/recepsurface_ratio
+            mindistance = r/recepsurface_ratio
             for distance in distance_from_source:
                 for ra in rate:
                     for dif in diffusion_constants:
