@@ -42,7 +42,9 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
     except:
         print('Error: not a float')
         print(received)
-    return brownian_pipe,received
+    radius = np.sqrt(xpos*xpos+ypos*ypos+zpos*zpos)
+    source_theta,source_phi=np.arccos(zpos/radius), np.mod(np.arctan2(ypos,xpos),2*np.pi)
+    return brownian_pipe,received,[source_theta,source_phi]
 
 def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
     return 1,np.random.rand(3)
@@ -50,7 +52,8 @@ def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=N
 def stop_BrownianParticle(brownian_pipe):
     brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
     brownian_pipe.stdin.flush()
-    return
+    received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    return 'C-PRORGAM STOPPED'
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     if step_theta != None and step_phi != None:
