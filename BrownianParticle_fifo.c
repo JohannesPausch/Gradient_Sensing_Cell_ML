@@ -295,7 +295,7 @@ PRINT_PARAM(param_cutoff, "-c", "%g");
 PRINT_PARAM(param_cutoff_squared, "", "%g");
 PRINT_PARAM(param_sphere_radius, "-r", "%g");
 PRINT_PARAM(param_sphere_radius_squared, "", "%g");
-PRINT_PARAM(param_release_rate, "-ra", "%g");
+PRINT_PARAM(param_release_rate, "-R", "%g");
 PRINT_PARAM(param_warmup_time, "-w", "%g");
 PRINT_PARAM(param_max_particles, "-N", "%i");
 PRINT_PARAM(param_seed, "-S", "%lu");
