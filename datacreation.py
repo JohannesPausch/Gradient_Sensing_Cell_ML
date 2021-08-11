@@ -81,14 +81,14 @@ receptor_seed = 1):
         for r in radius_sphere:
             mindistance = r/recepsurface_ratio
             for distance in distance_from_source:
-                sourcex *=distance
-                sourcey *=distance
-                sourcez *=distance
+                sx =sourcex*distance
+                sy =sourcey*distance
+                sz =sourcez*distance
                 for ra in rate:
                     for dif in diffusion_constants:
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
-                        brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,rate=ra,radius=r,diffusion=dif, use_seed=s) 
+                        brownian_pipe,received = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
                         print(received[0])
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
