@@ -7,12 +7,12 @@ def cart2spherical_point(x,y,z):
     phi = math.atan2(y,x)
     return r,theta,phi
 
-def cart2spherical_receptors(x,y,z):
-    receptnum = len(x)
-    r = np.zeros((receptnum))
-    theta = np.zeros((receptnum))
-    phi = np.zeros((receptnum))
-    for i in range(0,receptnum):
+def cart2spherical_array(x,y,z):
+    length = len(x)
+    r = np.zeros((length))
+    theta = np.zeros((length))
+    phi = np.zeros((length))
+    for i in range(0,length):
         r[i], theta[i], phi[i] = cart2spherical_point(x[i],y[i],z[i]) 
     return theta,phi
 

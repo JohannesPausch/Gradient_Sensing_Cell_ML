@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 def random_directions(number):
     # Cart coords not necessary just theta and phi
     x,y,z = random_on_sphere_points(1, number-1) 
-    theta,phi= cart2spherical_receptors(x,y,z) 
+    theta,phi= cart2spherical_array(x,y,z) 
     direction_sphcoords= np.array([theta,phi]).T
 
     return direction_sphcoords
@@ -19,7 +19,7 @@ def random_directions(number):
 def regular_directions(number):
     # Cart coords not necessary just theta and phi
     x,y,z = regular_on_sphere_points(1, number-1)
-    theta,phi=  cart2spherical_receptors(x,y,z) 
+    theta,phi=  cart2spherical_array(x,y,z) 
     direction_sphcoords= np.array([theta,phi]).T
 
     return direction_sphcoords
@@ -48,7 +48,6 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1))
 
     idx = np.where(distance == np.amin(distance))
-    best_direction = direction_sphcoords[idx[0],:]
     Y = np.zeros(len(direction_sphcoords))
     Y[idx[0]] = 1
   

@@ -201,9 +201,11 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:r:s:S:t:w:")) != -1) {
     case 'o':
       STRCPY(param_output, optarg);
       break;
-    case 'r':
+    case 'ra':
       param_release_rate=strtod(optarg, NULL);
       break;
+    case 'r':
+      param_sphere_radius=strtod(optarg,NULL);
     case 's':
       {
       char buffer[2048];
@@ -290,9 +292,9 @@ PRINT_PARAM(param_diffusion, "-d", "%g");
 PRINT_PARAM(param_sigma, "", "%g");
 PRINT_PARAM(param_cutoff, "-c", "%g");
 PRINT_PARAM(param_cutoff_squared, "", "%g");
-PRINT_PARAM(param_sphere_radius, "", "%g");
+PRINT_PARAM(param_sphere_radius, "-r", "%g");
 PRINT_PARAM(param_sphere_radius_squared, "", "%g");
-PRINT_PARAM(param_release_rate, "-r", "%g");
+PRINT_PARAM(param_release_rate, "-ra", "%g");
 PRINT_PARAM(param_warmup_time, "-w", "%g");
 PRINT_PARAM(param_max_particles, "-N", "%i");
 PRINT_PARAM(param_seed, "-S", "%lu");

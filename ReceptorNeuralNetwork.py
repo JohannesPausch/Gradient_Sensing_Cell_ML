@@ -76,17 +76,4 @@ def load_neural_network(filename):
 def direction_probabilities(mlp, X):
     return mlp.predict_proba(X)
            
-
-if __name__ == '__main__':
-     # new main for paula to use with dynamic filename, corrected accuracy function and proba of each class function
-
-    X =
-    Y = 
-    training_x, training_y, predict_x, predict_y = separate_train_set(X, Y)
-    mlp = train(training_x, training_y, layers_tuple = (6,4), max_iterations=1000)
-
-    filename = save_neural_network(mlp, distance=10,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None)
-    restored_mlp = load_neural_network(filename)
-    print(filename)
     
-    test(restored_mlp, predict_x, predict_y)

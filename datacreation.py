@@ -1,8 +1,10 @@
+from math import dist
 from IdealDirection import *
 import numpy as np
 from ReceptorMap import *
 from ML_Brownian_Interface import *
-import random_3d_rotation 
+from random_3d_rotation import random_3d_rotation
+from sphericaltransf import *
 
 def datacreate(
 direction_sphcoords,
@@ -27,10 +29,6 @@ receptor_seed = 1):
 #the variables ...exact are a shortcut to skipping all the for loops and plugging in one value per variable
 #random_yn decides if we want to take a random uniform approach for the data (1) or if we want to do equally spaced values between 
 #chosen boundaries (0).
-
-    source_theta = np.array(sourcenum)
-    source_phi = np.array(sourcenum)
-    
     
     if diffusionexact== -1:
         if random_yn==0:
@@ -39,7 +37,7 @@ receptor_seed = 1):
             diffusion_constants = np.random.default_rng().uniform(0,1, diffusionnum)
         else: 
             raise ValueError("Pick if diffusion constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
-    else: diffusion_constants = diffusionexact
+    else: diffusion_constants = np.array([diffusionexact])
     if distanceexact== -1:
         if random_yn==0:
             distance_from_source = np.linspace(0,maxdistance,distancenum)
@@ -47,7 +45,7 @@ receptor_seed = 1):
             distance_from_source = np.random.default_rng().uniform(0,maxdistance, distancenum)
         else:
             raise ValueError("Pick if distance constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
-    else: distance_from_source = distanceexact
+    else: distance_from_source = np.array([distanceexact])
     if rateexact == -1:
         if random_yn==0:
             rate = np.linspace(0.1,maxrate,ratenum)
@@ -55,7 +53,7 @@ receptor_seed = 1):
             rate = np.random.default_rng().uniform(0,maxrate, ratenum)
         else:
             raise ValueError("Pick if rate constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
-    else: rate=rateexact
+    else: rate=np.array([rateexact])
     if radiusexact== -1:
         if random_yn==0:
             radius_sphere = np.linspace(0.1,maxradius,radiusnum)
@@ -63,33 +61,35 @@ receptor_seed = 1):
             radius_sphere = np.random.default_rng().uniform(0,maxradius, radiusnum)
         else:
             raise ValueError("Pick if radius constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
-    else: radius_sphere = radiusexact
+    else: radius_sphere = np.array([radiusexact])
 
 
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(receptornum,1,receptor_seed)
-    #initialize activation 
-    activation_matrix = np.zeros(receptornum) 
-    #initialize X
-    X = np.zeros((receptornum*sourcenum,len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)*particlenum))
-   
-    for s in range(0,sourcenum-1):
-        #pick source??
-        #source_theta[s],source_phi[s] = random_3d_rotation(cart2spherical_point(0,0,1),s)
-        #sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s],source_phi[s])
-        #function to relate source coordinates to action direction -> make Y vector
-        #Y = ideal_direction(source_theta[s],source_phi[s],direction_sphcoords, 1)
 
+    loops = len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
+    X = np.zeros((sourcenum*loops,receptornum))
+    Y = np.zeros((direction_sphcoords.shape[0],sourcenum*loops))
+    for s in range(1,sourcenum+1):
+        print(s)
+        #pick source??
+        source_theta,source_phi = random_3d_rotation(0,0,s)
+        sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
+        #function to relate source coordinates to action direction -> make Y vector
+        move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
         for r in radius_sphere:
             mindistance = r/recepsurface_ratio
             for distance in distance_from_source:
+                sourcex *=distance
+                sourcey *=distance
+                sourcez *=distance
                 for ra in rate:
                     for dif in diffusion_constants:
-                        activation_array = np.zeros(receptornum)
-                            #needs source position and radius to be included in parameters?
-                        brownian_pipe,received = init_BrownianParticle_test(distance,ra,dif,s ) 
-                        Y = ideal_direction(received[3],received[4],direction_sphcoords, 1)
+                        activation_array = np.zeros((1,receptornum))
+                        #needs source position and radius to be included in parameters
+                        brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,rate=ra,radius=r,diffusion=dif, use_seed=s) 
+                        print(received[0])
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
@@ -99,15 +99,12 @@ receptor_seed = 1):
                             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
                             if ind == -1: pass
                             else: activation_array[ind] += 1
-                            
-                            if activation_matrix==np.zeros(receptornum): activation_matrix = activation_array
-                            else: 
-                                activation_matrix = np.concatenate(([activation_matrix],[activation_array]))
-                            Y = np.concatenate(([Y],[Y])).T
-
-                            received = update_BrownianParticle_test(brownian_pipe)
+                            received = update_BrownianParticle(brownian_pipe)
                             count+=1
-
-        X[s*len(activation_matrix),:] = activation_matrix #rows are each activation array
-        Y[:,s*len(activation_matrix)] = Y # columns are source direction, corresponding to each activation array row
+                            print(count)
+                        stop_BrownianParticle(brownian_pipe)
+                        X[s*loops-1,:] = activation_array
+                        Y[:,s*loops-1] = move
+                            
+                            
     return X, Y

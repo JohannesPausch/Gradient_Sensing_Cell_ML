@@ -21,7 +21,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
             y=np.matmul(special_ortho_group.rvs(3),np.array([radius+radius*np.random.rand(1),0,0]))
             command += ' -s '+str(y[0])+','+str(y[1])+','+str(y[2])
     if rate != None:
-        command += ' -r '+str(rate)
+        command += ' -ra '+str(rate)
     if cutoff != None:
         command += ' -c '+str(cutoff)
     if events != None:
@@ -31,7 +31,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
     if diffusion != None:
         command += ' -d '+str(diffusion)
     if radius != 1:
-        command += ' -rad '+str(radius)
+        command += ' -r '+str(radius)
     print('used command: '+command)
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)

@@ -12,7 +12,7 @@ def init_Receptors(radius, receptornum, seed=0):
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
     x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
-    theta,phi = cart2spherical_receptors(x,y,z) 
+    theta,phi = cart2spherical_array(x,y,z) 
     receptor_sphcoords = np.concatenate(([theta],[phi])).T
     receptor_cartcoords = np.concatenate(([x],[y],[z])).T
     activation_receptors = np.zeros((receptornum))
