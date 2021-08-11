@@ -184,7 +184,7 @@ double source_distance2, sphere_distance2;
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:ra:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:e:r:s:S:t:w:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
@@ -201,7 +201,7 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:ra:r:s:S:t:w:")) != -1) {
     case 'o':
       STRCPY(param_output, optarg);
       break;
-    case 'ra':
+    case 'e':
       param_release_rate=strtod(optarg, NULL);
       break;
     case 'r':
@@ -294,7 +294,7 @@ PRINT_PARAM(param_cutoff, "-c", "%g");
 PRINT_PARAM(param_cutoff_squared, "", "%g");
 PRINT_PARAM(param_sphere_radius, "-r", "%g");
 PRINT_PARAM(param_sphere_radius_squared, "", "%g");
-PRINT_PARAM(param_release_rate, "-ra", "%g");
+PRINT_PARAM(param_release_rate, "-e", "%g");
 PRINT_PARAM(param_warmup_time, "-w", "%g");
 PRINT_PARAM(param_max_particles, "-N", "%i");
 PRINT_PARAM(param_seed, "-S", "%lu");
