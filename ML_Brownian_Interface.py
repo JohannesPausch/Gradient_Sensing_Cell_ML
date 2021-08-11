@@ -21,7 +21,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
             y=np.matmul(special_ortho_group.rvs(3),np.array([radius+radius*np.random.rand(1),0,0]))
             command += ' -s '+str(y[0])+','+str(y[1])+','+str(y[2])
     if rate != None:
-        command += ' -ra '+str(rate)
+        command += ' -e '+str(rate)
     if cutoff != None:
         command += ' -c '+str(cutoff)
     if events != None:
