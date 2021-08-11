@@ -184,7 +184,7 @@ double source_distance2, sphere_distance2;
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
@@ -201,11 +201,12 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:r:s:S:t:w:")) != -1) {
     case 'o':
       STRCPY(param_output, optarg);
       break;
-    case 'ra':
+    case 'R':
       param_release_rate=strtod(optarg, NULL);
       break;
     case 'r':
       param_sphere_radius=strtod(optarg,NULL);
+      break;
     case 's':
       {
       char buffer[2048];
