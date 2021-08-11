@@ -1,4 +1,4 @@
-from math import dist
+#from math import dist
 from IdealDirection import *
 import numpy as np
 from ReceptorMap import *
@@ -32,7 +32,7 @@ receptor_seed = 1):
     
     if diffusionexact== -1:
         if random_yn==0:
-            diffusion_constants  = np.logspace(-6,0,diffusionnum)
+            diffusion_constants  = np.logspace(-2,0,diffusionnum)
         elif random_yn==1:
             diffusion_constants = np.random.default_rng().uniform(0,1, diffusionnum)
         else: 
@@ -40,7 +40,7 @@ receptor_seed = 1):
     else: diffusion_constants = np.array([diffusionexact])
     if distanceexact== -1:
         if random_yn==0:
-            distance_from_source = np.linspace(0,maxdistance,distancenum)
+            distance_from_source = np.linspace(maxradius,maxdistance,distancenum)
         elif random_yn==1:
             distance_from_source = np.random.default_rng().uniform(0,maxdistance, distancenum)
         else:
@@ -88,7 +88,7 @@ receptor_seed = 1):
                     for dif in diffusion_constants:
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
-                        brownian_pipe,received = init_BrownianParticle(sourcex,sourcey,sourcez,rate=ra,radius=r,diffusion=dif, use_seed=s) 
+                        brownian_pipe,received,source = init_BrownianParticle(sourcex,sourcey,sourcez,rate=ra,radius=r,diffusion=dif, use_seed=s) 
                         print(received[0])
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
@@ -99,7 +99,7 @@ receptor_seed = 1):
                             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
                             if ind == -1: pass
                             else: activation_array[ind] += 1
-                            received = update_BrownianParticle(brownian_pipe)
+                            received,source = update_BrownianParticle(brownian_pipe)
                             count+=1
                             print(count)
                         stop_BrownianParticle(brownian_pipe)
