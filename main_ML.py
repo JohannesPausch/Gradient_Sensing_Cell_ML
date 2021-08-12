@@ -9,7 +9,7 @@ import numpy as np
 direction_sphcoords = pick_direction(0, 10)
 
 #create data
-X, Y = datacreate(direction_sphcoords, recepsurface_ratio=1,diffusionexact=1,distanceexact=3,radiusexact=1,rateexact=1)
+X, Y = datacreate(direction_sphcoords,particlenum=10, recepsurface_ratio=5,diffusionexact=1,distanceexact=2,radiusexact=1,rateexact=1)
 print(X)
 print(Y)
 """
