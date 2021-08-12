@@ -13,15 +13,15 @@ recepsurface_ratio = 100,
 particlenum = 20,
 sourcenum = 10,
 random_yn  = 0,
-diffusionnum = 11,
+diffusionnum = 5,
 diffusionexact = -1,
-distancenum = 10,
+distancenum = 5,
 maxdistance = 10,
 distanceexact = -1,
-radiusnum = 10,
+radiusnum = 5,
 maxradius = 1,
 radiusexact = -1,
-ratenum = 10,
+ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1): 
@@ -32,7 +32,7 @@ receptor_seed = 1):
     
     if diffusionexact== -1:
         if random_yn==0:
-            diffusion_constants  = np.logspace(-2,0,diffusionnum)
+            diffusion_constants  = np.logspace(-1,0,diffusionnum)
         elif random_yn==1:
             diffusion_constants = np.random.default_rng().uniform(0,1, diffusionnum)
         else: 
