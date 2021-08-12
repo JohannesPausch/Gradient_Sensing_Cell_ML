@@ -7,11 +7,12 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
 
-def init_Receptors(radius, receptornum, seed=0):
+def init_Receptors(radius, receptornum,random_yn, seed=0):
 # Distribution of receptors:
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
-    x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
+    if random_yn==1: x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
+    else: x,y,z = regular_on_sphere_points(radius,receptornum)
     theta,phi = cart2spherical_array(x,y,z) 
     receptor_sphcoords = np.concatenate(([theta],[phi])).T
     receptor_cartcoords = np.concatenate(([x],[y],[z])).T
@@ -44,18 +45,16 @@ def visualize_Receptors(receptor_cartcoords,radius, mindistance):
         ax.add_patch(p)
         pathpatch_2d_to_3d(p, z = 0, normal = normal)
         pathpatch_translate(p, normal)
-    
+    plt.show()
     return plt
 
 def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistance):
     #Check wether a molecule is inside the area of a receptor and return the index of the receptor.
     #If not in the area return a negative number: no receptor is activated.
-    
     receptornum=len(receptor_sphcoords)
     theta_molecule = np.full((receptornum,1), mol_theta)
     phi_molecule = np.full((receptornum,1),mol_phi)
     distance = haversine(radius,theta_molecule,phi_molecule,receptor_sphcoords[:,0].reshape(receptornum,1),receptor_sphcoords[:,1].reshape(receptornum,1))
-    print(distance)
     if np.amin(distance)<= mindistance:
         index_recept = np.where(distance == np.amin(distance))
         return index_recept
