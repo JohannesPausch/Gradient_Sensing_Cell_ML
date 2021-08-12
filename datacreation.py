@@ -88,9 +88,6 @@ receptor_seed = 1):
                     for dif in diffusion_constants:
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
-                        
-                        brownian_pipe,received = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
-
                         brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
                         print(received[0])
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
