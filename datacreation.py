@@ -89,7 +89,6 @@ receptor_seed = 1):
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
                         brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
-                        print(received[0])
                             #same seed for brownian_pipe if we want to initialize with the same source rotation?
                             #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
@@ -101,7 +100,6 @@ receptor_seed = 1):
                             else: activation_array[ind] += 1
                             received,source = update_BrownianParticle(brownian_pipe)
                             count+=1
-                            print(count)
                         stop_BrownianParticle(brownian_pipe)
                         X[s*loops-1,:] = activation_array
                         Y[:,s*loops-1] = move
