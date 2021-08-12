@@ -50,10 +50,12 @@ def visualize_Receptors(receptor_cartcoords,radius, mindistance):
 def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistance):
     #Check wether a molecule is inside the area of a receptor and return the index of the receptor.
     #If not in the area return a negative number: no receptor is activated.
+    
     receptornum=len(receptor_sphcoords)
     theta_molecule = np.full((receptornum,1), mol_theta)
     phi_molecule = np.full((receptornum,1),mol_phi)
     distance = haversine(radius,theta_molecule,phi_molecule,receptor_sphcoords[:,0].reshape(receptornum,1),receptor_sphcoords[:,1].reshape(receptornum,1))
+    print(distance)
     if np.amin(distance)<= mindistance:
         index_recept = np.where(distance == np.amin(distance))
         return index_recept
