@@ -46,12 +46,9 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     theta_source = np.full((directionnum,1), source_theta)
     phi_source = np.full((directionnum,1), source_phi)
     distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1))
-    print(distance)
     idx = np.where(distance == np.amin(distance))
-    print(idx[0])
     Y = np.zeros((1,len(direction_sphcoords)))
     Y[0,idx[0]] = 1
-    print(Y)
     return Y
 
 def pick_direction(m = 0,num = 20):
