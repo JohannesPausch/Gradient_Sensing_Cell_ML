@@ -66,12 +66,15 @@ receptor_seed = 1):
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum,0,receptor_seed)
-    loops = len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
-    X = np.zeros((sourcenum*loops,receptornum))
-    Y = np.zeros((direction_sphcoords.shape[0],sourcenum*loops))
+    loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
+    X = np.zeros((loops,receptornum))
+    Y = np.zeros((loops,direction_sphcoords.shape[0]))
+    loop_count = 0
     for s in range(1,sourcenum+1):
         #pick source?
         source_theta,source_phi = random_3d_rotation(np.random.rand(1),np.random.rand(1),s)
+        print(source_theta)
+        print(source_phi)
         sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
         #function to relate source coordinates to action direction -> make Y vector
         move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
@@ -85,6 +88,7 @@ receptor_seed = 1):
                 sz = sourcez * distance
                 for ra in rate:
                     for dif in diffusion_constants:
+                        loop_count+=1
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
                         brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
@@ -100,7 +104,7 @@ receptor_seed = 1):
                             received,source = update_BrownianParticle(brownian_pipe)
                             count+=1
                         stop_BrownianParticle(brownian_pipe)
-                        X[s*loops-1,:] = activation_array
-                        Y[:,s*loops-1] = move
+                        X[loop_count-1,:] = activation_array
+                        Y[loop_count-1,:] = move
                             
     return X, Y
