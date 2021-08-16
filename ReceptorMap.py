@@ -7,11 +7,12 @@ from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
 
-def init_Receptors(radius, receptornum, seed=0):
+def init_Receptors(radius, receptornum,random_yn, seed=0):
 # Distribution of receptors:
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
-    x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
+    if random_yn==1: x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
+    else: x,y,z = regular_on_sphere_points(radius,receptornum)
     theta,phi = cart2spherical_array(x,y,z) 
     receptor_sphcoords = np.concatenate(([theta],[phi])).T
     receptor_cartcoords = np.concatenate(([x],[y],[z])).T
@@ -44,7 +45,7 @@ def visualize_Receptors(receptor_cartcoords,radius, mindistance):
         ax.add_patch(p)
         pathpatch_2d_to_3d(p, z = 0, normal = normal)
         pathpatch_translate(p, normal)
-    
+    plt.show()
     return plt
 
 def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistance):

@@ -13,15 +13,15 @@ recepsurface_ratio = 100,
 particlenum = 20,
 sourcenum = 10,
 random_yn  = 0,
-diffusionnum = 11,
+diffusionnum = 5,
 diffusionexact = -1,
-distancenum = 10,
+distancenum = 5,
 maxdistance = 10,
 distanceexact = -1,
-radiusnum = 10,
+radiusnum = 5,
 maxradius = 1,
 radiusexact = -1,
-ratenum = 10,
+ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1): 
@@ -32,7 +32,7 @@ receptor_seed = 1):
     
     if diffusionexact== -1:
         if random_yn==0:
-            diffusion_constants  = np.logspace(-2,0,diffusionnum)
+            diffusion_constants  = np.logspace(-1,0,diffusionnum)
         elif random_yn==1:
             diffusion_constants = np.random.default_rng().uniform(0,1, diffusionnum)
         else: 
@@ -66,20 +66,20 @@ receptor_seed = 1):
 
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
-    receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(receptornum,1,receptor_seed)
-
+    receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum,0,receptor_seed)
     loops = len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
     X = np.zeros((sourcenum*loops,receptornum))
     Y = np.zeros((direction_sphcoords.shape[0],sourcenum*loops))
     for s in range(1,sourcenum+1):
-        print(s)
-        #pick source??
-        source_theta,source_phi = random_3d_rotation(0,0,s)
+        #pick source?
+        source_theta,source_phi = random_3d_rotation(np.random.rand(1),np.random.rand(1),s)
         sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
         #function to relate source coordinates to action direction -> make Y vector
         move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
         for r in radius_sphere:
-            mindistance = r/recepsurface_ratio
+            mindistance = r*math.pi/recepsurface_ratio
+            visualize_Receptors(receptor_cartcoords,r,mindistance)            
+
             for distance in distance_from_source:
                 sx = sourcex * distance
                 sy = sourcey * distance
@@ -89,8 +89,7 @@ receptor_seed = 1):
                         activation_array = np.zeros((1,receptornum))
                         #needs source position and radius to be included in parameters
                         brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
-                        print(received[0])
-                            #same seed for brownian_pipe if we want to initialize with the same source rotation?
+                            #what is the seed for?
                             #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
                         while(count <= particlenum):
@@ -98,10 +97,9 @@ receptor_seed = 1):
                             phi_mol = received[1]
                             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
                             if ind == -1: pass
-                            else: activation_array[ind] += 1
+                            else: activation_array[0,ind] += 1
                             received,source = update_BrownianParticle(brownian_pipe)
                             count+=1
-                            print(count)
                         stop_BrownianParticle(brownian_pipe)
                         X[s*loops-1,:] = activation_array
                         Y[:,s*loops-1] = move
