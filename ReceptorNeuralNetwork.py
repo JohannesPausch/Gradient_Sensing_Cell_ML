@@ -23,9 +23,13 @@ def predict(mlp: MLPClassifier, X):
     return y
 
 def accuracy(true_y, predicted_y):
-    true_y = list(true_y)
-    predicted_y = list(predicted_y)
-    return sum(x == y for x, y in zip(true_y, predicted_y))/len(true_y)
+    score = 0
+    for true, predicted in zip(true_y, predicted_y):
+        is_there_a_zero = np.linalg.norm(true - predicted)
+        if is_there_a_zero == 0:
+            score += 1
+        
+    return score/len(true_y)
 
 def separate_train_set(X,Y):
     #if data is ordered use this to randomise it so every source position is trained on, then use first half of data to train the network
@@ -80,27 +84,32 @@ def load_neural_network(filename):
 def direction_probabilities(mlp, X):
     return mlp.predict_proba(X)
 
-def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, receptor_number, neighbour_number):
-    rue_y = list(true_y)
+def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_area, radius):
+    true_y = list(true_y)
     predicted_y = list(predicted_y)
+
     harsh_accuracy = accuracy(true_y, predicted_y)
     
-    neighbours = nearest_neighbours(frac_area, radius, direction_sphcoords)
+    neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords))
     correct_neighbours = []
     i = -1
     score = 0
-    for true in true_y:
+    for true, predicted in zip(true_y, predicted_y):
+        true = list(true)
         i+=1
-        idx = np.argwhere(true>=1)
-        
-        if (predicted_y[i] in neighbours[idx]):
-            score +=1
+        idx = true.index(1)
     
-    print("neighbour accuracy = ", score/len(true_y))
+        is_there_a_zero = np.linalg.norm(neighbours[idx]-predicted, axis=1)
+
+        bool_val = 0 in is_there_a_zero
+        if bool_val == True:
+            score += 1
+    
+    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
 
 
     
-def nearest_neighbours(frac_area, radius, direction_sphcoords):
+def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
@@ -120,14 +129,13 @@ def nearest_neighbours(frac_area, radius, direction_sphcoords):
             j += 1
             if elem <= max_distance:
                 idx.append(j-1)
-
-        best_directions = []       
+    
+        best_directions = []
         for i in idx:
             best_direction = np.zeros(len(direction_sphcoords))
             best_direction[i] = 1
             best_directions.append(best_direction)
 
-            neighbours.append(best_directions)
+        neighbours.append(best_directions)
             
     return neighbours
-
