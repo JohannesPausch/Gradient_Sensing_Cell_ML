@@ -85,6 +85,8 @@ def direction_probabilities(mlp, X):
     return mlp.predict_proba(X)
 
 def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_area, radius):
+        # uses the fraction of area of sphere you want covered to locate nearest directions, and see whether the predicted value was included in these
+
     true_y = list(true_y)
     predicted_y = list(predicted_y)
 
@@ -98,9 +100,7 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
         true = list(true)
         i+=1
         idx = true.index(1)
-    
         is_there_a_zero = np.linalg.norm(neighbours[idx]-predicted, axis=1)
-
         bool_val = 0 in is_there_a_zero
         if bool_val == True:
             score += 1
@@ -110,10 +110,10 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
 
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
+    # uses the fraction of area of sphere you want covered to locate nearest directions. Stores these as a list of lists, where the element i is a list of the nearest neighbours for direction i
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
-
     directionnum=len(direction_sphcoords)
     distances = []
     neighbours = []
@@ -139,3 +139,4 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
+
