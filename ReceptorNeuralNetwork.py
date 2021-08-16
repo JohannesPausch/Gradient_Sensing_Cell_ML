@@ -47,8 +47,11 @@ def train(training_x, training_y, layers_tuple, max_iterations):
 
 def test(mlp, predict_x, predict_y):
     pred = predict(mlp, predict_x)
-    print("Accuracy of MLPClassifier : ", accuracy(predict_y, pred))
-    print("Probabilities of each direction : ", direction_probabilities(mlp, predict_x))
+    acc = accuracy(predict_y, pred)
+    directprob = direction_probabilities(mlp, predict_x)
+    print("Accuracy of MLPClassifier : ", acc)
+    print("Probabilities of each direction : ", directprob)
+    return acc, directprob
     
 def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None):
     filename = 'MLPClassifier'

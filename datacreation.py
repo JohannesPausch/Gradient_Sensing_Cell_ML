@@ -1,4 +1,3 @@
-#from math import dist
 from IdealDirection import *
 import numpy as np
 from ReceptorMap import *
@@ -32,15 +31,15 @@ receptor_seed = 1):
     
     if diffusionexact== -1:
         if random_yn==0:
-            diffusion_constants  = np.logspace(-1,0,diffusionnum)
+            diffusion_constants  = np.linspace(0.5,1,diffusionnum)
         elif random_yn==1:
-            diffusion_constants = np.random.default_rng().uniform(0,1, diffusionnum)
+            diffusion_constants = np.random.default_rng().uniform(0.5,1, diffusionnum)
         else: 
             raise ValueError("Pick if diffusion constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
     else: diffusion_constants = np.array([diffusionexact])
     if distanceexact== -1:
         if random_yn==0:
-            distance_from_source = np.linspace(maxradius,maxdistance,distancenum)
+            distance_from_source = np.linspace((maxradius+maxdistance)/2,maxdistance,distancenum)
         elif random_yn==1:
             distance_from_source = np.random.default_rng().uniform(0,maxdistance, distancenum)
         else:
@@ -50,7 +49,7 @@ receptor_seed = 1):
         if random_yn==0:
             rate = np.linspace(0.1,maxrate,ratenum)
         elif random_yn==1:
-            rate = np.random.default_rng().uniform(0,maxrate, ratenum)
+            rate = np.random.default_rng().uniform(0.5,maxrate, ratenum)
         else:
             raise ValueError("Pick if rate constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
     else: rate=np.array([rateexact])
@@ -58,7 +57,7 @@ receptor_seed = 1):
         if random_yn==0:
             radius_sphere = np.linspace(0.1,maxradius,radiusnum)
         elif random_yn==1:
-            radius_sphere = np.random.default_rng().uniform(0,maxradius, radiusnum)
+            radius_sphere = np.random.default_rng().uniform(0.5,maxradius, radiusnum)
         else:
             raise ValueError("Pick if radius constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
     else: radius_sphere = np.array([radiusexact])
@@ -78,7 +77,7 @@ receptor_seed = 1):
         move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
         for r in radius_sphere:
             mindistance = r*math.pi/recepsurface_ratio
-            visualize_Receptors(receptor_cartcoords,r,mindistance)            
+            #visualize_Receptors(receptor_cartcoords,r,mindistance)            
 
             for distance in distance_from_source:
                 sx = sourcex * distance
