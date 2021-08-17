@@ -50,9 +50,10 @@ def read_datafile(filename):
     return(a)
 
 #test
+"""
 params_1 = ['#pick_direction(0, 10)', '#datacreate() called:' , '#receptornum=10', '#particlenum=20']
 X = np.random.rand(3,3)
 write_datafile('X',params_1,X)
 X = read_datafile('X.txt')
 print(X)
-
+"""
