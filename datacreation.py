@@ -67,8 +67,9 @@ initial_source_seed = 1):
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum,0,receptor_seed)
+    print('receptornum in regular method:'+ str(len(receptor_sphcoords)))
     loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
-    X = np.zeros((loops,receptornum))
+    X = np.zeros((loops,len(receptor_sphcoords)))
     Y = np.zeros((loops,direction_sphcoords.shape[0]))
     loop_count = 0
     np.random.seed(seed=initial_source_seed)
@@ -90,7 +91,7 @@ initial_source_seed = 1):
                 for ra in rate:
                     for dif in diffusion_constants:
                         loop_count+=1
-                        activation_array = np.zeros((1,receptornum))
+                        activation_array = np.zeros((1,len(receptor_sphcoords)))
                         #needs source position and radius to be included in parameters
                         brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
                             #what is the seed for?
@@ -101,7 +102,7 @@ initial_source_seed = 1):
                             phi_mol = received[1]
                             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
                             if ind == -1: pass
-                            else: activation_array[0,ind] += 1
+                            else: activation_array[0,ind[0]] += 1
                             received,source = update_BrownianParticle(brownian_pipe)
                             count+=1
                         stop_BrownianParticle(brownian_pipe)
