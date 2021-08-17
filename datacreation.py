@@ -23,7 +23,8 @@ radiusexact = -1,
 ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
-receptor_seed = 1): 
+receptor_seed = 1,
+initial_source_seed = 1): 
 ############## Parameters for receptor map ###################
 #the variables ...exact are a shortcut to skipping all the for loops and plugging in one value per variable
 #random_yn decides if we want to take a random uniform approach for the data (1) or if we want to do equally spaced values between 
@@ -33,7 +34,7 @@ receptor_seed = 1):
         if random_yn==0:
             diffusion_constants  = np.linspace(0.5,1,diffusionnum)
         elif random_yn==1:
-            diffusion_constants = np.random.default_rng().uniform(0.5,1, diffusionnum)
+            diffusion_constants = np.random.default_rng().uniform(0.5,1, diffusionnum) #too slow if close to 0
         else: 
             raise ValueError("Pick if diffusion constants should be equally spaced (random_yn = 0) or randomly chosen (random_yn = 1)")
     else: diffusion_constants = np.array([diffusionexact])
@@ -70,11 +71,11 @@ receptor_seed = 1):
     X = np.zeros((loops,receptornum))
     Y = np.zeros((loops,direction_sphcoords.shape[0]))
     loop_count = 0
+    np.random.seed(seed=initial_source_seed)
+    source_theta_init = np.random.uniform(0,math.pi)
+    source_phi_init = np.random.uniform(0,2*math.pi)   
     for s in range(1,sourcenum+1):
-        #pick source?
-        source_theta,source_phi = random_3d_rotation(np.random.rand(1),np.random.rand(1),s)
-        print(source_theta)
-        print(source_phi)
+        source_theta,source_phi = random_3d_rotation(source_phi_init,source_theta_init,s)
         sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
         #function to relate source coordinates to action direction -> make Y vector
         move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
