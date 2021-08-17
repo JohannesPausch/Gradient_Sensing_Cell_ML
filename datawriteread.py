@@ -37,7 +37,7 @@ def write_datafile(filename, params, data):
     return
 
 def read_datafile(filename):
-    with open(filename,'r') as fin:
+    with open(filename+'.txt','r') as fin:
         a = []
         for line in fin:
             if line.startswith('#'): pass
