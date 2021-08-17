@@ -21,7 +21,7 @@ maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1,
 initial_source_seed = 1):
-    return(['#'+pick_dir,'datacreate() called:','#receptornum= '+str(receptornum),'#recepsurface_ratio= '+str(recepsurface_ratio), \
+    return(['#'+pick_dir,'#datacreate() called:','#receptornum= '+str(receptornum),'#recepsurface_ratio= '+str(recepsurface_ratio), \
     '#particlenum= '+str(particlenum),'#sourcenum= '+str(sourcenum),'#random_yn= '+str(random_yn),'#diffusionnum= '+str(diffusionnum), \
     '#diffusionexact= '+ str(diffusionexact),'#distancenum= '+ str(distancenum),'#maxdistance= '+ str(maxdistance), '#distanceexact= '+ str(distanceexact),\
     '#radiusnum= '+ str(radiusnum), '#maxradius= '+ str(maxradius), '#radiusexact= '+ str(radiusexact), '#ratenum= '+ str(ratenum), '#maxrate= '+ str(maxrate),\
