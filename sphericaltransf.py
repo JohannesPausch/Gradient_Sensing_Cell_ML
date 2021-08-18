@@ -8,7 +8,7 @@ def cart2spherical_point(x,y,z):
         if (z<0.): theta+=math.pi
     else:theta=math.pi/2.
     phi = math.atan2(y,x) #same as gunnar's convention
-    return r,theta,phi
+    return theta,phi
 
 def cart2spherical_array(x,y,z):
     length = len(x)
