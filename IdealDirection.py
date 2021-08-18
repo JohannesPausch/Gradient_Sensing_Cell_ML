@@ -46,6 +46,7 @@ def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     theta_source = np.full((directionnum,1), source_theta)
     phi_source = np.full((directionnum,1), source_phi)
     distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1))
+    #can detect distances that are the same and so have Y with multiple 1s, keep?
     idx = np.where(distance == np.amin(distance))
     Y = np.zeros((1,len(direction_sphcoords)))
     Y[0,idx[0]] = 1

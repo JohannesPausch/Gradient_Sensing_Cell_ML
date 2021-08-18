@@ -85,6 +85,7 @@ initial_source_seed = 1):
             #visualize_Receptors(receptor_cartcoords,r,mindistance)            
 
             for distance in distance_from_source:
+                print(distance)
                 sx = sourcex * distance
                 sy = sourcey * distance
                 sz = sourcez * distance
