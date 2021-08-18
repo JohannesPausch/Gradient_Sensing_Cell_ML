@@ -38,16 +38,15 @@ def fibionaaci_directions(number):
     
     return direction_sphcoords
     
-
-
 def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     
+    source_phi = source_phi - np.pi
     directionnum=len(direction_sphcoords)
-    theta_source = np.full((directionnum,1), source_theta)
-    phi_source = np.full((directionnum,1), source_phi)
-    distance = haversine(radius,theta_source,phi_source,direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1))
-    idx = np.where(distance == np.amin(distance))
+    distance = []
+    for d in direction_sphcoords:
+        distance.append(haversine(radius,source_theta,source_phi, d[0].round(8), d[1].round(8)))    
     Y = np.zeros((1,len(direction_sphcoords)))
+    idx = np.where(distance == np.amin(distance))
     Y[0,idx[0]] = 1
     return Y
 
