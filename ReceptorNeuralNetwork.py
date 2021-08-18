@@ -1,5 +1,9 @@
+from datawriteread import read_datafile
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 import numpy as np
 from haversine import * 
 import pickle
@@ -7,15 +11,16 @@ import pickle
 def fit_mlp(X, Y, layers_tuple, max_iterations):
     #function to scale X to between 0 and 1 which is best for neural network, then creates mlp object 
     X = MinMaxScaler().fit_transform(X)
-    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',
-                        momentum=0, learning_rate_init=0.2) 
+    #mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',\
+                     #   momentum=0, learning_rate_init=0.2) 
+    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=1000) # lbfgs for small data
     #layers_tuple: Each element in the tuple is the number of nodes at the ith position. 
     #Length of tuple denotes the total number of layers.
     mlp.fit(X, Y)
     
     return mlp
 
-def predict(mlp: MLPClassifier, X):
+def predict(mlp, X):
     #function to scale X to between 0 and 1 and then use the Neural Network to produce predictions for Y
     X = MinMaxScaler().fit_transform(X)
     y = mlp.predict(X)
@@ -41,7 +46,6 @@ def separate_train_set(X,Y):
     training_y = np.array(Y)[indices[:n_train].astype(int)]
     predict_x = np.array(X)[indices[n_train:].astype(int)] 
     predict_y = np.array(Y)[indices[n_train:].astype(int)]
-    
     return training_x, training_y, predict_x, predict_y
 
 def train(training_x, training_y, layers_tuple, max_iterations):
@@ -51,20 +55,21 @@ def train(training_x, training_y, layers_tuple, max_iterations):
 
 def test(mlp, predict_x, predict_y):
     pred = predict(mlp, predict_x)
-    acc = accuracy(predict_y, pred)
+    score = mlp.score(predict_x, predict_y)
+    acc = accuracy_score(predict_y,pred)
     directprob = direction_probabilities(mlp, predict_x)
-    print("Accuracy of MLPClassifier : ", acc)
-    print("Probabilities of each direction : ", directprob)
-    return acc, directprob
+    #print("Accuracy of MLPClassifier : ", acc)
+    #print("Probabilities of each direction : ", directprob)
+    return acc, directprob, score
     
-def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None):
+def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
     filename = 'MLPClassifier'
-    if distance != None:
-        filename += ' -d '+str(distance)
+    if particlenum != None:
+        filename += ' -p '+str(particlenum)
+    if receptornum != None:
+        filename += ' -r '+str(receptornum)
     if rate != None:
-        filename += ' -r '+str(rate)
-    if seed != None:
-        filename += ' -S '+str(seed)
+        filename += ' -R '+str(rate)
     if cutoff != None:
         filename += ' -c '+str(cutoff)
     if events != None:
@@ -72,7 +77,7 @@ def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cu
     if iterations != None:
         filename += ' -N '+str(iterations)
     if diffusion != None:
-        filename += ' -s '+str(diffusion)
+        filename += ' -d '+str(diffusion)
     pickle.dump(mlp, open(filename, 'wb'))
     return filename
     
@@ -139,4 +144,6 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
-
+X= read_datafile('X_particlenum=1')
+Y= read_datafile('Y_particlenum=1')
+X_train, X_test, y_train, y_test = train_test_split(X,Y)
