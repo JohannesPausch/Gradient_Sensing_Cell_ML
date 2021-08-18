@@ -6,9 +6,9 @@ def cart2spherical_point(x,y,z):
     theta = math.pi/2 - math.acos(z/r)
     if (z!=0.):
         theta=math.atan(np.sqrt(x*x + y*y)/z)
-        if (theta<0.): theta+=math.pi
+        if (z<0.): theta+=math.pi
     else:theta=math.pi/2.
-    phi = math.atan2(y,x)
+    phi = math.atan2(y,x) #same as gunnar's convention
     return r,theta,phi
 
 def cart2spherical_array(x,y,z):
