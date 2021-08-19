@@ -13,7 +13,7 @@ def fit_mlp(X, Y, layers_tuple, max_iterations):
     X = MinMaxScaler().fit_transform(X)
     #mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',\
                      #   momentum=0, learning_rate_init=0.2) 
-    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=1000) # lbfgs for small data
+    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=max_iterations) # lbfgs for small data
     #layers_tuple: Each element in the tuple is the number of nodes at the ith position. 
     #Length of tuple denotes the total number of layers.
     mlp.fit(X, Y)
@@ -53,11 +53,12 @@ def train(training_x, training_y, layers_tuple, max_iterations):
     mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations)
     return mlp
 
-def test(mlp, predict_x, predict_y):
+def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
     pred = predict(mlp, predict_x)
     score = mlp.score(predict_x, predict_y)
     acc = accuracy_score(predict_y,pred)
     directprob = direction_probabilities(mlp, predict_x)
+    #accnn = nearest_neighbours_accuracy(direction_sphcoords,predict_y,pred,frac)
     #print("Accuracy of MLPClassifier : ", acc)
     #print("Probabilities of each direction : ", directprob)
     return acc, directprob, score
@@ -89,7 +90,7 @@ def load_neural_network(filename):
 def direction_probabilities(mlp, X):
     return mlp.predict_proba(X)
 
-def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_area, radius):
+def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_area, radius=1):
         # uses the fraction of area of sphere you want covered to locate nearest directions, and see whether the predicted value was included in these
 
     true_y = list(true_y)
@@ -98,34 +99,32 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
     harsh_accuracy = accuracy(true_y, predicted_y)
     
     neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords))
-    correct_neighbours = []
     i = -1
     score = 0
     for true, predicted in zip(true_y, predicted_y):
         true = list(true)
         i+=1
-        idx = true.index(1)
-        is_there_a_zero = np.linalg.norm(neighbours[idx]-predicted, axis=1)
-        bool_val = 0 in is_there_a_zero
-        if bool_val == True:
+        # we have to deal with move arrays of all 0's
+        idx = true.index(1) 
+        is_there_a_zero = np.linalg.norm(neighbours[idx] - predicted, axis=1)
+        if np.all(is_there_a_zero) == 0: #if there is then score augments
             score += 1
     
     print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
-
-
+    return score/len(true_y)
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
     # uses the fraction of area of sphere you want covered to locate nearest directions. Stores these as a list of lists, where the element i is a list of the nearest neighbours for direction i
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
+    print(max_distance)
     directionnum=len(direction_sphcoords)
     distances = []
     neighbours = []
     
     for coords in direction_sphcoords:
         distances.append(haversine(radius,coords[0],coords[1],direction_sphcoords[:,0].reshape(directionnum,1), direction_sphcoords[:,1].reshape(directionnum,1)))
-
     for d in distances:
         idx = []
         j = 0

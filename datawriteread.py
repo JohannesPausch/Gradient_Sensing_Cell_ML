@@ -7,6 +7,7 @@ receptornum = 10,
 recepsurface_ratio = 100,
 particlenum = 20,
 sourcenum = 10,
+sourceexact = -1,
 random_yn  = 0,
 diffusionnum = 5,
 diffusionexact = -1,
@@ -20,12 +21,13 @@ ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1,
-initial_source_seed = 1):
+initial_source_seed = 1,
+particle_seed= 1):#deal with source exact later
     return(['#'+pick_dir,'#datacreate() called:','#receptornum= '+str(receptornum),'#recepsurface_ratio= '+str(recepsurface_ratio), \
-    '#particlenum= '+str(particlenum),'#sourcenum= '+str(sourcenum),'#random_yn= '+str(random_yn),'#diffusionnum= '+str(diffusionnum), \
+    '#particlenum= '+str(particlenum),'#sourcenum= '+str(sourcenum), '#sourceexact=','#random_yn= '+str(random_yn),'#diffusionnum= '+str(diffusionnum), \
     '#diffusionexact= '+ str(diffusionexact),'#distancenum= '+ str(distancenum),'#maxdistance= '+ str(maxdistance), '#distanceexact= '+ str(distanceexact),\
     '#radiusnum= '+ str(radiusnum), '#maxradius= '+ str(maxradius), '#radiusexact= '+ str(radiusexact), '#ratenum= '+ str(ratenum), '#maxrate= '+ str(maxrate),\
-    '#rateexact= '+ str(rateexact), '#receptor_seed= '+ str(receptor_seed), '#initial_source_seed='+ str(initial_source_seed)])
+    '#rateexact= '+ str(rateexact), '#receptor_seed= '+ str(receptor_seed), '#initial_source_seed='+ str(initial_source_seed), '#particle_seed= '+ str(particle_seed)])
 
 
 def write_datafile(filename, params, data):

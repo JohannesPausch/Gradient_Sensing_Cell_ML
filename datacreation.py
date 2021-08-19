@@ -11,6 +11,7 @@ receptornum = 10,
 recepsurface_ratio = 10,
 particlenum = 20,
 sourcenum = 10,
+sourceexact = -1,
 random_yn  = 0,
 diffusionnum = 5,
 diffusionexact = -1,
@@ -24,12 +25,18 @@ ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1,
-initial_source_seed = 1): 
+initial_source_seed = 1,
+particle_seed= 1): 
 ############## Parameters for receptor map ###################
 #the variables ...exact are a shortcut to skipping all the for loops and plugging in one value per variable
 #random_yn decides if we want to take a random uniform approach for the data (1) or if we want to do equally spaced values between 
 #chosen boundaries (0).
-    
+    if np.all(sourceexact) == -1: pass #we create a random source
+    else: 
+        sourcenum = len(sourceexact)
+        source_theta = sourceexact[:,0]
+        source_phi = sourceexact[:,1]
+
     if diffusionexact== -1:
         if random_yn==0:
             diffusion_constants  = np.linspace(0.5,1,diffusionnum)
@@ -67,7 +74,7 @@ initial_source_seed = 1):
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum,0,receptor_seed)
-    print('receptornum in regular method:'+ str(len(receptor_sphcoords)))
+    #print('receptornum in regular method:'+ str(len(receptor_sphcoords)))
     loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
     X = np.zeros((loops,len(receptor_sphcoords)))
     Y = np.zeros((loops,direction_sphcoords.shape[0]))
@@ -76,16 +83,19 @@ initial_source_seed = 1):
     source_theta_init = np.random.uniform(0,math.pi)
     source_phi_init = np.random.uniform(0,2*math.pi)   
     for s in range(1,sourcenum+1):
-        source_theta,source_phi = random_3d_rotation(source_phi_init,source_theta_init,s)
-        sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
+        if np.all(sourceexact) == -1:
+            source_theta,source_phi = random_3d_rotation(source_phi_init,source_theta_init,s)
+            sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
         #function to relate source coordinates to action direction -> make Y vector
-        move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
+            move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
+        else:  #use exact coordinates of source that we can control
+            sourcex,sourcey,sourcez = spherical2cart_point(source_theta[s-1],source_phi[s-1])
+            move = ideal_direction(source_theta[s-1],source_phi[s-1],direction_sphcoords,1)
         for r in radius_sphere:
             mindistance = r*math.pi/recepsurface_ratio
             #visualize_Receptors(receptor_cartcoords,r,mindistance)            
 
             for distance in distance_from_source:
-                #print(distance)
                 sx = sourcex * distance
                 sy = sourcey * distance
                 sz = sourcez * distance
@@ -94,7 +104,7 @@ initial_source_seed = 1):
                         loop_count+=1
                         activation_array = np.zeros((1,len(receptor_sphcoords)))
                         #needs source position and radius to be included in parameters
-                        brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=s) 
+                        brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=particle_seed) 
                             #what is the seed for?
                             #do we fix parameters training,cutoff,events,iterations? 
                         count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
@@ -112,6 +122,6 @@ initial_source_seed = 1):
                             Y[loop_count-1,:] = np.zeros((1,len(direction_sphcoords)))
                         else: 
                             Y[loop_count-1,:] = move
-                        print(str(X[loop_count-1,:])+'\t'+str(Y[loop_count-1,:]))
+                        #print(str(X[loop_count-1,:])+'\t'+str(Y[loop_count-1,:]))
                             
     return X, Y
