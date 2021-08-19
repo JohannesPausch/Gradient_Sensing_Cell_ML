@@ -8,7 +8,7 @@ from sphericaltransf import *
 def datacreate(
 direction_sphcoords,
 receptornum = 10,
-recepsurface_ratio = 100,
+recepsurface_ratio = 10,
 particlenum = 20,
 sourcenum = 10,
 random_yn  = 0,
@@ -108,7 +108,10 @@ initial_source_seed = 1):
                             count+=1
                         stop_BrownianParticle(brownian_pipe)
                         X[loop_count-1,:] = activation_array
-                        Y[loop_count-1,:] = move
-                        print(str(activation_array)+'\t'+str(move))
+                        if (activation_array==0).all():
+                            Y[loop_count-1,:] = np.zeros((1,len(direction_sphcoords)))
+                        else: 
+                            Y[loop_count-1,:] = move
+                        print(str(X[loop_count-1,:])+'\t'+str(Y[loop_count-1,:]))
                             
     return X, Y
