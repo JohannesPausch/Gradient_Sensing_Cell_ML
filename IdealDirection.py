@@ -40,7 +40,6 @@ def fibionaaci_directions(number):
     
 def ideal_direction(source_theta, source_phi, direction_sphcoords, radius):
     
-    source_phi = source_phi - np.pi
     directionnum=len(direction_sphcoords)
     theta_source = np.full((directionnum,1), source_theta)
     phi_source = np.full((directionnum,1), source_phi)

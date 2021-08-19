@@ -9,7 +9,8 @@ def cart2spherical_point(x,y,z):
         if (theta<0.): theta+=math.pi
     else:theta=math.pi/2.
     phi = math.atan2(y,x)
-    return r,theta,phi
+    if y < 0 : phi += 2*np.pi
+    return theta,phi
 
 def cart2spherical_array(x,y,z):
     length = len(x)
@@ -17,7 +18,7 @@ def cart2spherical_array(x,y,z):
     theta = np.zeros((length))
     phi = np.zeros((length))
     for i in range(0,length):
-        r[i], theta[i], phi[i] = cart2spherical_point(x[i],y[i],z[i]) 
+        theta[i], phi[i] = cart2spherical_point(x[i],y[i],z[i]) 
     return theta,phi
 
 def spherical2cart_point(theta,phi):

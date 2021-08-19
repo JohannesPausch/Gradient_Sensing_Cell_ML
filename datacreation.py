@@ -85,7 +85,7 @@ initial_source_seed = 1):
             #visualize_Receptors(receptor_cartcoords,r,mindistance)            
 
             for distance in distance_from_source:
-                print(distance)
+                #print(distance)
                 sx = sourcex * distance
                 sy = sourcey * distance
                 sz = sourcez * distance
@@ -109,5 +109,6 @@ initial_source_seed = 1):
                         stop_BrownianParticle(brownian_pipe)
                         X[loop_count-1,:] = activation_array
                         Y[loop_count-1,:] = move
+                        print(str(activation_array)+'\t'+str(move))
                             
     return X, Y
