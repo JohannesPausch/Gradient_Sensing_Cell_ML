@@ -1,0 +1,37 @@
+# ML testing by Johannes on 16 Aug 2021
+# used parameters are
+# receptornum = 10
+# range of seeds for source creations: 1 to 20
+# particlenum = is varying
+# recepsurface_ratio = 10
+# radiusexact = 1
+# diffusionexact = 0.5
+# rateexact = 0.1
+# used seed for receptors 1
+# used seed for everything else 1
+# size of first hidden layer = 6
+# size of second hidden layer = 4
+# fraction of sphere area considered under soft accuracy measure 0.2
+# max number of iterations for Neural Network to converge 10000
+# 1st column: particlenum, 2nd column: harsh accuracy, 3rd column: soft accuracy
+10	0.5	0.5
+12	0.14	0.14
+14	0.5	0.5
+16	0.5	0.5
+18	0.5	0.5
+20	0.5	0.5
+22	0.5	0.5
+24	0.5	0.5
+26	0.24	0.24
+28	0.5	0.5
+30	0.0	0.0
+32	0.04	0.04
+34	0.02	0.02
+36	0.0	0.0
+38	0.5	0.5
+40	0.5	0.5
+42	0.0	0.0
+44	0.0	0.0
+46	0.0	0.0
+48	0.5	0.5
+50	0.06	0.06

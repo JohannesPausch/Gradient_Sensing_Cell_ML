@@ -2,9 +2,9 @@ import numpy as np
 from pointssphere import *
 from sphericaltransf import *
 from haversine import * 
-import random
-import math
-import mpl_toolkits.mplot3d
+#import random
+#import math
+#import mpl_toolkits.mplot3d
 import matplotlib.pyplot as plt
 
 def random_directions(number):

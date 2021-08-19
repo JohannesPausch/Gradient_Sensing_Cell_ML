@@ -64,7 +64,7 @@ def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistan
 #receptor_sphcoords,receptor_cartcoords, activation_receptors=init_Receptors(1,20)
 #plt=visualize_Receptors(receptor_cartcoords,1,0.05)
 #plt.show()
-receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(10,1,1)
-indx=activation_Receptors(0.1,0.4,receptor_sphcoords, 1, 2)
-print(indx)
+#receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(10,1,1)
+#indx=activation_Receptors(0.1,0.4,receptor_sphcoords, 1, 2)
+#print(indx)
 

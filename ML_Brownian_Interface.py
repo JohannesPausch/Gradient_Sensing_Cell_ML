@@ -32,7 +32,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
         command += ' -d '+str(diffusion)
     if radius != 1:
         command += ' -r '+str(radius)
-    print('used command: '+command)
+    #print('# used command: '+command)
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     while received[0] == '#':
@@ -40,7 +40,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
     try: 
         received = [float(x) for x in received]
     except:
-        print('Error: not a float')
+        print('# Error: not a float')
         print(received)
     radius = np.sqrt(xpos*xpos+ypos*ypos+zpos*zpos)
     source_theta,source_phi=np.arccos(zpos/radius), np.mod(np.arctan2(ypos,xpos),2*np.pi)
@@ -53,7 +53,7 @@ def stop_BrownianParticle(brownian_pipe):
     brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
     brownian_pipe.stdin.flush()
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-    return 'C-PRORGAM STOPPED'
+    return '# C-PRORGAM STOPPED'
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     if step_theta != None and step_phi != None:
@@ -81,7 +81,7 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
     try: 
         received = [float(x) for x in received]
     except:
-        print('not a float')
+        print('# not a float')
         error_string = received[0]
         for x in received:
             error_string += x

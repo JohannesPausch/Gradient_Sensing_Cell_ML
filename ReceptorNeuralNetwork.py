@@ -49,12 +49,12 @@ def train(training_x, training_y, layers_tuple, max_iterations):
     mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations)
     return mlp
 
-def test(mlp, predict_x, predict_y):
+def test(mlp,direction_sphcoords,frac_area, radius,predict_x, predict_y):
     pred = predict(mlp, predict_x)
-    acc = accuracy(predict_y, pred)
+    acc = nearest_neighbours_accuracy(direction_sphcoords,predict_y, pred,frac_area, radius)
     directprob = direction_probabilities(mlp, predict_x)
-    print("Accuracy of MLPClassifier : ", acc)
-    print("Probabilities of each direction : ", directprob)
+    #print("Accuracy of MLPClassifier (soft/harsh): ", acc)
+    #print("Probabilities of each direction : ", directprob)
     return acc, directprob
     
 def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None):
@@ -105,7 +105,7 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
         if bool_val == True:
             score += 1
     
-    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
+    return score/len(true_y), harsh_accuracy
 
 
     

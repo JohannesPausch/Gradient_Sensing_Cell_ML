@@ -23,12 +23,13 @@ radiusexact = -1,
 ratenum = 5,
 maxrate = 1,
 rateexact = -1, 
-receptor_seed = 1): 
+receptor_seed = 1,
+use_seed = 1): 
 ############## Parameters for receptor map ###################
 #the variables ...exact are a shortcut to skipping all the for loops and plugging in one value per variable
 #random_yn decides if we want to take a random uniform approach for the data (1) or if we want to do equally spaced values between 
 #chosen boundaries (0).
-    
+    np.random.seed(seed=use_seed)
     if diffusionexact== -1:
         if random_yn==0:
             diffusion_constants  = np.linspace(0.5,1,diffusionnum)
@@ -72,9 +73,9 @@ receptor_seed = 1):
     loop_count = 0
     for s in range(1,sourcenum+1):
         #pick source?
-        source_theta,source_phi = random_3d_rotation(np.random.rand(1),np.random.rand(1),s)
-        print(source_theta)
-        print(source_phi)
+        source_theta,source_phi = random_3d_rotation(np.pi*np.random.rand(1),2*np.pi*np.random.rand(1),s)
+        #print(source_theta)
+        #print(source_phi)
         sourcex,sourcey,sourcez = spherical2cart_point(source_theta,source_phi)
         #function to relate source coordinates to action direction -> make Y vector
         move = ideal_direction(source_theta,source_phi,direction_sphcoords, 1)
