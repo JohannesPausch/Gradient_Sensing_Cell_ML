@@ -4,6 +4,10 @@ import math
 def cart2spherical_point(x,y,z):
     r = math.pow(x,2) + math.pow(y,2) + math.pow(z,2)
     theta = math.pi/2 - math.acos(z/r)
+    if (z!=0.):
+        theta=math.atan(np.sqrt(x*x + y*y)/z)
+        if (theta<0.): theta+=math.pi
+    else:theta=math.pi/2.
     phi = math.atan2(y,x)
     return r,theta,phi
 

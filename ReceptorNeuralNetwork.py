@@ -1,5 +1,9 @@
+from datawriteread import read_datafile
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 import numpy as np
 from haversine import * 
 import pickle
@@ -7,15 +11,16 @@ import pickle
 def fit_mlp(X, Y, layers_tuple, max_iterations):
     #function to scale X to between 0 and 1 which is best for neural network, then creates mlp object 
     X = MinMaxScaler().fit_transform(X)
-    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',
-                        momentum=0, learning_rate_init=0.2) 
+    #mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',\
+                     #   momentum=0, learning_rate_init=0.2) 
+    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=1000) # lbfgs for small data
     #layers_tuple: Each element in the tuple is the number of nodes at the ith position. 
     #Length of tuple denotes the total number of layers.
     mlp.fit(X, Y)
     
     return mlp
 
-def predict(mlp: MLPClassifier, X):
+def predict(mlp, X):
     #function to scale X to between 0 and 1 and then use the Neural Network to produce predictions for Y
     X = MinMaxScaler().fit_transform(X)
     y = mlp.predict(X)
@@ -41,7 +46,6 @@ def separate_train_set(X,Y):
     training_y = np.array(Y)[indices[:n_train].astype(int)]
     predict_x = np.array(X)[indices[n_train:].astype(int)] 
     predict_y = np.array(Y)[indices[n_train:].astype(int)]
-    
     return training_x, training_y, predict_x, predict_y
 
 def train(training_x, training_y, layers_tuple, max_iterations):
@@ -49,22 +53,23 @@ def train(training_x, training_y, layers_tuple, max_iterations):
     mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations)
     return mlp
 
-def test(mlp,direction_sphcoords,frac_area, radius,predict_x, predict_y):
+def test(mlp, predict_x, predict_y):
     pred = predict(mlp, predict_x)
-    acc = nearest_neighbours_accuracy(direction_sphcoords,predict_y, pred,frac_area, radius)
+    score = mlp.score(predict_x, predict_y)
+    acc = accuracy_score(predict_y,pred)
     directprob = direction_probabilities(mlp, predict_x)
-    #print("Accuracy of MLPClassifier (soft/harsh): ", acc)
+    #print("Accuracy of MLPClassifier : ", acc)
     #print("Probabilities of each direction : ", directprob)
-    return acc, directprob
+    return acc, directprob, score
     
-def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cutoff=None,events=None,iterations=None):
+def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
     filename = 'MLPClassifier'
-    if distance != None:
-        filename += ' -d '+str(distance)
+    if particlenum != None:
+        filename += ' -p '+str(particlenum)
+    if receptornum != None:
+        filename += ' -r '+str(receptornum)
     if rate != None:
-        filename += ' -r '+str(rate)
-    if seed != None:
-        filename += ' -S '+str(seed)
+        filename += ' -R '+str(rate)
     if cutoff != None:
         filename += ' -c '+str(cutoff)
     if events != None:
@@ -72,7 +77,7 @@ def save_neural_network(mlp, distance=None,rate=None,diffusion=None,seed=None,cu
     if iterations != None:
         filename += ' -N '+str(iterations)
     if diffusion != None:
-        filename += ' -s '+str(diffusion)
+        filename += ' -d '+str(diffusion)
     pickle.dump(mlp, open(filename, 'wb'))
     return filename
     
@@ -85,6 +90,8 @@ def direction_probabilities(mlp, X):
     return mlp.predict_proba(X)
 
 def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_area, radius):
+        # uses the fraction of area of sphere you want covered to locate nearest directions, and see whether the predicted value was included in these
+
     true_y = list(true_y)
     predicted_y = list(predicted_y)
 
@@ -98,22 +105,20 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
         true = list(true)
         i+=1
         idx = true.index(1)
-    
         is_there_a_zero = np.linalg.norm(neighbours[idx]-predicted, axis=1)
-
         bool_val = 0 in is_there_a_zero
         if bool_val == True:
             score += 1
     
-    return score/len(true_y), harsh_accuracy
+    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
 
 
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
+    # uses the fraction of area of sphere you want covered to locate nearest directions. Stores these as a list of lists, where the element i is a list of the nearest neighbours for direction i
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
-
     directionnum=len(direction_sphcoords)
     distances = []
     neighbours = []
@@ -139,3 +144,6 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
+X= read_datafile('X_particlenum=1')
+Y= read_datafile('Y_particlenum=1')
+X_train, X_test, y_train, y_test = train_test_split(X,Y)

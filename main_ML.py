@@ -1,80 +1,114 @@
+from os import read
+from numpy.core.function_base import linspace
 from ReceptorNeuralNetwork import *
 from datacreation import *
 from IdealDirection import *
+from datawriteread import *
+from sklearn.model_selection import train_test_split
 import numpy as np
-#import pickle
-"""
+import pickle
+
+
 ######## data ##################
 #direction picking for cell: 
 #create some kind of print command for user to select the directions
-direction_sphcoords = pick_direction(0, 10)
+#direction_sphcoords = pick_direction(0, 10)
+#print(direction_sphcoords)
 
-#create data
-X, Y = datacreate(direction_sphcoords, receptornum=10,particlenum=20)
-
-print(X)
-print(Y)
-pickle.dump(X, open('X', 'wb'))
-pickle.dump(Y, open('Y', 'wb')) 
+#why index 0 more activated than the rest?
+#X, Y = datacreate(direction_sphcoords, sourcenum=5 ,receptornum=10,particlenum=10, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+#params = params_string('pick_direction(0,10)', sourcenum=5 ,receptornum=10,particlenum=10, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+#write_datafile('X_test=',params, X)
+#write_datafile('Y_test=',params, Y)
+#check double index in Y
+#coords = cart2spherical_point(-4.651031627755137,2.903085818191935,-0.43588706087042833)
+#print(direction_sphcoords)
+#print(coords)
+#ind = ideal_direction(coords[1],coords[2],direction_sphcoords,1)
+#print(ind)
+#check 
 """
+################### compare particle number accuracy ###########################
+particletest= [1,5,10,15,20]
+#same source directions for each data: same Y
+#5*3*3*3*2=270 data arrays to test
 
-direction_sphcoords = pick_direction(0, 10)
+for i in particletest:
+    X, Y = datacreate(direction_sphcoords, sourcenum=5 ,receptornum=10,particlenum=i, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    params = params_string('pick_direction(0,10)', sourcenum=5 ,receptornum=10,particlenum=i, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    write_datafile('X_particlenum='+str(i),params, X)
+    write_datafile('Y_particlenum='+str(i),params, Y)
+"""
+# TRAIN #
+particletest= [1,5,10,15,20]
+accuracy =[]
+random.seed(1)
+for i in particletest:
+    print(i)
+    X = read_datafile('X_particlenum='+str(i))
+    Y = read_datafile('Y_particlenum='+str(i))
+    training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
+    print('training data amount percentage:' + str((len(training_x)/len(X))*100))
+    mlp = train(training_x, training_y, layers_tuple = (100,50,25), max_iterations=1000)
+    save_neural_network(mlp, particlenum=i)
+    acc, probs, score = test(mlp, predict_x, predict_y)
+    accuracy.append(acc)
+print(accuracy)
 
+"""
+################### compare receptor number accuracy ###########################
+receptest= [10,20,30,40,50]
+#same source directions for each data: same Y
+loops = 5*3*3*3*2 #270 data arrays to test
+print(loops)
 
-#X = pickle.load(open('X', 'rb'))
-#Y = pickle.load(open('Y', 'rb'))
-#print(X.shape)
-#print(Y.shape)
-mysource_num = 20
-myreceptornum = 10
-myparticlenum = 25
-myrecepsurface_ratio = 10
-myradiusexact = 1
-mydiffusionexact = 0.5
-myrateexact = 0.1
-myfirst_layer = 6
-mysecond_layer = 4
-myfrac_area = 0.4
-myreceptor_seed = 1
-myuse_seed = 1
-mymax_iterations = 10000
-print('# ML testing by Johannes on 16 Aug 2021')
-print('# used parameters are')
-#print('# direction_sphcoords '+str(direction_sphcoords))
-print('# receptornum = '+str(myreceptornum))
-print('# range of seeds for source creations: 1 to '+str(mysource_num))
-print('# particlenum = is varying')
-print('# recepsurface_ratio = '+str(myrecepsurface_ratio))
-print('# radiusexact = '+str(myradiusexact))
-print('# diffusionexact = '+str(mydiffusionexact))
-print('# rateexact = '+str(myrateexact))
-print('# used seed for receptors '+str(myreceptor_seed))
-print('# used seed for everything else '+str(myuse_seed))
-print('# size of first hidden layer = '+str(myfirst_layer))
-print('# size of second hidden layer = '+str(mysecond_layer))
-print('# fraction of sphere area considered under soft accuracy measure '+str(myfrac_area))
-print('# max number of iterations for Neural Network to converge '+str(mymax_iterations))
+for i in receptest:
+    X, Y = datacreate(direction_sphcoords, sourcenum=5 ,receptornum=i,particlenum=20, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    params = params_string('pick_direction(0,10)', sourcenum=5 ,receptornum=i,particlenum=20, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    write_datafile('X_receptornum='+str(i),params, X)
+    write_datafile('Y_receptornum='+str(i),params, Y)
+    """
+receptest= [10,20,30,40,50]
+accuracy =[]
+random.seed(1)
+for i in receptest:
+    print(i)
+    X = read_datafile('X_receptornum='+str(i))
+    Y = read_datafile('Y_receptornum='+str(i))
+    training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
+    print('training data amount percentage:' + str((len(training_x)/len(X))*100))
+    mlp = train(training_x, training_y, layers_tuple = (100,50,25), max_iterations=1000)
+    save_neural_network(mlp, particlenum=i)
+    acc, probs, score = test(mlp, predict_x, predict_y)
+    accuracy.append(acc)
+print(accuracy)
+################### compare diffusion constants accuracy ###########################
+"""
+diffusion_constants  = np.linspace(0.5,1,5)
+#same source directions for each data: same Y
+loops = 5*3*3*3*2 #270 data arrays to test
+print(loops)
 
-print('# 1st column: particlenum, 2nd column: harsh accuracy, 3rd column: soft accuracy')
-for myparticlenum in [10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50]:
-    X1, Y1 = datacreate(direction_sphcoords, receptornum=myreceptornum, recepsurface_ratio=myrecepsurface_ratio,particlenum=myparticlenum,sourcenum=mysource_num, radiusexact=myradiusexact,diffusionexact=mydiffusionexact,rateexact=myrateexact,receptor_seed = myreceptor_seed,use_seed = myuse_seed)
-    #pickle.dump(X1, open('X1', 'wb'))
-    #pickle.dump(Y1, open('Y1', 'wb')) 
-    #X1 = pickle.load(open('X1', 'rb'))
-    #Y1 = pickle.load(open('Y1', 'rb'))
-    #print(Y1)
-    #print(X1)
-    training_x, training_y, predict_x, predict_y = separate_train_set(X1, Y1)
+for i in diffusion_constants:
+    X, Y = datacreate(direction_sphcoords, sourcenum=5 ,receptornum=10,particlenum=20, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionexact=i,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    params = params_string('pick_direction(0,10)', sourcenum=5 ,receptornum=10,particlenum=20, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionexact=i,ratenum=2,receptor_seed=1,initial_source_seed=1)
+    write_datafile('X_diffusion='+str(i),params, X)
+    write_datafile('Y_diffusion='+str(i),params, Y)
+#compare layer nodes accuracy 
+"""
+diffusion_constants  = np.linspace(0.5,1,5)
+accuracy =[]
+random.seed(1)
+for i in diffusion_constants:
+    print(i)
+    X = read_datafile('X_diffusion='+str(i))
+    Y = read_datafile('Y_diffusion='+str(i))
+    training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
+    print('training data amount percentage:' + str((len(training_x)/len(X))*100))
+    mlp = train(training_x, training_y, layers_tuple = (100,50,25), max_iterations=1000)
+    save_neural_network(mlp, particlenum=i)
+    acc, probs, score = test(mlp, predict_x, predict_y)
+    accuracy.append(acc)
+print(accuracy)
 
-    mlp = train(training_x, training_y, layers_tuple = (myfirst_layer,mysecond_layer), max_iterations=mymax_iterations)
-    filename = save_neural_network(mlp)
-    #restored_mlp = load_neural_network(filename)
-    #print(filename)
-
-    acc, directprob = test(mlp,direction_sphcoords,myfrac_area,myradiusexact, predict_x, predict_y)
-    #print(X1)
-    #print(Y1)
-    #print('# soft accuracy = '+str(acc[0]))
-    #print('# harsh accuracy = '+str(acc[1]))
-    print(str(myparticlenum)+'\t'+str(acc[1])+'\t'+str(acc[0]))
-
+Ytest = read_datafile('Y_diffusion=0.5')
