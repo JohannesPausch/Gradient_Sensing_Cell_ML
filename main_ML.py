@@ -12,7 +12,7 @@ import pickle
 ######## FIRST CHECK ##################
 #direction picking for cell: 
 #create some kind of print command for user to select the directions
-direction_sphcoords = pick_direction(0, 5)
+#direction_sphcoords = pick_direction(0, 5)
 #print(direction_sphcoords)
 
 #why index 0 more activated than the rest?
