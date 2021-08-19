@@ -218,7 +218,7 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
       for (p=buffer; *p; p++) if ((*p==',') || (*p==';')) *p=' ';
 
       if (sscanf(buffer, "%lg %lg %lg", &(source.x), &(source.y), &(source.z))!=3) {
-	fprintf(stderr, "Error: sscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	printf("# Error: sscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	exit(EXIT_FAILURE);
       }
       }
@@ -233,7 +233,7 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
       param_warmup_time=strtod(optarg, NULL);
       break;
     default:
-      fprintf(stderr, "Unknown flag %c.\n", ch);
+      printf("# Unknown flag %c.\n", ch);
       exit(EXIT_FAILURE);
       break;
     }
@@ -403,7 +403,7 @@ for (tm=0.; ;tm+=param_delta_t) {
 
 	/* It looks like when I terminate the fscanf string by a \n then it tries to gobble as much whitespace as possible, so it waits until no-whitespace? */
         if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
-	  fprintf(stderr, "Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	  printf("# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	  exit(EXIT_FAILURE);
 	}
         /* Update the position of all particles and the source.
