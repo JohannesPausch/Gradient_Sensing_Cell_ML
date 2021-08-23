@@ -12,11 +12,11 @@ def init_Receptors(radius, receptornum,random_yn, seed=0):
 # This code was taken from GitHub: https://gist.github.com/dinob0t/9597525
 # Uses reference: https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
     if random_yn==1: x,y,z = random_on_sphere_points(radius,receptornum,seed=0)
-    else: x,y,z = regular_on_sphere_points(radius,receptornum)
+    else: x,y,z = regular_on_sphere_points(radius,receptornum-1)
     theta,phi = cart2spherical_array(x,y,z) 
     receptor_sphcoords = np.concatenate(([theta],[phi])).T
     receptor_cartcoords = np.concatenate(([x],[y],[z])).T
-    activation_receptors = np.zeros((receptornum))
+    activation_receptors = np.zeros((len(receptor_sphcoords))) #not the same as receptnum sometimes
     return receptor_sphcoords,receptor_cartcoords, activation_receptors
 
 def visualize_Receptors(receptor_cartcoords,radius, mindistance):  
