@@ -8,12 +8,12 @@ import numpy as np
 from haversine import * 
 import pickle
 
-def fit_mlp(X, Y, layers_tuple, max_iterations):
+def fit_mlp(X, Y, layers_tuple, max_iterations, alph):
     #function to scale X to between 0 and 1 which is best for neural network, then creates mlp object 
     X = MinMaxScaler().fit_transform(X)
     #mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',\
                      #   momentum=0, learning_rate_init=0.2) 
-    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=max_iterations) # lbfgs for small data
+    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam',alpha=alph, max_iter=max_iterations, early_stopping=True) # lbfgs for small data
     #layers_tuple: Each element in the tuple is the number of nodes at the ith position. 
     #Length of tuple denotes the total number of layers.
     mlp.fit(X, Y)
@@ -48,9 +48,9 @@ def separate_train_set(X,Y):
     predict_y = np.array(Y)[indices[n_train:].astype(int)]
     return training_x, training_y, predict_x, predict_y
 
-def train(training_x, training_y, layers_tuple, max_iterations):
+def train(training_x, training_y, layers_tuple, max_iterations,alph):
     #function to train our neural network with half the data given
-    mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations)
+    mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations,alph)
     return mlp
 
 def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
@@ -63,8 +63,10 @@ def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
     #print("Probabilities of each direction : ", directprob)
     return acc, directprob, score
     
-def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
+def save_neural_network(mlp, filename,particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
+    """
     filename = 'MLPClassifier'
+    
     if particlenum != None:
         filename += ' -p '+str(particlenum)
     if receptornum != None:
@@ -79,6 +81,7 @@ def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,ra
         filename += ' -N '+str(iterations)
     if diffusion != None:
         filename += ' -d '+str(diffusion)
+        """
     pickle.dump(mlp, open(filename, 'wb'))
     return filename
     
@@ -143,6 +146,3 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
-X= read_datafile('X_particlenum=1')
-Y= read_datafile('Y_particlenum=1')
-X_train, X_test, y_train, y_test = train_test_split(X,Y)

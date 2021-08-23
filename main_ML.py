@@ -250,7 +250,7 @@ def report(results, n_top=3):
                           results['std_test_score'][candidate]))
             print("Parameters: {0}".format(results['params'][candidate]))
             print("")
-parameters ={'solver': ['adam'],'alpha':np.logspace(-1, 1, 5),'early_stopping':[True]}
+parameters ={'solver': ['adam'],'alpha':np.logspace(-1,1, 5), 'hidden_layer_sizes' : np.arange(18,22),'early_stopping':[True]}
 #parameters = {'solver': ['adam'], 'max_iter': [1000,2000,3000,4000,5000 ], \
     #'alpha':np.logspace(-1, 1, 5), \
     #'hidden_layer_sizes':np.arange(15, 25), 'beta_1':np.linspace(0.1, 0.9, 5), \
