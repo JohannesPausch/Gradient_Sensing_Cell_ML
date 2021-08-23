@@ -44,7 +44,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
         print(received)
     radius = np.sqrt(xpos*xpos+ypos*ypos+zpos*zpos)
     source_theta,source_phi=np.arccos(zpos/radius), np.mod(np.arctan2(ypos,xpos),2*np.pi)
-    return brownian_pipe,received,[source_theta,source_phi]
+    return brownian_pipe,received,[radius,source_theta,source_phi]
 
 def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=None,cutoff=None,events=None,training=None,iterations=None):
     return 1,np.random.rand(3)
@@ -55,9 +55,9 @@ def stop_BrownianParticle(brownian_pipe):
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     return '# C-PRORGAM STOPPED'
 
-def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
+def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_radius=0.1):
     if step_theta != None and step_phi != None:
-        brownian_pipe.stdin.write(bytes(str(np.cos(step_phi)*np.sin(step_theta))+separator+str(np.sin(step_phi)*np.sin(step_theta))+separator+str(np.cos(step_theta))+'\n', 'UTF-8'))
+        brownian_pipe.stdin.write(bytes(str(step_radius*np.cos(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.sin(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.cos(step_theta))+'\n', 'UTF-8'))
     else:
         brownian_pipe.stdin.write(bytes('0'+separator+'0'+separator+'0\n', 'UTF-8'))
     brownian_pipe.stdin.flush()
@@ -86,7 +86,7 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None):
         for x in received:
             error_string += x
         print(error_string)
-    return received,[source_theta,source_phi]
+    return received,[radius,source_theta,source_phi]
 
 def update_BrownianParticle_test(brownian_pipe,step_theta=None,step_phi=None):
     return np.random.rand(3)
