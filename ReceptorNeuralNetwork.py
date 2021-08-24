@@ -99,21 +99,25 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
     true_y = list(true_y)
     predicted_y = list(predicted_y)
 
-    harsh_accuracy = accuracy(true_y, predicted_y)
-    
-    neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords))
+    neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords), dtype=object)
     i = -1
     score = 0
-    for true, predicted in zip(true_y, predicted_y):
-        true = list(true)
+    for trued, predicted in zip(true_y, predicted_y):
+        trued = list(trued)
         i+=1
         # we have to deal with move arrays of all 0's
-        idx = true.index(1) 
-        is_there_a_zero = np.linalg.norm(neighbours[idx] - predicted, axis=1)
-        if np.all(is_there_a_zero) == 0: #if there is then score augments
-            score += 1
-    
-    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
+        
+        if (sum(trued)==0): 
+            if (sum(predicted)==0): 
+                score += 1
+            else:
+                score += 0
+        else:    
+            idx = trued.index(1) 
+            is_there_a_zero = np.linalg.norm(neighbours[idx] - predicted, axis=1)
+            if np.all(is_there_a_zero) == 0: #if there is then score augments
+                score += 1
+
     return score/len(true_y)
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
@@ -121,7 +125,6 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
-    print(max_distance)
     directionnum=len(direction_sphcoords)
     distances = []
     neighbours = []
@@ -146,3 +149,4 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
+
