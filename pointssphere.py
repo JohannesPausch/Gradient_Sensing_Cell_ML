@@ -44,3 +44,4 @@ def regular_on_sphere_points(r,num): #for directions
             y.append(yy)
             z.append(zz)
     return x,y,z
+

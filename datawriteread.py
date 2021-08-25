@@ -30,7 +30,7 @@ particle_seed= 1):#deal with source exact later
     '#rateexact= '+ str(rateexact), '#receptor_seed= '+ str(receptor_seed), '#initial_source_seed='+ str(initial_source_seed), '#particle_seed= '+ str(particle_seed)])
 
 
-def write_datafile(filename, params, data):
+def write_datafile(filename, params=[0], data=[0]):
     with open(filename +'.txt', 'w') as filehandle:
         filehandle.writelines("%s\n" % p for p in params)
         data = np.matrix(data)
