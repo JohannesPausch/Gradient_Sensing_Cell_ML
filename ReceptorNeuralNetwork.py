@@ -8,34 +8,31 @@ import numpy as np
 from haversine import * 
 import pickle
 
-def fit_mlp(X, Y, layers_tuple, max_iterations):
+def fit_mlp(X, Y, layers_tuple, max_iterations,alph):
     #function to scale X to between 0 and 1 which is best for neural network, then creates mlp object 
     X = MinMaxScaler().fit_transform(X)
     #mlp = MLPClassifier(hidden_layer_sizes=layers_tuple,random_state=0, max_iter=max_iterations, solver='sgd', learning_rate='constant',\
                      #   momentum=0, learning_rate_init=0.2) 
-    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='adam', max_iter=max_iterations) # lbfgs for small data
+    mlp = MLPClassifier(hidden_layer_sizes=layers_tuple, solver='lbfgs', max_iter=max_iterations, early_stopping=True,alpha=alph) # lbfgs for small data
     #layers_tuple: Each element in the tuple is the number of nodes at the ith position. 
     #Length of tuple denotes the total number of layers.
     mlp.fit(X, Y)
-    
     return mlp
 
 def predict(mlp, X):
     #function to scale X to between 0 and 1 and then use the Neural Network to produce predictions for Y
     X = MinMaxScaler().fit_transform(X)
     y = mlp.predict(X)
-    
     return y
-
+"""
 def accuracy(true_y, predicted_y):
     score = 0
     for true, predicted in zip(true_y, predicted_y):
         is_there_a_zero = np.linalg.norm(true - predicted)
         if is_there_a_zero == 0:
             score += 1
-        
     return score/len(true_y)
-
+"""
 def separate_train_set(X,Y):
     #if data is ordered use this to randomise it so every source position is trained on, then use first half of data to train the network
     #use second half of the data to predict if network is working
@@ -48,9 +45,9 @@ def separate_train_set(X,Y):
     predict_y = np.array(Y)[indices[n_train:].astype(int)]
     return training_x, training_y, predict_x, predict_y
 
-def train(training_x, training_y, layers_tuple, max_iterations):
+def train(training_x, training_y, layers_tuple, max_iterations,alph):
     #function to train our neural network with half the data given
-    mlp = fit_mlp(training_x, training_y, layers_tuple, max_iterations)
+    mlp =fit_mlp(training_x, training_y, layers_tuple, max_iterations,alph)
     return mlp
 
 def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
@@ -63,8 +60,10 @@ def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
     #print("Probabilities of each direction : ", directprob)
     return acc, directprob, score
     
-def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
+def save_neural_network(mlp, filename,particlenum=None,receptornum=None,diffusion=None,rate=None,cutoff=None,events=None,iterations=None):
+    """
     filename = 'MLPClassifier'
+    
     if particlenum != None:
         filename += ' -p '+str(particlenum)
     if receptornum != None:
@@ -79,6 +78,7 @@ def save_neural_network(mlp, particlenum=None,receptornum=None,diffusion=None,ra
         filename += ' -N '+str(iterations)
     if diffusion != None:
         filename += ' -d '+str(diffusion)
+        """
     pickle.dump(mlp, open(filename, 'wb'))
     return filename
     
@@ -96,21 +96,40 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
     true_y = list(true_y)
     predicted_y = list(predicted_y)
 
-    harsh_accuracy = accuracy(true_y, predicted_y)
+<<<<<<< Updated upstream
+    neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords), dtype=object)
+=======
+    #harsh_accuracy = accuracy(true_y, predicted_y)
     
     neighbours = np.array(find_nearest_neighbours(frac_area, radius, direction_sphcoords))
+>>>>>>> Stashed changes
     i = -1
     score = 0
-    for true, predicted in zip(true_y, predicted_y):
-        true = list(true)
+    for trued, predicted in zip(true_y, predicted_y):
+        trued = list(trued)
         i+=1
         # we have to deal with move arrays of all 0's
+<<<<<<< Updated upstream
+        
+        if (sum(trued)==0): 
+            if (sum(predicted)==0): 
+                score += 1
+            else:
+                score += 0
+        else:    
+            idx = trued.index(1) 
+            is_there_a_zero = np.linalg.norm(neighbours[idx] - predicted, axis=1)
+            if np.all(is_there_a_zero) == 0: #if there is then score augments
+                score += 1
+
+=======
         idx = true.index(1) 
         is_there_a_zero = np.linalg.norm(neighbours[idx] - predicted, axis=1)
         if np.all(is_there_a_zero) == 0: #if there is then score augments
             score += 1
     
-    #print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
+    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", score)
+>>>>>>> Stashed changes
     return score/len(true_y)
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
@@ -118,7 +137,6 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
     cap_area = frac_area * 4 * np.pi * np.power(radius,2)
     dtheta = np.arccos(1-cap_area/(2 * np.pi * np.power(radius,2)))
     max_distance = haversine(radius,0,0,dtheta,0)
-    print(max_distance)
     directionnum=len(direction_sphcoords)
     distances = []
     neighbours = []
@@ -143,6 +161,4 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
-#X= read_datafile('X_particlenum=1')
-#Y= read_datafile('Y_particlenum=1')
-#X_train, X_test, y_train, y_test = train_test_split(X,Y)
+
