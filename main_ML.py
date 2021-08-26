@@ -32,34 +32,65 @@ import pickle
 ####### THIS WORKS!! EXACT BUT DIFFERENT SEEDS###########
 #particletest= [5,10,20,30]
 #particletest= [40,50,60]
-particletest= [70,80,90,100]
-
-
-direction_sphcoords = pick_direction(0,10) #same as sourcenum
-Xfinal = np.zeros((10*100,11)) #((sourcenum*seeds,receptornum))
-Yfinal = np.zeros((10*100,len(direction_sphcoords)))
-for i in particletest:
-    for seed_particle in range(1,101): #10 sources corresponding each to the 10 directions -> therefore 10 arrays for each seed of fifo
-        X, Y = datacreate(direction_sphcoords, sourcenum=10 ,sourceexact=direction_sphcoords,receptornum=10,particlenum=i, recepsurface_ratio=10, distanceexact=3,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,particle_seed=seed_particle)
-        Xfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = X
-        Yfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = Y
-    params = params_string('pick_direction(0,10)', sourcenum=10 ,receptornum=10,particlenum=i, recepsurface_ratio=10, distanceexact=3,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,initial_source_seed=1,particle_seed=seed_particle)
-    write_datafile('Xseed_particlenum='+str(i),params, Xfinal)
-    write_datafile('Yseed_particlenum='+ str(i),params,Yfinal)
-
-
-particletest= [5,10,20,30,40,50,60,70,80,90,100]
-accuracy =[]
-for i in particletest:
-    X = read_datafile('Xseed_particlenum='+str(i))
-    Y = read_datafile('Yseed_particlenum='+str(i))
+#particletest= [10,12,14,16,18,20,22]
+direction_sphcoords = pick_direction(0,10)
+my_sourcenum=10
+my_receptornum=10
+my_recepsurface_ratio=10
+my_distanceexact=3
+my_radiusexact=1
+my_diffusionexact=1
+my_rateexact=1
+my_receptor_seed=1
+my_particle_seed=100
+first_layer = my_receptornum + len(direction_sphcoords)
+second_layer = 0
+my_max_iterations = 5000
+print('# test of Neural Network training for Gradient Sensening of Cell')
+print('# sourcenum = '+str(my_sourcenum))
+print('# receptornum = '+str(my_receptornum))
+print('# particlenum = varies (1st column), accuracy 2nd column, mlp score 3rd column')
+print('# recepsurface_ratio = '+str(my_recepsurface_ratio))
+print('# distanceexact = '+str(my_distanceexact))
+print('# radiusexact = '+str(my_radiusexact))
+print('# diffusionexact = '+str(my_diffusionexact))
+print('# rateexact = '+str(my_rateexact))
+print('# receptor_seed = '+str(my_receptor_seed))
+print('# number of particle seeds particle_seed = '+str(my_particle_seed))
+print('# first_layer of NN = '+str(first_layer))
+print('# second_layer of NN = '+str(second_layer))
+print('# my_max_iterations for mlp training = '+str(my_max_iterations))
+for i in range(10,200,2):
+    X, Y = datacreate(direction_sphcoords, sourcenum=my_sourcenum ,sourceexact=direction_sphcoords,receptornum=my_receptornum,particlenum=i, recepsurface_ratio=my_recepsurface_ratio, distanceexact=my_distanceexact,radiusexact=my_radiusexact,diffusionexact=my_diffusionexact,rateexact=my_rateexact,receptor_seed=my_receptor_seed,particle_seed=my_particle_seed)
     training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
-    #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
-    mlp = train(training_x, training_y, layers_tuple = (100,50), max_iterations=5000)
-    save_neural_network(mlp, particlenum=i)
+    mlp = train(training_x, training_y, layers_tuple = (first_layer), max_iterations=my_max_iterations)
     acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
-    accuracy.append(acc)
-print(accuracy)
+    print(str(i)+'\t'+str(acc)+'\t'+str(score))
+# direction_sphcoords = pick_direction(0,10) #same as sourcenum
+# Xfinal = np.zeros((10*100,11)) #((sourcenum*seeds,receptornum))
+# Yfinal = np.zeros((10*100,len(direction_sphcoords)))
+# for i in particletest:
+#     for seed_particle in range(1,101): #10 sources corresponding each to the 10 directions -> therefore 10 arrays for each seed of fifo
+#         X, Y = datacreate(direction_sphcoords, sourcenum=10 ,sourceexact=direction_sphcoords,receptornum=10,particlenum=i, recepsurface_ratio=10, distanceexact=3,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,particle_seed=seed_particle)
+#         Xfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = X
+#         Yfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = Y
+#     params = params_string('pick_direction(0,10)', sourcenum=10 ,receptornum=10,particlenum=i, recepsurface_ratio=10, distanceexact=3,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,initial_source_seed=1,particle_seed=seed_particle)
+#     write_datafile('Xseed_particlenum='+str(i),params, Xfinal)
+#     write_datafile('Yseed_particlenum='+ str(i),params,Yfinal)
+
+
+# particletest= [5,10,20,30,40,50,60,70,80,90,100]
+# accuracy =[]
+# for i in particletest:
+#     X = read_datafile('Xseed_particlenum='+str(i))
+#     Y = read_datafile('Yseed_particlenum='+str(i))
+#     training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
+#     #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
+#     mlp = train(training_x, training_y, layers_tuple = (100,50), max_iterations=5000)
+#     save_neural_network(mlp, particlenum=i)
+#     acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
+#     accuracy.append(acc)
+# print(accuracy)
 
 ####### BELOW IS WHAT I WAS DOING BEFORE AND DOESN'T MAKE MUCH SENSE NOW #############
 """

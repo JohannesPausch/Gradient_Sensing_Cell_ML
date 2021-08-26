@@ -110,7 +110,7 @@ def nearest_neighbours_accuracy(direction_sphcoords, true_y, predicted_y, frac_a
         if np.all(is_there_a_zero) == 0: #if there is then score augments
             score += 1
     
-    print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
+    #print("accuracy considering close neighbours = ", score/len(true_y), "accuracy considering only correct direction =", harsh_accuracy)
     return score/len(true_y)
     
 def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
@@ -143,6 +143,6 @@ def find_nearest_neighbours(frac_area, radius, direction_sphcoords):
         neighbours.append(best_directions)
             
     return neighbours
-X= read_datafile('X_particlenum=1')
-Y= read_datafile('Y_particlenum=1')
-X_train, X_test, y_train, y_test = train_test_split(X,Y)
+#X= read_datafile('X_particlenum=1')
+#Y= read_datafile('Y_particlenum=1')
+#X_train, X_test, y_train, y_test = train_test_split(X,Y)
