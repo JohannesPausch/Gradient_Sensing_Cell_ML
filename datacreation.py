@@ -26,7 +26,7 @@ maxrate = 1,
 rateexact = -1, 
 receptor_seed = 1,
 initial_source_seed = 1,
-particle_seed= 1): 
+particle_seed= 10): 
 ############## Parameters for receptor map ###################
 #the variables ...exact are a shortcut to skipping all the for loops and plugging in one value per variable
 #random_yn decides if we want to take a random uniform approach for the data (1) or if we want to do equally spaced values between 
@@ -75,7 +75,7 @@ particle_seed= 1):
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
     receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum, 0,receptor_seed)
     #print('receptornum in regular method:'+ str(len(receptor_sphcoords)))
-    loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
+    loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)*particle_seed
     X = np.zeros((loops,len(receptor_sphcoords)))
     Y = np.zeros((loops,direction_sphcoords.shape[0]))
     loop_count = 0
@@ -101,27 +101,30 @@ particle_seed= 1):
                 sz = sourcez * distance
                 for ra in rate:
                     for dif in diffusion_constants:
-                        loop_count+=1
-                        activation_array = np.zeros((1,len(receptor_sphcoords)))
-                        #needs source position and radius to be included in parameters
-                        brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=particle_seed) 
-                            #what is the seed for?
-                            #do we fix parameters training,cutoff,events,iterations? 
-                        count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
-                        while(count <= particlenum):
-                            theta_mol = received[0]
-                            phi_mol = received[1]
-                            ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
-                            if ind == -1: pass
-                            else: activation_array[0,ind[0]] += 1
-                            received,source = update_BrownianParticle(brownian_pipe)
-                            count+=1
-                        stop_BrownianParticle(brownian_pipe)
-                        X[loop_count-1,:] = activation_array
-                        if (activation_array==0).all():
-                            Y[loop_count-1,:] = np.zeros((1,len(direction_sphcoords)))
-                        else: 
-                            Y[loop_count-1,:] = move
-                        #print(str(X[loop_count-1,:])+'\t'+str(Y[loop_count-1,:]))
-                            
+                        for c_seed in range(1,particle_seed):
+                            loop_count+=1
+                            activation_array = np.zeros((1,len(receptor_sphcoords)))
+                            #needs source position and radius to be included in parameters
+                            brownian_pipe,received,source = init_BrownianParticle(sx,sy,sz,rate=ra,radius=r,diffusion=dif, use_seed=c_seed) 
+                                #what is the seed for?
+                                #do we fix parameters training,cutoff,events,iterations? 
+                            count = 1 #count how many particles in one activation array measure. Starts with 1 particle.
+                            while(count <= particlenum):
+                                try :
+                                    theta_mol = received[0]
+                                    phi_mol = received[1]
+                                except:
+                                    print(received)
+                                ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,r,mindistance)
+                                if ind == -1: pass
+                                else: activation_array[0,ind[0]] += 1
+                                received,source = update_BrownianParticle(brownian_pipe)
+                                count+=1
+                            stop_BrownianParticle(brownian_pipe)
+                            X[loop_count-1,:] = activation_array
+                            if (activation_array==0).all():
+                                Y[loop_count-1,:] = np.zeros((1,len(direction_sphcoords)))
+                            else: 
+                                Y[loop_count-1,:] = move
+                            #print(str(X[loop_count-1,:])+'\t'+str(Y[loop_count-1,:]))                       
     return X, Y
