@@ -224,7 +224,7 @@ for (iteration=1LL; ((iteration<=param_num_iterations) &&   ( (param_num_events=
         if ((theta=atan(sqrt(distance_from_z_axis2)/z))<0.) theta+=M_PI;
       } else theta=M_PI/2.;
       phi=atan2(y,x); /* phi=0 for y=0 */
-
+      
       event++;
 
       printf("# EVENT %lli %lli %10.20g %10.20g %10.20g %10.20g %10.20g %lli\n", event, iteration, theta, phi, x, y, z, steps);

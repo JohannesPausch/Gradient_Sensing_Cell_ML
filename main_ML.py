@@ -36,7 +36,8 @@ import pickle
 
 ################### compare particle number accuracy  ###########################
 ####### THIS WORKS!! EXACT BUT DIFFERENT SEEDS###########
-particletest = np.arange(200,501,10)
+"""
+particletest = np.arange(200,401,10)
 
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
 
@@ -50,10 +51,10 @@ for i in particletest:
     params = params_string('pick_direction(0,10)', sourcenum=10 ,receptornum=10,particlenum=i, recepsurface_ratio=10, distanceexact=3,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,initial_source_seed=1,particle_seed=seed_particle)
     write_datafile('Xseed_particlenum='+str(i),params, Xfinal)
     write_datafile('Yseed_particlenum='+ str(i),params,Yfinal)
-
-
-particlenum= np.arange(10,501,10)
-instances = np.arange(1,50,1)
+"""
+"""
+particlenum= np.arange(10,401,10)
+instances = np.arange(1,51,1)
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
 accuracytotal = np.zeros((len(instances),len(particlenum)))
 for j in instances: 
@@ -65,7 +66,7 @@ for j in instances:
         training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
     #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
     #mlp = train(training_x, training_y, layers_tuple = (15), max_iterations=5000,alph=0.01)
-        mlp = train(training_x, training_y, layers_tuple =(15), max_iterations=10000, alph=0.01)
+        mlp = train(training_x, training_y, layers_tuple =(16), max_iterations=50000, alph=0.001)
     #pickle.dump(mlp, open("MLP_classifier_particles", 'wb'))  
     #restored_clf = pickle.load(open("MLP_classifier", 'rb'))
         acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
@@ -74,8 +75,8 @@ for j in instances:
     accuracytotal[j-1,:]=accur
 #write_datafile('accuracy_particle_big18-0.01',params=[0], data=accur)
 #write_datafile('score_particle_big18-0.01',params=[0],data=sc)
-write_datafile('accuracy_total_particle15-0.01',params=[0],data=accuracytotal)
-
+write_datafile('accuracy_total_particle16-0.001',params=[0],data=accuracytotal)
+"""
 #changed receptor thing in regular_on_sphere so should give you 9 receptors next time when doing this function
 
 ############ RECEPTORS ##################
@@ -95,10 +96,10 @@ for i in recept:
     write_datafile('Xseed_receptornum='+str(i),params, Xfinal)
     write_datafile('Yseed_receptornum='+ str(i),params,Yfinal)
 """
-
+"""
 #recept= [5,10,20,30,40,50,60,70,80,90,100]
 recept = np.arange(5,100,2)
-instances = np.arange(1,50,1)
+instances = np.arange(1,51,1)
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
 accuracytotal = np.zeros((len(instances),len(recept)))
 for j in instances: 
@@ -109,7 +110,7 @@ for j in instances:
         Y = read_datafile('Yseed_receptornum='+str(i))
         training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
         #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
-        mlp = train(training_x, training_y, layers_tuple = (i+6), max_iterations=20000,alph=0.01)
+        mlp = train(training_x, training_y, layers_tuple = (i+7), max_iterations=50000,alph=0.001)
         #save_neural_network(mlp, particlenum=i)
         acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
         accur.append(acc)
@@ -117,8 +118,8 @@ for j in instances:
     accuracytotal[j-1,:]=accur
     #write_datafile('accuracy_recept_big+6-0.01-'+str(j),params=[0], data=accur)
     #write_datafile('score_recept_big+6-0.01-'+str(j),params=[0],data=sc)
-write_datafile('accuracy_total_big+6-0.01-iter20000',params=[0],data=accuracytotal)
-
+write_datafile('accuracy_total_big+7-0.001-iter50000',params=[0],data=accuracytotal)
+"""
 
 ############ DIFFUSION ##################
 """
@@ -136,7 +137,7 @@ for i in diffusion:
     write_datafile('Xseed_diffusion='+str(i),params, Xfinal)
     write_datafile('Yseed_diffusion='+ str(i),params,Yfinal)
 """
-
+"""
 diffusion = np.arange(0.1,2.1,0.1)
 direction_sphcoords = pick_direction(0,10) 
 instances = np.arange(1,51,1)
@@ -150,7 +151,7 @@ for j in instances:
         Y = read_datafile('Yseed_diffusion='+str(i))
         training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
         #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
-        mlp = train(training_x, training_y, layers_tuple = (15), max_iterations=5000,alph=0.01)
+        mlp = train(training_x, training_y, layers_tuple = (16), max_iterations=50000,alph=0.001)
         #save_neural_network(mlp, particlenum=i)
         acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
         accur.append(acc)
@@ -158,56 +159,78 @@ for j in instances:
     accuracytotal[j-1,:]=accur
     #write_datafile('accuracy_diffusion_big15-0.01',params=[0], data=accur)
     #write_datafile('score_diffusion_big15-0.01',params=[0],data=sc)
-write_datafile('accuracy_total_diffusion_15-0.01',params=[0],data=accuracytotal)
-
+write_datafile('accuracy_total_diffusion_16-0.001',params=[0],data=accuracytotal)
+"""
 """
 
-"""
 """
 ############ CAPTURE AREA ##################### 
 #not really needed because same as having more receptors...
 #################### DISTANCE ############
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
-#distance= [2,3,4,5,6,7,8,9,10]
-distance= [2]
+distance= [2,2.5,3,3.5,4,4.5,5,5.5,6]
+#6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13]
 seednum = 1000 #check more data only for NN check
 
 Yfinal = np.zeros((10*seednum,len(direction_sphcoords)))
 Xfinal = np.zeros((10*seednum,9))
 for i in distance:
-    for seed_particle in range(1,1001): #10 sources corresponding each to the 10 directions -> therefore 10 arrays for each seed of fifo
-        X, Y = datacreate(direction_sphcoords, sourcenum=10 ,sourceexact=direction_sphcoords,receptornum=10,particlenum=20, recepsurface_ratio=10, distanceexact=i,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,particle_seed=seed_particle)
+    for seed_particle in range(1,seednum+1): #10 sources corresponding each to the 10 directions -> therefore 10 arrays for each seed of fifo
+        X, Y = datacreate(direction_sphcoords, sourcenum=10 ,sourceexact=direction_sphcoords,receptornum=10,particlenum=100, recepsurface_ratio=10, distanceexact=i,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,particle_seed=seed_particle)
         Xfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = X
         Yfinal[10*(seed_particle-1):(10*(seed_particle-1)+ 9),:] = Y
-    params = params_string('pick_direction(0,10)', sourcenum=10 ,receptornum=10,particlenum=20, recepsurface_ratio=10, distanceexact=i,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,initial_source_seed=1,particle_seed=seed_particle)
-    write_datafile('Xseed_distanceonly='+str(i),params, Xfinal)
-    write_datafile('Yseed_distanceonly='+ str(i),params,Yfinal)
-"""
+    params = params_string('pick_direction(0,10)', sourcenum=10 ,receptornum=10,particlenum=100, recepsurface_ratio=10, distanceexact=i,radiusexact=1,diffusionexact=1,rateexact=1,receptor_seed=1,initial_source_seed=1,particle_seed=seed_particle)
+    write_datafile('Xseed_distance_big='+str(i),params, Xfinal)
+    write_datafile('Yseed_distance_big='+ str(i),params,Yfinal)
 
-distance= [2,3,4,5,6,7,8,9,10]
+distance= [2,2.5,3,3.5,4,4.5,5,5.5,6]
+#6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13]
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
 instances = np.arange(1,51,1)
+accuracytotal = np.zeros((len(instances),len(distance)))
+accuracynn25 = np.zeros((len(instances),len(distance)))
+accuracynn35 = np.zeros((len(instances),len(distance)))
+accuracynn50 = np.zeros((len(instances),len(distance)))
+
 for j in instances:
     accur =[]
+    acn25 = []
+    acn35 = []
+    acn50 = []
+
     for i in distance:
-        X = read_datafile('Xseed_distance='+str(i))
-        Y = read_datafile('Yseed_distance='+str(i))
+        X = read_datafile('Xseed_distance_big='+str(i))
+        Y = read_datafile('Yseed_distance_big='+str(i))
         training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
-        #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
-        mlp = train(training_x, training_y, layers_tuple = (15), max_iterations=10000, alph=0.01)
+        mlp = train(training_x, training_y, layers_tuple = (16), max_iterations=50000, alph=0.001)
     #save_neural_network(mlp, particlenum=i)
-        acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
+        pred = predict(mlp, predict_x)
+        acc = accuracy_score(predict_y,pred)
+        accnn25 = nearest_neighbours_accuracy(direction_sphcoords,predict_y,pred,0.25)
+        accnn35 = nearest_neighbours_accuracy(direction_sphcoords,predict_y,pred,0.35)
+        accnn50 = nearest_neighbours_accuracy(direction_sphcoords,predict_y,pred,0.50)
         accur.append(acc)
+        acn25.append(accnn25)
+        acn35.append(accnn35)
+        acn50.append(accnn50)
     accuracytotal[j-1,:]=accur
-write_datafile('accuracy_total_distances',params=[0],data=accuracytotal)
+    accuracynn25[j-1,:]=acn25
+    accuracynn35[j-1,:]=acn35
+    accuracynn50[j-1,:]=acn50
+
+write_datafile('accuracy_total_distances16-0.00150000',params=[0],data=accuracytotal)
+write_datafile('accuracynn0.25_total_distances16-0.00150000',params=[0],data=accuracynn25)
+write_datafile('accuracynn0.35_total_distances16-0.00150000',params=[0],data=accuracynn35)
+write_datafile('accuracynn0.50_total_distances16-0.00150000',params=[0],data=accuracynn50)
 
 """
 """
 
 ############# NEURAL NETWORK ################
+"""
 direction_sphcoords = pick_direction(0,10) #same as sourcenum
-alpha= logspace(-4,-1,20)
-instances = np.arange(1,11,1)
+alpha= [0.0001,0.001,0.01,0.1,0.5,1.0,1.5,2.0,2.5,3.0]
+instances = np.arange(1,51,1)
 accuracytotal = np.zeros((len(instances),len(alpha)))
 for j in instances:
     accur =[]
@@ -216,13 +239,13 @@ for j in instances:
         Y = read_datafile('Yseed_distanceonly=2')
         training_x, predict_x,training_y, predict_y = train_test_split(X, Y)
     #print('training data amount percentage:' + str((len(training_x)/len(X))*100))
-        mlp = train(training_x, training_y, layers_tuple = (15), max_iterations=10000, alph=i)
+        mlp = train(training_x, training_y, layers_tuple = (16), max_iterations=10000, alph=i, solve ='adam')
     #save_neural_network(mlp, particlenum=i)
         acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
         accur.append(acc)
     accuracytotal[j-1,:]=accur
-write_datafile('accuracy_total_alphas_15',params=[0],data=accuracytotal)
-
+write_datafile('accuracy_total_alphas_16',params=[0],data=accuracytotal)
+"""
 """
 def report(results, n_top=3):
     for i in range(1, n_top + 1):
@@ -234,14 +257,14 @@ def report(results, n_top=3):
                           results['std_test_score'][candidate]))
             print("Parameters: {0}".format(results['params'][candidate]))
             print("")
-parameters ={'solver': ['adam'],'alpha':[0.0001,0.001,0.01,0.1], 'hidden_layer_sizes' : np.arange(10,20),'early_stopping':[True]}
+parameters ={'solver': ['lbfgs'],'alpha':[0.0001,0.001,0.01,0.1,0.5,1.0,1.5,2.0,2.5,3.0], 'hidden_layer_sizes' : np.arange(10,20),'early_stopping':[True]}
 #parameters = {'solver': ['adam'], 'max_iter': [1000,2000,3000,4000,5000 ], \
     #'alpha':np.logspace(-1, 1, 5), \
     #'hidden_layer_sizes':np.arange(15, 25), 'beta_1':np.linspace(0.1, 0.9, 5), \
     #'beta_2' : np.linspace(0.1, 0.999, 5), 'epsilon': np.logspace(-8,-2,5),  'early_stopping':[True]}
 clf = GridSearchCV(MLPClassifier(), parameters)
-X = read_datafile('Xseed_distanceonly=2')
-Y = read_datafile('Yseed_distanceonly=2')
+X = read_datafile('Xseed_distance=2') #distanceonly when using 'adam' (bottom results)
+Y = read_datafile('Yseed_distance=2')
 X = MinMaxScaler().fit_transform(X)
 clf.fit(X, Y)
 report(clf.cv_results_)

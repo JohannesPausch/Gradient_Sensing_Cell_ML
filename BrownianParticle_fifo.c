@@ -396,7 +396,7 @@ for (tm=0.; ;tm+=param_delta_t) {
 	if (particle[i].z!=0.) {
     theta=atan(sqrt(particle[i].x*particle[i].x + particle[i].y*particle[i].y)/particle[i].z); 
 	  if(theta <0.) theta+=M_PI;
-	} else theta=M_PI/2.; // -pi/2 to pi/2
+	} else theta=M_PI/2.; // 0 to pi
 	phi=atan2(particle[i].y,particle[i].x); /* phi=0 for y=0 */ // this makes phi from -pi to pi, transform to 0 to 2pi
  if (particle[i].y<0.) phi= 2*M_PI + phi;
 	

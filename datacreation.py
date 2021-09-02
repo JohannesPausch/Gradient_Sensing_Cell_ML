@@ -73,7 +73,7 @@ particle_seed= 1):
 
 ########### LOOPs for data #################
     #fix number of receptors for each training data, it's like fixing the number of eyes the cell has... makes sense, I think.
-    receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum,0,receptor_seed)
+    receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(1,receptornum, 0,receptor_seed)
     #print('receptornum in regular method:'+ str(len(receptor_sphcoords)))
     loops = sourcenum*len(radius_sphere)*len(distance_from_source)*len(rate)*len(diffusion_constants)
     X = np.zeros((loops,len(receptor_sphcoords)))
