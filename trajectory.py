@@ -7,5 +7,8 @@ filename = 'coordinates4_cart'
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 data = np.array(read_datafile(filename))
-ax.scatter3D(data[:,1], data[:,2], data[:,3], cmap='Reds');
+print(data)
+ax.scatter3D(data[:,1], data[:,2], data[:,3])
+ax.scatter3D(data[0,1],data[0,2],data[0,3],'r') 
+
 plt.show()
