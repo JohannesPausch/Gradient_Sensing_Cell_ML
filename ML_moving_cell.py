@@ -7,7 +7,7 @@ from IdealDirection import *
 from ReceptorMap import *
 from sklearn.preprocessing import MinMaxScaler
 from datawriteread import *
-
+from sphericaltransf import *
 
 # initialise the cell (load directions, load mlp, load receptors)
 # choose initial distance
@@ -19,7 +19,7 @@ recepsurface_ratio = 10
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 
 filename = 'Total_mlp'
-init_distance = 5
+init_distance = 4
 rate = 1
 diffusion = 1 #ideally 0.1
 seed = 1
@@ -28,10 +28,6 @@ init_pos = np.matmul(special_ortho_group.rvs(3),np.array([init_distance,0,0]))
 sourcex= init_pos[0]
 sourcey= init_pos[1]
 sourcez= init_pos[2]
-#sourcex,sourcey,sourcez = spherical2cart_point(direction_sphcoords[0,0],direction_sphcoords[0,1])
-#sourcex *= init_distance 
-#sourcey *= init_distance 
-#sourcez *= init_distance 
 particlenum = 100
 max_particles = 100000
 mlp = load_neural_network(filename)
@@ -48,8 +44,6 @@ print('# filename of neural network = '+filename)
 
 # initalize c setup
 brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,seed,cutoff)
-
-#ind_list = list(-np.ones(particlenum))
 ind_list = []
 countparticle = 0
 count = 1 #count how many particles have been detected so far
@@ -72,7 +66,6 @@ while(count <= max_particles):
         for i in ind_list:
             if i != -1:
                 activation_array[0,i]+=1
-        scaler = MinMaxScaler()
         move = mlp.predict(activation_array)
         if (move == 0).all():
             received,source = mlbi.update_BrownianParticle(brownian_pipe)
@@ -81,10 +74,13 @@ while(count <= max_particles):
             received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[move.index(1)][0],direction_sphcoords[move.index(1)][1], step_radius=0.1)
         if str(source[0]) == 'F':
             print('# Source found')
-            print(str(count)+'\t'+str(0)+'\t'+str(0)+'\t'+str(0))
             break
         else:
-            print(str(count)+'\t'+str(source[0])+'\t'+str(source[1])+'\t'+str(source[2]))
+            x,y,z = spherical2cart_point(source[1],source[2])
+            sourcex = source[0]* x
+            sourcey = source[0]* y
+            sourcez = source[0]* z
+            print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
 
     else: pass
     count+=1
