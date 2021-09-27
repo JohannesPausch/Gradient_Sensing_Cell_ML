@@ -9,7 +9,7 @@ from reshapevalues import *
 from random_3d_rotation import *
 
 ############## DATA origin source ###########################
-data = np.loadtxt('BrownianParticle_RUNRUN01/BrownianParticle_RUNRUN01_2_1000_P01_20210705_173431.txt',
+data = np.loadtxt('BrownianParticle_ref2.txt',
 				delimiter=' ', 	# String used to separate values
 				usecols=[0,1,2,3,4,5,6,7], 	# Specify which columns to read
 				dtype=np.double) 		# The type of the resulting array
@@ -31,7 +31,7 @@ Xdata=np.transpose(np.concatenate((np.transpose(theta_data).reshape(1,numtrain-1
 # In Xtot, the row 0 is not rotated and row 1 is the random rotation of row 0,
 # the rest of the rows correspond to randomly rotated variables of the selected window of Xdata.
 
-groupsize=60
+groupsize=50
 
 for i in range(0,numtrain-1):
     if (i+groupsize>numtrain-1):
@@ -58,6 +58,17 @@ for i in range(0,numtrain-1):
 print(Xtot.shape)
 beta= analyticalreg(Xtot, Ytot)
 print(beta[0:10,:])
+plt.rcParams.update({'font.size': 15})
 plt.hist(beta[0::2,0])
-plt.savefig('betaHistogramm02.png')
-#plt.hist(theta_data)
+plt.xlabel(r'$\beta$ ($\theta\rightarrow\theta_s$)')
+plt.ylabel('Frequency')
+plt.tight_layout()
+plt.savefig('betaHistogramthetatheta2.png')
+
+plt.clf()
+plt.rcParams.update({'font.size': 15})
+plt.hist(beta[0::2,1])
+plt.xlabel(r'$\beta$ ($\theta\rightarrow\phi_s$)')
+plt.ylabel('Frequency')
+plt.tight_layout()
+plt.savefig('phiHistogramthetaphi2.png')

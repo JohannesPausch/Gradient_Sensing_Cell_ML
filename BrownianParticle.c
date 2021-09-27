@@ -59,22 +59,22 @@ double param_cutoff_squared=CUTOFF*CUTOFF;
 double param_sphere_radius=SPHERE_RADIUS;
 double param_sphere_radius_squared=SPHERE_RADIUS*SPHERE_RADIUS;
 
-/* Position of the cell sphere along x-axis. */
+/* Position of the cell sphere along x-axis. Deafult beginning was 5.0*/
 #ifndef SPHERE_POSZ
-#define SPHERE_POSZ (5.0)
+#define SPHERE_POSZ (10.0) 
 #endif
 double param_sphere_posz=SPHERE_POSZ;
 
 
 /* Diffusive step length, sigma=2D\Delta t in every direction. */
 #ifndef SIGMA 
-#define SIGMA (0.01)
+#define SIGMA (0.1)
 #endif
 double param_sigma=SIGMA;
 
 /* Number of iterations */
 #ifndef NUM_ITERATIONS
-#define NUM_ITERATIONS (1000000LL)
+#define NUM_ITERATIONS (100000LL)
 #endif
 long long int param_num_iterations=NUM_ITERATIONS;
 long long int param_num_events=0LL;

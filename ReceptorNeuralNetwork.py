@@ -24,8 +24,6 @@ def predict(mlp, X):
     #function to scale X to between 0 and 1 and then use the Neural Network to produce predictions for Y
     #X = MinMaxScaler().fit_transform(X)
     y = mlp.predict(X)
-    print(X)
-    #print(y)
     return y
 
 def accuracy(true_y, predicted_y):
@@ -56,7 +54,6 @@ def train(training_x, training_y, layers_tuple, max_iterations,alph,solve='lbfgs
 
 def test(mlp, predict_x, predict_y, direction_sphcoords, frac):
     pred = predict(mlp, predict_x)
-    print(pred)
     score = mlp.score(predict_x, predict_y) #same thing as accuracy_score just predicts again inside the function
     acc = accuracy_score(predict_y,pred)
     #directprob = direction_probabilities(mlp, predict_x)
