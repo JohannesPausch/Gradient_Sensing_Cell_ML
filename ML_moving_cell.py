@@ -5,7 +5,6 @@ from scipy.stats import special_ortho_group
 from ReceptorNeuralNetwork import *
 from IdealDirection import *
 from ReceptorMap import *
-from sklearn.preprocessing import MinMaxScaler
 from datawriteread import *
 from sphericaltransf import *
 
@@ -18,16 +17,20 @@ recepsurface_ratio = 10
 
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 
-filename = 'Total_mlp'
-init_distance = 4
+filename = 'Total_mlp1'
+init_distance = 30
 rate = 1
 diffusion = 1 #ideally 0.1
 seed = 1
-cutoff = 20  
+cutoff = 40  
 init_pos = np.matmul(special_ortho_group.rvs(3),np.array([init_distance,0,0]))
 sourcex= init_pos[0]
 sourcey= init_pos[1]
 sourcez= init_pos[2]
+#x,y,z =spherical2cart_point(direction_sphcoords[0,1],direction_sphcoords[0,2])
+#sourcex= init_distance*x
+#sourcey= init_distance*y
+#sourcez= init_distance*z
 particlenum = 100
 max_particles = 100000
 mlp = load_neural_network(filename)
@@ -66,6 +69,7 @@ while(count <= max_particles):
         for i in ind_list:
             if i != -1:
                 activation_array[0,i]+=1
+        print(activation_array)
         move = mlp.predict(activation_array)
         if (move == 0).all():
             received,source = mlbi.update_BrownianParticle(brownian_pipe)
