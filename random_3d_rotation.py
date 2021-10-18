@@ -11,7 +11,8 @@ def random_3d_rotation(theta,phi, use_seed=None):
     try:
         np.random.seed(seed=use_seed)
         y=np.matmul(special_ortho_group.rvs(3),np.array([np.cos(phi)*np.sin(theta),np.sin(phi)*np.sin(theta),np.cos(theta)]))#special_ortho_group.rvs(3)
-        theta, phi =cart2spherical_point(y[0],y[1],y[2]) #transform to theta phi again
+        if (np.array(y).ndim)>1: theta, phi =cart2spherical_array(y[0],y[1],y[2])
+        else: theta, phi =cart2spherical_point(y[0],y[1],y[2]) #transform to theta phi again
         return theta, phi
     except ValueError:
         if phi.shape != theta.shape:  print("Error in random_3d_rotation: Shapes of phi and theta don't match")

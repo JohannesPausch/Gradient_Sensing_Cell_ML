@@ -6,6 +6,7 @@ from receptorpatches import *
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
+import math
 
 def init_Receptors(radius, receptornum,random_yn, seed=0):
 # Distribution of receptors:
@@ -45,7 +46,6 @@ def visualize_Receptors(receptor_cartcoords,radius, mindistance):
         ax.add_patch(p)
         pathpatch_2d_to_3d(p, z = 0, normal = normal)
         pathpatch_translate(p, normal)
-    plt.show()
     return plt
 
 def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistance):
@@ -67,4 +67,3 @@ def activation_Receptors(mol_theta,mol_phi,receptor_sphcoords, radius, mindistan
 #receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(10,1,1)
 #indx=activation_Receptors(0.1,0.4,receptor_sphcoords, 1, 2)
 #print(indx)
-

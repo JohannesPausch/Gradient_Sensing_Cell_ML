@@ -158,6 +158,7 @@ char param_input[PATH_MAX]={0};
 
 double param_warmup_time=0.;
 
+int param_protocol=0;
 
 gsl_rng *rng;
 
@@ -184,7 +185,7 @@ double source_distance2, sphere_distance2;
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
@@ -201,6 +202,9 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
     case 'o':
       STRCPY(param_output, optarg);
       break;
+    case 'p':
+      param_protocol=1;
+      break;
     case 'R':
       param_release_rate=strtod(optarg, NULL);
       break;
@@ -209,7 +213,7 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:R:r:s:S:t:w:")) != -1) {
       break;
     case 's':
       {
-      char buffer[2048];
+      char buffer[2048]; // BAD STYLE, buffer overflow should be caught.
       char *p;
 
       strncpy(buffer, optarg, sizeof(buffer)-1);
@@ -288,6 +292,7 @@ printf("# Info: PID: %i\n", (int)getpid());
 param_sigma=sqrt(2.*param_delta_t*param_diffusion);
 param_cutoff_squared=param_cutoff*param_cutoff;
 param_sphere_radius_squared=param_sphere_radius*param_sphere_radius;
+PRINT_PARAM(param_protocol, "-p", "%i");
 PRINT_PARAM(param_delta_t, "-t", "%g");
 PRINT_PARAM(param_diffusion, "-d", "%g");
 PRINT_PARAM(param_sigma, "", "%g");
@@ -396,17 +401,41 @@ for (tm=0.; ;tm+=param_delta_t) {
 	if (particle[i].z!=0.) {
     theta=atan(sqrt(particle[i].x*particle[i].x + particle[i].y*particle[i].y)/particle[i].z); 
 	  if(theta <0.) theta+=M_PI;
-	} else theta=M_PI/2.; // -pi/2 to pi/2
+	} else theta=M_PI/2.; // 0 to pi
 	phi=atan2(particle[i].y,particle[i].x); /* phi=0 for y=0 */ // this makes phi from -pi to pi, transform to 0 to 2pi
  if (particle[i].y<0.) phi= 2*M_PI + phi;
 	
 	fprintf(fout, "%g %g %g\n", theta, phi, tm);
 
 	/* It looks like when I terminate the fscanf string by a \n then it tries to gobble as much whitespace as possible, so it waits until no-whitespace? */
-        if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
-	  printf("# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
-	  exit(EXIT_FAILURE);
+	if (param_protocol==0) {
+	  if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
+	    printf("# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	    exit(EXIT_FAILURE);
+	    //printf("# Warning: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	    //printf("# Warning: Exiting quietly.\n");
+	    //exit(EXIT_SUCCESS);
+	  }
+	} else {
+	  char buffer[2048]; // BAD STYLE, buffer overflow should be caught.
+	  char *p=buffer;
+
+	  read(STDIN_FILENO, p, 1);
+	  while (*p!='\n') {
+	    p++;
+	    read(STDIN_FILENO, p, 1);
+	  }
+	  *p=(char)0;
+	  if (sscanf(buffer, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
+	    if (strcmp(buffer, "STOP")==0) {
+	      printf("# Info: STOP keyword received. Good bye!\n");
+	      exit(EXIT_SUCCESS);
+	    }
+	    printf("# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
+	    exit(EXIT_FAILURE);
+	  }
 	}
+
         /* Update the position of all particles and the source.
 	 * One update is superfluous, as particle[i] will be purged
 	 * anyway. */
