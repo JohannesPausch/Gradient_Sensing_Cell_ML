@@ -9,8 +9,7 @@ from ReceptorMap import *
 from datawriteread import *
 from sphericaltransf import *
 
-# initialise the cell (load directions, load mlp, load receptors)
-# choose initial distance
+
 receptornum = 10
 direction_sphcoords = pick_direction(0,10)
 radius = 1
@@ -18,13 +17,12 @@ recepsurface_ratio = 10
 
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 
-filename = 'Total_mlp1'
-init_distance = 10
+init_distance = 3
 rate = 1
 diffusion = 1 #ideally 0.1
 seed = 1
 cutoff = 20  
-init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
+init_pos = np.matmul(special_ortho_group.rvs(3, 1,random_state= seed),np.array([init_distance,0,0]))
 sourcex= init_pos[0]
 sourcey= init_pos[1]
 sourcez= init_pos[2]
@@ -32,19 +30,15 @@ sourcez= init_pos[2]
 #sourcex= init_distance*x
 #sourcey= init_distance*y
 #sourcez= init_distance*z
-particlenum = 100
 max_particles = 100000
-mlp = load_neural_network(filename)
-print('# movement simulation of the cell with previously learnt neural network')
+print('# movement simulation of the cell with greedy algorithm')
 print('# init_distance = '+str(init_distance))
 print('# rate = '+str(rate))
 print('# diffusion = '+str(diffusion))
 print('# seed = '+str(seed))
 print('# cutoff = '+str(cutoff))
 print('# init_pos = '+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
-print('# particlenum = '+str(particlenum))
 print('# max_particles = '+str(max_particles))
-print('# filename of neural network = '+filename)
 
 # initalize c setup
 brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,seed,cutoff)
@@ -56,26 +50,10 @@ while(count <= max_particles):
     phi_mol = received[1]
     ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
     if ind == -1: 
-        countparticle +=1
-        ind_list.append(-1)
-        if countparticle>particlenum:
-            ind_list.pop(0) 
-    else:
-        countparticle +=1
-        ind_list.append(ind[0][0])
-        if countparticle>particlenum:
-            ind_list.pop(0)
-    if len(ind_list) == particlenum:
-        activation_array = np.zeros((1,len(receptor_sphcoords)))
-        for i in ind_list:
-            if i != -1:
-                activation_array[0,i]+=1
-        move = mlp.predict(activation_array)
-        if (move == 0).all():
-            received,source = mlbi.update_BrownianParticle(brownian_pipe)
-        else:
-            move= list(move[0])
-            received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[move.index(1)][0],direction_sphcoords[move.index(1)][1], step_radius=0.1)
+        received,source = mlbi.update_BrownianParticle(brownian_pipe)
+    else: #same index for receptors and directions
+        ind = ind[0][0]
+        received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[ind][0],direction_sphcoords[ind][1], step_radius=0.1)
         if str(source[0]) == 'F':
             print('# Source found')
             break
@@ -85,10 +63,4 @@ while(count <= max_particles):
             sourcey = source[0]* y
             sourcez = source[0]* z
             print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
-
-    else: pass
     count+=1
-
-
-
-
