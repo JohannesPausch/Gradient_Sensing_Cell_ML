@@ -11,21 +11,13 @@ direction_sphcoords = pick_direction(0,10) #same as sourcenum
 Xfinal = read_datafile('X_total_distances_update')
 #Yfinal = np.zeros((len(distance)*len(X),len(direction_sphcoords)))
 Yfinal = read_datafile('Y_total_distances_update')
-"""
-for i in distance:
-    X = read_datafile('Xtseed_distanceonly='+str(i))
-    Y = read_datafile('Xtseed_distanceonly='+str(i))
-    indx= distance.index(i)
-    Xfinal[indx*len(X):indx*len(X)+len(X),:]= X
-    Yfinal[indx*len(Y):indx*len(Y)+len(Y),:]= Y
-    """        
+     
 
 training_x, predict_x,training_y, predict_y = train_test_split(Xfinal, Yfinal)
 mlp = train(training_x, training_y, layers_tuple = (19), max_iterations=50000, alph=0.1,solve='lbfgs')
 acc, probs, score = test(mlp, predict_x, predict_y,direction_sphcoords,0.25)
 print(acc)
 save_neural_network(mlp, 'Total_mlp2')
-"""
+
 write_datafile('X_total_distances_update',params=[0],data=Xfinal)
 write_datafile('Y_total_distances_update',params=[0],data=Yfinal)
-"""

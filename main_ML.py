@@ -15,25 +15,6 @@ import numpy as np
 import pickle
 
 
-######## FIRST CHECK ##################
-#direction picking for cell: 
-#create some kind of print command for user to select the directions
-#direction_sphcoords = pick_direction(0, 5)
-#print(direction_sphcoords)
-
-#why index 0 more activated than the rest?
-#X, Y = datacreate(direction_sphcoords, sourcenum=5 ,receptornum=10,particlenum=10, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
-#params = params_string('pick_direction(0,10)', sourcenum=5 ,receptornum=10,particlenum=10, recepsurface_ratio=10, distancenum=3,radiusnum=3,diffusionnum=3,ratenum=2,receptor_seed=1,initial_source_seed=1)
-#write_datafile('X_test=',params, X)
-#write_datafile('Y_test=',params, Y)
-#check double index in Y
-#coords = cart2spherical_point(-4.651031627755137,2.903085818191935,-0.43588706087042833)
-#print(direction_sphcoords)
-#print(coords)
-#ind = ideal_direction(coords[1],coords[2],direction_sphcoords,1)
-#print(ind)
-#check 
-
 ################### compare particle number accuracy  ###########################
 ####### THIS WORKS!! EXACT BUT DIFFERENT SEEDS###########
 

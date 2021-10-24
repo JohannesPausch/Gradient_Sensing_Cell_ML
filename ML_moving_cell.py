@@ -18,7 +18,7 @@ recepsurface_ratio = 10
 
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 
-filename = 'Total_mlp1'
+filename = 'Total_mlp2'
 init_distance = 10
 rate = 1
 diffusion = 1 #ideally 0.1
