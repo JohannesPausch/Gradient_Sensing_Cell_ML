@@ -16,7 +16,6 @@ import pickle
 
 
 ################### compare particle number accuracy  ###########################
-####### THIS WORKS!! EXACT BUT DIFFERENT SEEDS###########
 
 """
 particletest = np.arange(200,401,10)
@@ -370,6 +369,8 @@ for j in instances:
     accuracytotal[j-1,:]=accur
 write_datafile('accuracy_total_nodes_big_update',params=[0],data=accuracytotal)
 """
+
+
 """
 #mistake doing the matrices  always a zero vector separating them:
 dis = [2]
@@ -382,85 +383,7 @@ for i in dis:
     write_datafile('Xseed_distanceonly_update='+str(i), params, X)
     write_datafile('Yseed_distanceonly_update='+ str(i),params, Y)
 """  
-"""
-
-def report(results, n_top=3):
-    for i in range(1, n_top + 1):
-        candidates = np.flatnonzero(results['rank_test_score'] == i)
-        for candidate in candidates:
-            print("Model with rank: {0}".format(i))
-            print("Mean validation score: {0:.3f} (std: {1:.3f})"
-                  .format(results['mean_test_score'][candidate],
-                          results['std_test_score'][candidate]))
-            print("Parameters: {0}".format(results['params'][candidate]))
-            print("")
-parameters ={'max_iter': [50000],'solver': ['lbfgs'],'alpha':[0.0001,0.001,0.01,0.1,0.5,1.0,1.5,2.0,2.5,3.0], 'hidden_layer_sizes' : np.arange(10,20),'early_stopping':[True]}
-#parameters = {'solver': ['adam'], 'max_iter': [1000,2000,3000,4000,5000 ], \
-    #'alpha':np.logspace(-1, 1, 5), \
-    #'hidden_layer_sizes':np.arange(15, 25), 'beta_1':np.linspace(0.1, 0.9, 5), \
-    #'beta_2' : np.linspace(0.1, 0.999, 5), 'epsilon': np.logspace(-8,-2,5),  'early_stopping':[True]}
-clf = GridSearchCV(MLPClassifier(), parameters)
-X = read_datafile('Xseed_particlenum_update=10') #distanceonly when using 'adam' (bottom results)
-Y = read_datafile('Yseed_particle_update=10')
-X = MinMaxScaler().fit_transform(X)
-clf.fit(X, Y)
-report(clf.cv_results_)
-"""
-"""
-#####  for Xseed_distance_update=2
-Model with rank: 1
-Mean validation score: 0.728 (std: 0.041)
-Parameters: {'alpha': 0.1, 'early_stopping': True, 'hidden_layer_sizes': 12, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-Model with rank: 1
-Mean validation score: 0.728 (std: 0.043)
-Parameters: {'alpha': 0.5, 'early_stopping': True, 'hidden_layer_sizes': 19, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-Model with rank: 3
-Mean validation score: 0.727 (std: 0.038)
-Parameters: {'alpha': 0.01, 'early_stopping': True, 'hidden_layer_sizes': 14, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-Model with rank: 3
-Mean validation score: 0.727 (std: 0.036)
-Parameters: {'alpha': 0.1, 'early_stopping': True, 'hidden_layer_sizes': 19, 'max_iter': 50000, 'solver': 'lbfgs'}
-#############################
-### for Xseed_distance_big_update=2
-Model with rank: 1
-Mean validation score: 0.994 (std: 0.001)
-Parameters: {'alpha': 0.1, 'early_stopping': True, 'hidden_layer_sizes': 16, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-Model with rank: 2
-Mean validation score: 0.993 (std: 0.001)
-Parameters: {'alpha': 0.1, 'early_stopping': True, 'hidden_layer_sizes': 19, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-Model with rank: 3
-Mean validation score: 0.993 (std: 0.001)
-Parameters: {'alpha': 0.5, 'early_stopping': True, 'hidden_layer_sizes': 17, 'max_iter': 50000, 'solver': 'lbfgs'}
-
-"""
-"""
-plt.rcParams.update({'font.size': 18})
-nodes= range(3,50)
-#accuracy= [0.052, 0.34, 0.44, 0.628, 0.088, 0.692, 0.728, 0.676, 0.752, 0.772, 0.716, 0.764, 0.74, 0.648, 0.792, 0.768, 0.768, 0.74, 0.72, 0.732, 0.752, 0.756, 0.744, 0.748, 0.728, 0.752, 0.804, 0.76, 0.728, 0.748, 0.716, 0.72, 0.728, 0.688, 0.684, 0.736, 0.74, 0.768, 0.712, 0.74, 0.748, 0.7, 0.712, 0.716, 0.752, 0.74, 0.692, 0.724, 0.724, 0.704, 0.712, 0.716, 0.74, 0.724, 0.72, 0.712, 0.704, 0.728, 0.712, 0.688, 0.728, 0.72, 0.696, 0.656, 0.732, 0.696, 0.72, 0.732, 0.708, 0.74, 0.744, 0.668, 0.7, 0.732, 0.712, 0.672, 0.76, 0.72, 0.724, 0.74, 0.712, 0.728, 0.748, 0.732, 0.74, 0.744, 0.736, 0.728, 0.708, 0.724, 0.712, 0.74, 0.7, 0.796, 0.712, 0.7, 0.78, 0.712, 0.724, 0.724, 0.724, 0.748, 0.684, 0.7, 0.756, 0.7, 0.732, 0.732, 0.696, 0.764, 0.76, 0.728, 0.728, 0.784, 0.716, 0.764, 0.736, 0.708, 0.74, 0.744, 0.732, 0.784, 0.68, 0.716, 0.744, 0.748, 0.724, 0.76, 0.724, 0.74, 0.724, 0.748, 0.736, 0.704, 0.768, 0.764, 0.712, 0.732, 0.72, 0.7, 0.764, 0.74, 0.76, 0.756, 0.724, 0.736, 0.74, 0.724, 0.708, 0.716, 0.696, 0.72, 0.764, 0.704, 0.688, 0.712, 0.74, 0.804, 0.696, 0.716, 0.696, 0.748, 0.708, 0.776, 0.716, 0.756, 0.724, 0.74, 0.752, 0.736, 0.724, 0.72, 0.756, 0.712, 0.74, 0.72, 0.72, 0.74, 0.696, 0.752, 0.768, 0.708, 0.68, 0.76, 0.728, 0.72, 0.74, 0.732, 0.796, 0.704, 0.676, 0.756, 0.756, 0.696, 0.728, 0.744, 0.74]
-accuracy= [0.5, 0.3276, 0.6968, 0.702, 0.7304, 0.7356, 0.7096, 0.7716, 0.7812, 0.7688, 0.7656, 0.7808, 0.7716, 0.7644, 0.764, 0.7988, 0.7776, 0.78, 0.794, 0.7772, 0.786, 0.7996, 0.7952, 0.7748, 0.7928, 0.782, 0.7876, 0.7788, 0.7844, 0.7932, 0.792, 0.796, 0.788, 0.8008, 0.7884, 0.792, 0.7772, 0.7768, 0.7884, 0.794, 0.7888, 0.794, 0.7756, 0.7972, 0.79, 0.7916, 0.7948]
-write_datafile('nodesaccuracy',params=[0] ,data=accuracy,linewidth = 0, marker = 'o', color = 'blue')
-plt.figure(figsize=(8,6))
-plt.plot(nodes,accuracy, '--o',)
-plt.ylabel('Accuracy of MLPClassifier')
-plt.xlabel('Nodes of first hidden layer')
-plt.savefig('nodes2.png')
-
-"""
-X = read_datafile('Xseed_particlenum_update=350')
-print(MinMaxScaler().fit_transform(X)[0:3,:])
-X = read_datafile('Xseed_particlenum_update=190')
-print(MinMaxScaler().fit_transform(X)[0:3,:])
 
 
 
-
-
-
-
-################# BEFORE ######################
 
