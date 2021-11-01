@@ -18,18 +18,8 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 1 #ideally 0.1
-<<<<<<< HEAD
-<<<<<<< HEAD
-seeds = np.arange(1,100)
+seeds = np.arange(1,101)
 distances = np.arange(2,22)
-=======
-seeds = np.arange(1,101,1)
-distances = np.arange(4,21,1)
->>>>>>> 8b8e414769928373b24a2fee039b7c53f2f5083c
-=======
-seeds = np.arange(1,3,1)
-distances = np.arange(4,6,1)
->>>>>>> 99f458dbc33f6df7d87c1111b5d4eab668e6d060
 mean_final_counts = []
 std_final_counts = []
 
@@ -37,11 +27,7 @@ for init_distance in distances:
     final_counts =[]
     for seed in seeds: 
         print(seed, init_distance)
-<<<<<<< HEAD
         cutoff = 30 #20 initially
-=======
-        cutoff = 30  
->>>>>>> 8b8e414769928373b24a2fee039b7c53f2f5083c
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
