@@ -18,8 +18,13 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 1 #ideally 0.1
+<<<<<<< HEAD
 seeds = np.arange(1,100)
 distances = np.arange(2,22)
+=======
+seeds = np.arange(1,101,1)
+distances = np.arange(4,21,1)
+>>>>>>> 8b8e414769928373b24a2fee039b7c53f2f5083c
 mean_final_counts = []
 std_final_counts = []
 
@@ -27,7 +32,11 @@ for init_distance in distances:
     final_counts =[]
     for seed in seeds: 
         print(seed, init_distance)
+<<<<<<< HEAD
         cutoff = 30 #20 initially
+=======
+        cutoff = 30  
+>>>>>>> 8b8e414769928373b24a2fee039b7c53f2f5083c
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
@@ -70,10 +79,6 @@ for init_distance in distances:
         final_counts.append(count)
     mean_counts = np.mean(final_counts)
     range_counts = np.std(final_counts)
-    with open("greedy_algorithm_steps_data.txt", "a") as output:
+    with open("greedy_algorithm_steps_datacutoff30.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
-    mean_final_counts.append(mean_counts)
-    std_final_counts.append(range_counts)
-print('mean', mean_final_counts)
-print('st dev', std_final_counts)
