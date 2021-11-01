@@ -2,7 +2,7 @@ from pointssphere import *
 import matplotlib.pyplot as plt
 from haversine import * 
 from sphericaltransf import *
-from receptorpatches import *
+#from receptorpatches import *
 from mpl_toolkits.mplot3d import proj3d
 from matplotlib.patches import Circle
 from itertools import product
