@@ -18,8 +18,8 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 1 #ideally 0.1
-seeds = np.arange(1,101,1)
-distances = np.arange(4,21,1)
+seeds = np.arange(1,3,1)
+distances = np.arange(4,6,1)
 mean_final_counts = []
 std_final_counts = []
 

@@ -21,8 +21,8 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 filename = 'Total_mlp2'
 rate = 1
 diffusion = 1 #ideally 0.1
-seeds = [102]
-distances = [13]
+seeds = np.arange(1,101,1)
+distances = np.arange(4,22,1)
 mean_final_counts = []
 std_final_counts = []
 
@@ -30,7 +30,7 @@ for init_distance in distances:
     final_counts =[]
     for seed in seeds: 
         print(seed, init_distance)
-        cutoff = 20
+        cutoff = 30
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         print(init_pos)
         sourcex= init_pos[0]
@@ -99,7 +99,7 @@ for init_distance in distances:
         final_counts.append(count)
     mean_counts = np.mean(final_counts)
     range_counts = np.std(final_counts)
-    with open("neural_network_steps_data.txt", "a") as output:
+    with open("neural_network_steps_datacutoff30.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
     mean_final_counts.append(mean_counts)
