@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats 
+import os
 
 import sys
-sys.path.append('/Users/taliarahall/Gradient_Sensing_Cell_ML/Code')
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'Code'))
+
 
 from datawriteread import read_datafile
 
