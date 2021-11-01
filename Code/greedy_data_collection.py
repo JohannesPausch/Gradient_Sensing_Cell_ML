@@ -18,13 +18,8 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 1 #ideally 0.1
-seeds = [  1,  2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15, 16,  17,  18,
-  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,
-  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  53,  54,
-  55,  56,  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,
-  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  87,  88,  89,
-  91,  92,  93,  94,  95,  96,  97,  98,  99, 100, 101, 102]
-distances = [13]
+seeds = np.arange(1,100)
+distances = np.arange(2,22)
 mean_final_counts = []
 std_final_counts = []
 
@@ -32,24 +27,24 @@ for init_distance in distances:
     final_counts =[]
     for seed in seeds: 
         print(seed, init_distance)
-        cutoff = 20  
+        cutoff = 30 #20 initially
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
         sourcez= init_pos[2]
-        particlenum=100
         max_particles = 100000
-        # print('# movement simulation of the cell with greedy algorithm')
-        # print('# init_distance = '+str(init_distance))
-        # print('# rate = '+str(rate))
-        # print('# diffusion = '+str(diffusion))
-        # print('# seed = '+str(seed))
-        # print('# cutoff = '+str(cutoff))
-        # print('# init_pos = '+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
-        # print('# max_particles = '+str(max_particles))
+        #print('# movement simulation of the cell with greedy algorithm')
+        #print('# init_distance = '+str(init_distance))
+        #print('# rate = '+str(rate))
+        #print('# diffusion = '+str(diffusion))
+        #print('# seed = '+str(seed))
+        #print('# cutoff = '+str(cutoff))
+        #print('# init_pos = '+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
+        #print('# max_particles = '+str(max_particles))
 
         # initalize c setup
         brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff)
+        print(received)
         ind_list = []
         countparticle = 0
         count = 1 #count how many particles have been detected so far

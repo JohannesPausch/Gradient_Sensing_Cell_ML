@@ -2,15 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats 
 import os
-
 import sys
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'Code'))
 
 
+
+
+sys.path.append('/Users/Paula/Documents/GitHub/Gradient_Sensing_Cell_ML/Code')
+#os.path.join(os.path.dirname(sys.path[0]),'Code'
 from datawriteread import read_datafile
-
 neuraldata = read_datafile('neural_network_steps_data')
-greedydata= read_datafile('greedy_algorithm_steps_data')
+greedydata = read_datafile('greedy_algorithm_steps_data')
 
 dist = np.arange(2,15,1)
 
