@@ -17,17 +17,19 @@ radius = 1
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 recepsurface_ratio = 10
 rate = 1
-diffusion = 1 #ideally 0.1
-seeds = np.arange(1,101)
-distances = np.arange(2,22)
+diffusion = 2 #ideally 0.1 #1 initially
+seeds = np.arange(1,51)
+distances = np.arange(2,14)
 mean_final_counts = []
 std_final_counts = []
 
+
 for init_distance in distances:
-    final_counts =[]
+    final_counts = []
+    final_steps = []
     for seed in seeds: 
         print(seed, init_distance)
-        cutoff = 30 #20 initially
+        cutoff = 20 #20 initially
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
@@ -47,6 +49,7 @@ for init_distance in distances:
         print(received)
         ind_list = []
         countparticle = 0
+        steps = 0
         count = 1 #count how many particles have been detected so far
         while(count <= max_particles):
             theta_mol = received[0]
@@ -66,10 +69,12 @@ for init_distance in distances:
                     sourcey = source[0]* y
                     sourcez = source[0]* z
                     #print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
+                    steps+=1
             count+=1
         final_counts.append(count)
-    mean_counts = np.mean(final_counts)
-    range_counts = np.std(final_counts)
-    with open("greedy_algorithm_steps_datacutoff30.txt", "a") as output:
+        final_steps.append(steps)
+    #mean_counts = np.mean(final_counts)
+    #range_counts = np.std(final_counts)
+    with open("greedy_algorithm_stepsmoved_diff2cutoff20.txt", "a") as output:
         output.write(str(init_distance)+'\n')
-        output.write(str(final_counts)+'\n')
+        output.write(str(final_steps)+'\n')
