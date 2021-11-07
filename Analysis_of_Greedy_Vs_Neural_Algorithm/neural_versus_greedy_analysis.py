@@ -40,8 +40,8 @@ for data_set in data:
     plt.errorbar(dist, mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
     i+=1
 plt.legend()
-plt.xlabel('Distance of Cell from Source')
-plt.ylabel('Steps to find source')
+plt.xlabel('Initial distance of Cell from Source')
+plt.ylabel('No. of cue particles hit cell')
 plt.grid()
 plt.show()
         
