@@ -20,9 +20,9 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 # ones that dont work dist = 13, seeds 52, 90. seed 8 and 17 for dist 15
 filename = 'Total_mlp2'
 rate = 1
-diffusion = 1 #ideally 0.1
-seeds = np.arange(1,101,1)
-distances = np.arange(4,22,1)
+diffusion = 2 #ideally 0.1
+seeds = np.arange(51,101,1)
+distances = np.arange(13,14,1)
 mean_final_counts = []
 std_final_counts = []
 
@@ -30,9 +30,8 @@ for init_distance in distances:
     final_counts =[]
     for seed in seeds: 
         print(seed, init_distance)
-        cutoff = 30
+        cutoff = 20
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
-        print(init_pos)
         sourcex= init_pos[0]
         sourcey= init_pos[1]
         sourcez= init_pos[2]
@@ -55,6 +54,7 @@ for init_distance in distances:
         ind_list = []
         countparticle = 0
         count = 1 #count how many particles have been detected so far
+        steps=0
         while(count <= max_particles):
             theta_mol = received[0]
             phi_mol = received[1]
@@ -82,10 +82,10 @@ for init_distance in distances:
                 else:
                     move= list(move[0])
                     received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[move.index(1)][0],direction_sphcoords[move.index(1)][1], step_radius=0.1)
-                  
+                    steps+=1
+
                 if str(source[0]) == 'F':
                     # print('# Source found')
-                    print(count)
                     break
                 else:
                     x,y,z = spherical2cart_point(source[1],source[2])
@@ -96,10 +96,10 @@ for init_distance in distances:
 
             else: pass
             count+=1
-        final_counts.append(count)
+        final_counts.append(steps)
     mean_counts = np.mean(final_counts)
     range_counts = np.std(final_counts)
-    with open("neural_network_steps_datacutoff30.txt", "a") as output:
+    with open("neural_network_steps_take2.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
     mean_final_counts.append(mean_counts)
