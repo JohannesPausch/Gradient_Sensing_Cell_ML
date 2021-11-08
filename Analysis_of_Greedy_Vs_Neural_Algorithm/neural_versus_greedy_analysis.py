@@ -17,19 +17,22 @@ def read_datafile(filename):
                 a.append(b)
     return(a)
 
-neuraldatadiff1 = read_datafile('neural_network_steps_datacutoff20diffusion1')
-greedydatadiff1 = read_datafile('greedy_algorithm_steps_datacutoff20diffusion1')
+neuraldatadiff1 = read_datafile('NN_actual_steps_cutoff20diff2')
+greedydatadiff1 = read_datafile('greedy_actual_stepscutoff20diff2')
 
-neuraldatadiff2 = read_datafile('neural_network_steps_datacutoff20diffusion2')
-greedydatadiff2 = read_datafile('greedy_algorithm_steps_datacutoff20diffusion2')
+neuraldatadiff2 = read_datafile('neural_network_counts_datacutoff20diffusion2')
+greedydatadiff2 = read_datafile('greedy_algorithm_counts_datacutoff20diffusion2')
 
 dist = np.arange(2,14,1)
 
-data = [neuraldatadiff1, greedydatadiff1, neuraldatadiff2, greedydatadiff2]
-colors = ['black', 'blue', 'green', 'red']
-labels = ['NN diff=1', 'Greedy diff=1', 'NN diff=2', 'Greedy diff=2']
+data1 = [neuraldatadiff1, greedydatadiff1]
+data2 = [neuraldatadiff2, greedydatadiff2]
+colors = ['red', 'black']
+labels = ['Neural Network', 'Greedy Algorithm']
 i=0
-for data_set in data:
+
+plt.subplot(1, 2, 1)
+for data_set in data1:
 
     mean_data = []
     std_data = []
@@ -41,7 +44,27 @@ for data_set in data:
     i+=1
 plt.legend()
 plt.xlabel('Initial distance of Cell from Source')
-plt.ylabel('No. of cue particles hit cell')
+plt.ylabel('Steps to Source')
+plt.title('Steps Cell Makes')
+plt.grid()
+
+i=0
+
+plt.subplot(1, 2, 2)
+for data_set in data2:
+
+    mean_data = []
+    std_data = []
+    for j in range(0,len(dist)):
+        mean_data.append(np.mean(data_set[j]))
+        std_data.append(np.std(data_set[j]))
+    plt.plot(dist, mean_data, color=colors[i])
+    plt.errorbar(dist, mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
+    i+=1
+plt.legend()
+plt.xlabel('Initial distance of Cell from Source')
+plt.ylabel('Cue Particle Hits on Cell')
+plt.title('No. of Particles hitting Cell')
 plt.grid()
 plt.show()
-        
+
