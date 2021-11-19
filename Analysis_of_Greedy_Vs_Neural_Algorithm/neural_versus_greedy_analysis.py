@@ -30,7 +30,7 @@ dist2 = np.arange(4,21,1)
 data1 = [neuraldatadiff1, greedydatadiff1, neuraldatadiff2_cutoff30]
 data2 = [neuraldatadiff2, greedydatadiff2]
 colors = ['red', 'black', 'green']
-labels = ['Neural Network 20', 'Greedy Algorithm', 'Neural Network 30']
+labels = ['Neural Network 20', 'Greedy Algorithm 20', 'Neural Network 30']
 i=0
 
 plt.subplot(1, 2, 1)
