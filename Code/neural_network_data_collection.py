@@ -8,7 +8,6 @@ from IdealDirection import *
 from ReceptorMap import *
 from datawriteread import *
 from sphericaltransf import *
-
 # initialise the cell (load directions, load mlp, load receptors)
 # choose initial distance
 receptornum = 10
@@ -21,8 +20,8 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 filename = 'Total_mlp2'
 rate = 1
 diffusion = 2 #ideally 0.1
-seeds = np.arange(51,101,1)
-distances = np.arange(13,14,1)
+seeds = np.arange(1,2,1)
+distances = np.arange(4,5,1)
 mean_final_counts = []
 std_final_counts = []
 
@@ -58,6 +57,8 @@ for init_distance in distances:
         while(count <= max_particles):
             theta_mol = received[0]
             phi_mol = received[1]
+            print (theta_mol, phi_mol, received[2])
+            print(count)
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 countparticle +=1
@@ -69,13 +70,14 @@ for init_distance in distances:
                 ind_list.append(ind[0][0])
                 if countparticle>particlenum:
                     ind_list.pop(0)
-            if len(ind_list) == particlenum:
+            if len(ind_list) == particlenum:# and ind!=-1:
                 activation_array = np.zeros((1,len(receptor_sphcoords)))
                 for i in ind_list:
                     if i != -1:
                         activation_array[0,i]+=1
                 move = mlp.predict(activation_array)
-    
+                print(activation_array)
+
                 if (move == 0).all():
                     received,source = mlbi.update_BrownianParticle(brownian_pipe)
                 
@@ -94,12 +96,14 @@ for init_distance in distances:
                     sourcez = source[0]* z
                     #print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
 
-            else: pass
+            else:
+                received,source = mlbi.update_BrownianParticle(brownian_pipe) 
+                #pass
             count+=1
-        final_counts.append(steps)
+"""        final_counts.append(steps)
     mean_counts = np.mean(final_counts)
     range_counts = np.std(final_counts)
-    with open("neural_network_steps_take2.txt", "a") as output:
+    with open("neural_network_steps_taken_diff2cutoff304-14.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
     mean_final_counts.append(mean_counts)
@@ -107,3 +111,4 @@ for init_distance in distances:
 print('mean', mean_final_counts)
 print('st dev', std_final_counts)
 
+"""
