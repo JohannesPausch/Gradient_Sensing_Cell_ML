@@ -81,5 +81,5 @@ plt.legend()
 plt.xlabel('Initial distance of Cell from Source')
 plt.ylabel('Time Taken to Find Source')
 plt.title('Time')
-
+plt.tight_layout()
 plt.show()
