@@ -17,20 +17,20 @@ def read_datafile(filename):
                 a.append(b)
     return(a)
 
-nn_steps = read_datafile('neural_network_steps_taken_diff2_cutoff30_newcode')
-nn_times = read_datafile('neural_network_time_diff2_cutoff30_newcode')
-nn_counts = read_datafile('neural_network_counts_diff2_cutoff30_newcode')
+greedyl_steps = read_datafile('greedy_algorithm_stepsmoved_diff2cutoff30_lazy')
+greedyl_times = read_datafile('greedy_algorithm_time_diff2cutoff30_lazy')
+greedyl_counts = read_datafile('greedy_algorithm_counts_diff2cutoff30_lazy')
 
 greedy_steps = read_datafile('greedy_steps_taken_diff2_cutoff30_newcode')
 greedy_times = read_datafile('greedy_time_diff2_cutoff30_newcode')
 greedy_counts = read_datafile('greedy_counts_diff2_cutoff30_newcode')
 
-steps_data = [nn_steps, greedy_steps]
-counts_data = [nn_counts, greedy_counts]
-times_data =[nn_times, greedy_times]
+steps_data = [greedyl_steps, greedy_steps]
+counts_data = [greedyl_counts, greedy_counts]
+times_data =[greedyl_times, greedy_times]
 colors=['blue','green']
-labels=['Neural Network', 'Greedy Algorithm']
-
+labels=['Greedy lazy Algorithm', 'Greedy Algorithm']
+dist = np.arange(2,12,1)
 i=0
 plt.subplot(1, 3, 1)
 for data_set in steps_data:

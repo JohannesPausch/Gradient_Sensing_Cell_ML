@@ -18,8 +18,8 @@ recepsurface_ratio = 10
 
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 
-filename = 'Total_mlp1'
-init_distance = 10
+filename = 'Total_mlp2'
+init_distance = 6
 rate = 1
 diffusion = 1 #ideally 0.1
 seed = 1
@@ -71,10 +71,14 @@ while(count <= max_particles):
             if i != -1:
                 activation_array[0,i]+=1
         move = mlp.predict(activation_array)
+        print(activation_array)
         if (move == 0).all():
+            print(mlp.predict_proba(activation_array))
             received,source = mlbi.update_BrownianParticle(brownian_pipe)
         else:
             move= list(move[0])
+            print(mlp.predict_proba(activation_array))
+
             received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[move.index(1)][0],direction_sphcoords[move.index(1)][1], step_radius=0.1)
         if str(source[0]) == 'F':
             print('# Source found')
@@ -86,7 +90,9 @@ while(count <= max_particles):
             sourcez = source[0]* z
             print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
 
-    else: pass
+    else:
+        received,source = mlbi.update_BrownianParticle(brownian_pipe) 
+        #pass
     count+=1
 
 

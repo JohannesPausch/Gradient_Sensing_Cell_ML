@@ -75,6 +75,6 @@ for init_distance in distances:
         final_steps.append(steps)
     #mean_counts = np.mean(final_counts)
     #range_counts = np.std(final_counts)
-    with open("greedy_algorithm_stepsmoved_diff2cutoff20.txt", "a") as output:
+    with open("greedy_algorithm_stepsmoved_diff2cutoff30_lazy.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_steps)+'\n')

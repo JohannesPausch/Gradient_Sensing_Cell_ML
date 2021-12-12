@@ -20,16 +20,22 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 filename = 'Total_mlp2'
 rate = 1
 diffusion = 2 #ideally 0.1
-seeds = np.arange(1,2,1)
-distances = np.arange(4,5,1)
-mean_final_counts = []
-std_final_counts = []
-
-for init_distance in distances:
+seeds = np.arange(1,100,1)
+#distances = np.arange(12,21,1)
+memorycount = np.arange(10,50,1)
+#mem = 20
+#final_counts = []
+#inal_steps = []
+#final_time = []
+init_distance = 5
+#for init_distance in distances:
+for mem in memorycount:
     final_counts =[]
+    final_steps = []
+    final_time = []
     for seed in seeds: 
-        print(seed, init_distance)
-        cutoff = 20
+        #print(seed, init_distance)
+        cutoff = 30
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
@@ -54,30 +60,50 @@ for init_distance in distances:
         countparticle = 0
         count = 1 #count how many particles have been detected so far
         steps=0
+        memory = 0
+        
         while(count <= max_particles):
+            #print('hi2')
             theta_mol = received[0]
             phi_mol = received[1]
-            print (theta_mol, phi_mol, received[2])
-            print(count)
+            tm = received[2]
+            #print (theta_mol, phi_mol, received[2])
+            #print(count)
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 countparticle +=1
                 ind_list.append(-1)
                 if countparticle>particlenum:
+                    #print(ind_list)
+                    memory +=1 
                     ind_list.pop(0) 
             else:
                 countparticle +=1
                 ind_list.append(ind[0][0])
+
                 if countparticle>particlenum:
+                    #if ind in ind_list: del ind_list[ind_list.index(ind)]
+                    #else: ind_list.pop(0)
+                    #print(ind_list)
+                    memory +=1 
                     ind_list.pop(0)
+            if memory < mem :
+                #print(memory)
+                #if memory==1:
+                #    print(ind_list)
+                received,source = mlbi.update_BrownianParticle(brownian_pipe) 
+                continue 
+           # print(ind_list)
+           # print('hi3')
             if len(ind_list) == particlenum:# and ind!=-1:
                 activation_array = np.zeros((1,len(receptor_sphcoords)))
                 for i in ind_list:
                     if i != -1:
                         activation_array[0,i]+=1
+                
                 move = mlp.predict(activation_array)
-                print(activation_array)
-
+                #print(activation_array)
+                memory = 0
                 if (move == 0).all():
                     received,source = mlbi.update_BrownianParticle(brownian_pipe)
                 
@@ -100,15 +126,16 @@ for init_distance in distances:
                 received,source = mlbi.update_BrownianParticle(brownian_pipe) 
                 #pass
             count+=1
-"""        final_counts.append(steps)
-    mean_counts = np.mean(final_counts)
-    range_counts = np.std(final_counts)
-    with open("neural_network_steps_taken_diff2cutoff304-14.txt", "a") as output:
-        output.write(str(init_distance)+'\n')
+        final_counts.append(count)
+        final_steps.append(steps)
+        final_time.append(tm)
+    with open("neural_network_counts_taken_diff2cutoff30_diffmem.txt", "a") as output:
+        output.write(str(mem)+'\n')
         output.write(str(final_counts)+'\n')
-    mean_final_counts.append(mean_counts)
-    std_final_counts.append(range_counts)
-print('mean', mean_final_counts)
-print('st dev', std_final_counts)
+    with open("neural_network_steps_taken_diff2cutoff30_diffmem.txt", "a") as output:
+        output.write(str(mem)+'\n')
+        output.write(str(final_steps)+'\n')
+    with open("neural_network_time_taken_diff2cutoff30_diffmem.txt", "a") as output:
+        output.write(str(mem)+'\n')
+        output.write(str(final_time)+'\n')
 
-"""
