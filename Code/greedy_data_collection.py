@@ -27,6 +27,7 @@ std_final_counts = []
 for init_distance in distances:
     final_counts = []
     final_steps = []
+    final_time =[]
     for seed in seeds: 
         print(seed, init_distance)
         cutoff = 20 #20 initially
@@ -54,6 +55,7 @@ for init_distance in distances:
         while(count <= max_particles):
             theta_mol = received[0]
             phi_mol = received[1]
+            tm = received[2]
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 received,source = mlbi.update_BrownianParticle(brownian_pipe)
@@ -73,8 +75,15 @@ for init_distance in distances:
             count+=1
         final_counts.append(count)
         final_steps.append(steps)
+        final_time.append(tm)
     #mean_counts = np.mean(final_counts)
     #range_counts = np.std(final_counts)
-    with open("greedy_algorithm_stepsmoved_diff2cutoff30_lazy.txt", "a") as output:
+    with open("greedy_algorithm_stepsmoved_diff2cutoff30.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_steps)+'\n')
+    with open("greedy_algorithm_counts_diff2cutoff30.txt", "a") as output:
+        output.write(str(init_distance)+'\n')
+        output.write(str(final_counts)+'\n')
+    with open("greedy_algorithm_time_diff2cutoff30.txt", "a") as output:
+        output.write(str(init_distance)+'\n')
+        output.write(str(final_time)+'\n')

@@ -64,3 +64,4 @@ while(count <= max_particles):
             sourcez = source[0]* z
             print(str(count)+'\t'+str(sourcex)+'\t'+str(sourcey)+'\t'+str(sourcez))
     count+=1
+    

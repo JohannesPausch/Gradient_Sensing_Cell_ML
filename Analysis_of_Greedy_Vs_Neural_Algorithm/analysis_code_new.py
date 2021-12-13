@@ -25,23 +25,37 @@ greedy_steps = read_datafile('greedy_steps_taken_diff2_cutoff30_newcode')
 greedy_times = read_datafile('greedy_time_diff2_cutoff30_newcode')
 greedy_counts = read_datafile('greedy_counts_diff2_cutoff30_newcode')
 
-steps_data = [greedyl_steps, greedy_steps]
-counts_data = [greedyl_counts, greedy_counts]
-times_data =[greedyl_times, greedy_times]
-colors=['blue','green']
-labels=['Greedy lazy Algorithm', 'Greedy Algorithm']
-dist = np.arange(2,12,1)
+nn_steps = read_datafile('neural_network_steps_taken_diff2_cutoff30_newcode')
+nn_times = read_datafile('neural_network_time_diff2_cutoff30_newcode')
+nn_counts = read_datafile('neural_network_counts_diff2_cutoff30_newcode')
+
+nnmem20_steps = read_datafile('neural_network_steps_taken_diff2cutoff30_mem20')
+nnmem20_times = read_datafile('neural_network_time_taken_diff2cutoff30_mem20')
+nnmem20_counts = read_datafile('neural_network_counts_taken_diff2cutoff30_mem20')
+
+nnmem50_steps = read_datafile('neural_network_steps_taken_diff2cutoff30_mem50')
+nnmem50_times = read_datafile('neural_network_time_taken_diff2cutoff30_mem50')
+nnmem50_counts = read_datafile('neural_network_counts_taken_diff2cutoff30_mem50')
+
+distnnmem = np.arange(2,12,1)
+distnn = np.arange(2,21,1)
+datasteps = [nn_steps, greedy_steps, greedyl_steps, nnmem20_steps,nnmem50_steps]
+datacounts = [nn_counts, greedy_counts, greedyl_counts,nnmem20_counts,nnmem50_counts]
+datatimes = [nn_times, greedy_counts, greedyl_times, nnmem20_times,nnmem50_times]
+dist = [distnn,distnn,distnnmem, distnnmem,distnnmem]
+colors=['blue','purple','green','red','black']
+labels=['NN 1', 'Greedy','Greedy lazy', 'NN 20', 'NN 50']
+
 i=0
 plt.subplot(1, 3, 1)
-for data_set in steps_data:
-    dist = np.arange(2,len(data_set)+2)
+for data_set in datasteps:
     mean_data = []
     std_data = []
-    for j in range(0,len(dist)):
+    for j in range(0,len(dist[i])):
         mean_data.append(np.mean(data_set[j]))
         std_data.append(np.std(data_set[j]))
-    plt.plot(dist, mean_data, color=colors[i])
-    plt.errorbar(dist, mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
+    plt.plot(dist[i], mean_data, color=colors[i])
+    plt.errorbar(dist[i], mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
     i+=1
 plt.legend()
 plt.xlabel('Initial distance of Cell from Source')
@@ -50,15 +64,14 @@ plt.title('Steps')
 
 i=0
 plt.subplot(1, 3, 2)
-for data_set in counts_data:
-    dist = np.arange(2,len(data_set)+2)
+for data_set in datacounts:
     mean_data = []
     std_data = []
-    for j in range(0,len(dist)):
+    for j in range(0,len(dist[i])):
         mean_data.append(np.mean(data_set[j]))
         std_data.append(np.std(data_set[j]))
-    plt.plot(dist, mean_data, color=colors[i])
-    plt.errorbar(dist, mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
+    plt.plot(dist[i], mean_data, color=colors[i])
+    plt.errorbar(dist[i], mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
     i+=1
 plt.legend()
 plt.xlabel('Initial distance of Cell from Source')
@@ -67,15 +80,14 @@ plt.title('Counts')
 
 i=0
 plt.subplot(1, 3, 3)
-for data_set in times_data:
-    dist = np.arange(2,len(data_set)+2)
+for data_set in datatimes:
     mean_data = []
     std_data = []
-    for j in range(0,len(dist)):
+    for j in range(0,len(dist[i])):
         mean_data.append(np.mean(data_set[j]))
         std_data.append(np.std(data_set[j]))
-    plt.plot(dist, mean_data, color=colors[i])
-    plt.errorbar(dist, mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
+    plt.plot(dist[i], mean_data, color=colors[i])
+    plt.errorbar(dist[i], mean_data, yerr=std_data, color=colors[i],fmt='o',  markersize=6, capsize=5, label=labels[i])
     i+=1
 plt.legend()
 plt.xlabel('Initial distance of Cell from Source')

@@ -5,7 +5,7 @@ import os
 import sys
 
 def read_datafile(filename):
-    with open(filename+'.txt','r') as fin:
+    with open(filename+".txt","r") as fin:
         a = []
         for line in fin:
             if line.startswith('#'): pass
@@ -35,7 +35,7 @@ greedy_counts = read_datafile('greedy_algorithm_counts_diff2cutoff30_lazy')
 
 
 distnnmem = np.arange(2,12,1)
-distnn = np.arange(4,21,1)
+distnn = np.arange(2,21,1)
 datasteps = [nn_steps, greedy_steps, nnmem20_steps,nnmem50_steps]
 datacounts = [nn_counts, greedy_counts,nnmem20_counts,nnmem50_counts]
 datatimes = [nn_times, greedy_times, nnmem20_times,nnmem50_times]
