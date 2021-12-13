@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import scipy.stats 
 import os
 import sys
-sys.path.append('/Users/Paula/Documents/GitHub/Gradient_Sensing_Cell_ML/Analysis_of_Greedy_Vs_Neural_Algorithm')
 
 def read_datafile(filename):
     with open(filename+'.txt','r') as fin:
