@@ -22,9 +22,9 @@ filename = 'Total_mlp2'
 rate = 1
 diffusion = 2 #ideally 0.1
 seeds = np.arange(1,100,1)
-distances = np.arange(2,12,1)
+distances = np.arange(2,21,1)
 
-mem = 50
+mem = 2
 #final_counts = []
 #inal_steps = []
 #final_time = []
@@ -130,13 +130,13 @@ for init_distance in distances:
         final_counts.append(count)
         final_steps.append(steps)
         final_time.append(tm)
-    with open("neural_network_counts_taken_diff2cutoff30_mem50.txt", "a") as output:
+    with open("neural_network_counts_taken_diff2cutoff30_mem2.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
-    with open("neural_network_steps_taken_diff2cutoff30_mem50.txt", "a") as output:
+    with open("neural_network_steps_taken_diff2cutoff30_mem2.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_steps)+'\n')
-    with open("neural_network_time_taken_diff2cutoff30_mem50.txt", "a") as output:
+    with open("neural_network_time_taken_diff2cutoff30_mem2.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_time)+'\n')
         

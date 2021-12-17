@@ -26,7 +26,7 @@ nnmem_counts = read_datafile('neural_network_counts_taken_diff2cutoff30_diffmem'
 
 
 
-distnnmem = np.arange(1,10,1)
+distnnmem = np.arange(1,50,1)
 datasteps = [nnmem_steps]
 datacounts = [nnmem_counts]
 datatimes = [nnmem_times]
