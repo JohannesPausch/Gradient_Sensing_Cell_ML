@@ -13,7 +13,7 @@ from sphericaltransf import *
 receptornum = 10
 direction_sphcoords = pick_direction(0,10)
 radius = 1
-
+v = 0.01
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
 recepsurface_ratio = 10
 rate = 1
@@ -52,17 +52,19 @@ for init_distance in distances:
         steps = 0
         count = 1 #count how many particles have been detected so far
         moving = 0
+        t = []
         while(count <= max_particles):
             theta_mol = received[0]
             phi_mol = received[1]
-            tm = received[2]
-
+            t.append(received[2])
+            if count==1: tm = t[0]
+            else: tm = t[count-1]-t[count-2]
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 if moving ==0: 
                     received,source = mlbi.update_BrownianParticle(brownian_pipe)
                 else: 
-                    received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=0.1)
+                    received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
                     if str(source[0]) == 'F':
                         print('# Source found')
                         break
@@ -76,7 +78,7 @@ for init_distance in distances:
             else: #same index for receptors and directions
                 moving =1
                 indm = ind[0][0]
-                received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=0.1)
+                received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
                 if str(source[0]) == 'F':
                     print('# Source found')
                     break
@@ -90,16 +92,16 @@ for init_distance in distances:
             count+=1
         final_counts.append(count)
         final_steps.append(steps)
-        final_time.append(tm)
+        final_time.append(t[count-1])
 
     #mean_counts = np.mean(final_counts)
     #range_counts = np.std(final_counts)
-    with open("greedy_algorithm_stepsmoved_diff2cutoff30_steps.txt", "a") as output:
+    with open("greedy_algorithm_stepsmoved_diff2cutoff30_v.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_steps)+'\n')
-    with open("greedy_algorithm_counts_diff2cutoff30_steps.txt", "a") as output:
+    with open("greedy_algorithm_counts_diff2cutoff30_v.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_counts)+'\n')
-    with open("greedy_algorithm_time_diff2cutoff30_steps.txt", "a") as output:
+    with open("greedy_algorithm_time_diff2cutoff30_v.txt", "a") as output:
         output.write(str(init_distance)+'\n')
         output.write(str(final_time)+'\n')
