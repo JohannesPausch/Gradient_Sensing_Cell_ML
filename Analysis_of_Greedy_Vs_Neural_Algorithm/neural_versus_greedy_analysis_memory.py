@@ -17,9 +17,13 @@ def read_datafile(filename):
                 a.append(b)
     return(a)
 
-nn_steps = read_datafile('neural_network_steps_taken_diff2_cutoff30_newcode')
-nn_times = read_datafile('neural_network_time_diff2_cutoff30_newcode')
-nn_counts = read_datafile('neural_network_counts_diff2_cutoff30_newcode')
+#nn_steps = read_datafile('neural_network_steps_taken_diff2_cutoff30_newcode')
+#nn_times = read_datafile('neural_network_time_diff2_cutoff30_newcode')
+#nn_counts = read_datafile('neural_network_counts_diff2_cutoff30_newcode')
+
+greedyv_steps = read_datafile('greedy_algorithm_stepsmoved_diff2cutoff30_v0.01')
+greedyv_times = read_datafile('greedy_algorithm_time_diff2cutoff30_v0.01')
+greedyv_counts = read_datafile('greedy_algorithm_counts_diff2cutoff30_v0.01')
 
 nnmem2_steps = read_datafile('neural_network_steps_taken_diff2cutoff30_mem2')
 nnmem2_times = read_datafile('neural_network_time_taken_diff2cutoff30_mem2')
@@ -33,20 +37,25 @@ nnmem50_steps = read_datafile('neural_network_steps_taken_diff2cutoff30_mem50')
 nnmem50_times = read_datafile('neural_network_time_taken_diff2cutoff30_mem50')
 nnmem50_counts = read_datafile('neural_network_counts_taken_diff2cutoff30_mem50')
 
-greedy_steps = read_datafile('greedy_algorithm_stepsmoved_diff2cutoff30_lazy')
-greedy_times = read_datafile('greedy_algorithm_time_diff2cutoff30_lazy')
-greedy_counts = read_datafile('greedy_algorithm_counts_diff2cutoff30_lazy')
+greedys_steps = read_datafile('greedy_algorithm_stepsmoved_diff2cutoff30_steps')
+greedys_times = read_datafile('greedy_algorithm_time_diff2cutoff30_steps')
+greedys_counts = read_datafile('greedy_algorithm_counts_diff2cutoff30_steps')
+
+greedy_steps = read_datafile('greedy_stepstaken_diff2_cutoff30_newcode')
+greedy_times = read_datafile('greedy_time_diff2_cutoff30_newcode')
+greedy_counts = read_datafile('greedy_counts_diff2_cutoff30_newcode')
 
 
 distnnmem = np.arange(2,12,1)
 distnn = np.arange(2,21,1)
-datasteps = [nn_steps, greedy_steps, nnmem2_steps,nnmem50_steps]
-datacounts = [nn_counts, greedy_counts,nnmem2_counts,nnmem50_counts]
-datatimes = [nn_times, greedy_times, nnmem2_times,nnmem50_times]
+distgv= np.arange(2,7,1)
+datasteps = [greedyv_steps, greedy_steps, greedys_steps, nnmem2_steps,nnmem50_steps]
+datacounts = [greedyv_counts, greedy_counts, greedys_counts,nnmem2_counts,nnmem50_counts]
+datatimes = [greedyv_times, greedy_times, greedys_times, nnmem2_times,nnmem50_times]
 
-dist = [distnn,distnnmem, distnn,distnnmem]
-colors = ['green', 'black', 'blue','red']
-labels = ['NN 1 new','greedy','NN 2 new', 'NN 50 new']
+dist = [distgv,distnn, distnnmem, distnn,distnnmem]
+colors = ['green', 'orange', 'black', 'blue','red']
+labels = ['greedyv','greedyactivations','greedysteps','NN 2 new', 'NN 50 new']
 
 plt.subplot(1, 3, 1)
 for i in range(0,4):
