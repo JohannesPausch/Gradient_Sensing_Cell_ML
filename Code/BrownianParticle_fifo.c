@@ -6,7 +6,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-#include "Gradient_Sensing_Cell_ML_git_stamps.h"
+#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
 /* This code is based on BrownianParticle.c
  *  + signalling particles are released from the origin.
@@ -185,7 +185,7 @@ double source_distance2, sphere_distance2;
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:p:R:r:s:S:t:w:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
