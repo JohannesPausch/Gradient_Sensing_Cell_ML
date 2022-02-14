@@ -7,7 +7,7 @@ import numpy as np
 separator = ' '
 
 def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,iterations=None):
-    command = './BrownianParticle_fifo.o'
+    command = './BrownianParticle_fifo.o -p 1'
     if use_seed != None:
         command += ' -S '+str(use_seed)
         np.random.seed(seed=use_seed)
@@ -55,9 +55,12 @@ def stop_BrownianParticle(brownian_pipe):
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     return '# C-PRORGAM STOPPED'
 
-def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_radius=0.1):
+def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_radius=0.1,velocity=None):
     if step_theta != None and step_phi != None:
-        brownian_pipe.stdin.write(bytes(str(step_radius*np.cos(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.sin(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.cos(step_theta))+'\n', 'UTF-8'))
+        if velocity != None:
+            brownian_pipe.stdin.write(bytes('V'+separator+str(step_radius*np.cos(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.sin(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.cos(step_theta))+'\n', 'UTF-8'))
+        else:
+            brownian_pipe.stdin.write(bytes(str(step_radius*np.cos(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.sin(step_phi)*np.sin(step_theta))+separator+str(step_radius*np.cos(step_theta))+'\n', 'UTF-8'))
     else:
         brownian_pipe.stdin.write(bytes('0'+separator+'0'+separator+'0\n', 'UTF-8'))
     brownian_pipe.stdin.flush()

@@ -6,7 +6,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-#include "Gradient_Sensing_Cell_ML_git_stamps.h"
+#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
 /* This code is based on BrownianParticle.c
  *  + signalling particles are released from the origin.
@@ -538,7 +538,7 @@ void update_particles_and_cell(particle_strct d, double scale)
 	source.y-=d.y;
 	source.z-=d.z;
 
-        printf("# Info: New source position %g %g %g, new velocity %g %g %g\n", (source.x), (source.y), (source.z), velocity.x, velocity.y, velocity.z);
+        printf("# Info: New source position %g %g %g new velocity %g %g %g\n", (source.x), (source.y), (source.z), velocity.x, velocity.y, velocity.z);
 	/* The source is found if it resides within the cell. */
         source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
 	if (source_distance2<param_sphere_radius_squared) {
