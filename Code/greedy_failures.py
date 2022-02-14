@@ -1,4 +1,3 @@
-from textwrap import indent
 import numpy as np
 import ML_Brownian_Interface as mlbi
 import random_3d_rotation as r3dr
@@ -12,6 +11,7 @@ from sphericaltransf import *
 # choose initial distance
 receptornum = 10
 direction_sphcoords = pick_direction(0,10)
+print(len(direction_sphcoords))
 radius = 1
 v = 0.01
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
@@ -19,16 +19,17 @@ recepsurface_ratio = 10
 rate = 1
 diffusion = 2 #ideally 0.1 #1 initially
 seeds = np.arange(1,201)
-distances = np.arange(6,20)
+distances = np.arange(6,8)
+init_distance = 10
 mean_final_counts = []
 std_final_counts = []
+cutoff = 30
+cutoffs = np.arange(30,40,5)
 
-
-for init_distance in distances:
+for cutoff in cutoffs:
     failed = 0
     for seed in seeds: 
-        print(seed, init_distance)
-        cutoff = 40 #20 initially
+        #print(seed, init_distance)
         init_pos = np.matmul(special_ortho_group.rvs(3,1,random_state= seed),np.array([init_distance,0,0]))
         sourcex= init_pos[0]
         sourcey= init_pos[1]
@@ -61,7 +62,7 @@ for init_distance in distances:
                     received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
                     
                     if str(source[0]) == 'F':
-                        print('# Source found')
+                        #print('# Source found')
                         break
                     else:
                         x,y,z = spherical2cart_point(source[1],source[2])
@@ -83,7 +84,7 @@ for init_distance in distances:
                 
                 received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
                 if str(source[0]) == 'F':
-                    print('# Source found')
+                    #print('# Source found')
                     break
                 else:
                     x,y,z = spherical2cart_point(source[1],source[2])
@@ -94,6 +95,6 @@ for init_distance in distances:
                     steps+=1
             count+=1
 
-    with open("greedy_algorithm_failed_40", "a") as output:
-        output.write(str(init_distance)+'\n')
+    with open("greedy_algorithm_failed_10_testb.dat", "a") as output:
+        output.write(str(cutoff)+'\t')
         output.write(str(failed)+'\n')

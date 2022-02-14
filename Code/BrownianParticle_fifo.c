@@ -6,7 +6,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-#include "Gradient_Sensing_Cell_ML_git_stamps.h"
+#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
 /* This code is based on BrownianParticle.c
  *  + signalling particles are released from the origin.

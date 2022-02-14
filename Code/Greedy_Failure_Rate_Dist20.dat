@@ -1,0 +1,16 @@
+# Estimating the probability that the greey algorithm never finds the source
+# initial distance 20
+# diffusion constant 2
+# source emittance rate 1
+# number of receptors 10
+# cell radius 1
+# v=0.01
+# seedsmin 1
+# seedsmax 201
+30	89
+35	75
+40	76
+45	51
+50	38
+55	54
+60	54
