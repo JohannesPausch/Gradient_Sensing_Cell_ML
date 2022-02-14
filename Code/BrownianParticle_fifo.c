@@ -6,7 +6,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
+#include "Gradient_Sensing_Cell_ML_git_stamps.h"
 
 /* This code is based on BrownianParticle.c
  *  + signalling particles are released from the origin.
@@ -166,26 +166,30 @@ gsl_rng *rng;
 
 
 void postamble(void);
+void update_particles_and_cell(particle_strct d, double scale);
 
 /* Each signalling particle has a position relative to the origin.
  * There are at most N signalling particles.
  */
 
+int active_particles, total_particles;
+particle_strct *particle;
+particle_strct delta, velocity;
+double source_distance2, sphere_distance2;
+FILE *fin, *fout;
+
 int main(int argc, char *argv[])
 {
 int ch;
 double tm=0.;
-particle_strct *particle;
-FILE *fin, *fout;
-int active_particles, total_particles;
-double source_distance2, sphere_distance2;
+
 
 
 #define STRCPY(dst,src) strncpy(dst,src,sizeof(dst)-1); dst[sizeof(dst)-1]=(char)0
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:p:R:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
@@ -353,6 +357,8 @@ printf("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z))
 for (tm=0.; ;tm+=param_delta_t) {
   int i;
 
+if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
+  update_particles_and_cell(velocity, DELTA_T);
 
   if (param_release_rate*param_delta_t>gsl_ran_flat(rng, 0., 1.)) {
     if (active_particles>=param_max_particles) {
@@ -390,7 +396,6 @@ for (tm=0.; ;tm+=param_delta_t) {
         i, active_particles, param_max_particles, total_particles,
         particle[i].x, particle[i].y, particle[i].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[i].release_time);
       if (tm>param_warmup_time) {
-        particle_strct delta;
 	double theta, phi;
 
         //fprintf(fout, "%g %g %g %g\n", particle[i].x, particle[i].y, particle[i].z, tm);
@@ -415,6 +420,10 @@ for (tm=0.; ;tm+=param_delta_t) {
 	    //printf("# Warning: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	    //printf("# Warning: Exiting quietly.\n");
 	    //exit(EXIT_SUCCESS);
+	  } else {
+	    velocity.x=0.;
+	    velocity.y=0.;
+	    velocity.z=0.;
 	  }
 	} else {
 	  char buffer[2048]; // BAD STYLE, buffer overflow should be caught.
@@ -427,38 +436,32 @@ for (tm=0.; ;tm+=param_delta_t) {
 	  }
 	  *p=(char)0;
 	  if (sscanf(buffer, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
-	    if (strcmp(buffer, "STOP")==0) {
-	      printf("# Info: STOP keyword received. Good bye!\n");
-	      exit(EXIT_SUCCESS);
+	    if (buffer[0]=='V') {
+	      if (sscanf(buffer+1, "%lg %lg %lg", &(velocity.x), &(velocity.y), &(velocity.z))!=3) {
+		printf("# Error: sscanf of [%s] returned without all three conversions for velocity. %i::%s\n", buffer, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	      } else {
+	        delta.x=0.;
+		delta.y=0.;
+		delta.z=0.;
+	      }
+	    } else {
+	      if (strcmp(buffer, "STOP")==0) {
+		printf("# Info: STOP keyword received. Good bye!\n");
+		exit(EXIT_SUCCESS);
+	      }
+	      printf("# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
+	      exit(EXIT_FAILURE);
 	    }
-	    printf("# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
-	    exit(EXIT_FAILURE);
+	  } else {
+	    velocity.x=0.;
+	    velocity.y=0.;
+	    velocity.z=0.;
 	  }
 	}
 
-        /* Update the position of all particles and the source.
-	 * One update is superfluous, as particle[i] will be purged
-	 * anyway. */
-	{ int j;
-	for (j=0; j<active_particles; j++) {
-	  particle[j].x-=delta.x;
-	  particle[j].y-=delta.y;
-	  particle[j].z-=delta.z;
-	}
-	}
-	source.x-=delta.x;
-	source.y-=delta.y;
-	source.z-=delta.z;
-
-        printf("# Info: New source position %g %g %g\n", (source.x), (source.y), (source.z));
-	/* The source is found if it resides within the cell. */
-        source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
-	if (source_distance2<param_sphere_radius_squared) {
-	  fprintf(fout, "HEUREKA!\n");
-	  printf("# Info: HEUREKA!\n");
-	  printf("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
-	  printf("# Info: Expecting SIGHUP.\n");
-	}
+if ((delta.x!=0.) || (delta.y!=0.) || (delta.z!=0.))
+  update_particles_and_cell(delta, 1.);
 
       }
       active_particles--;
@@ -513,3 +516,39 @@ GETRUSAGE_long(ru_nivcsw);
 printf("# Info: Good bye and thanks for all the fish.\n");
 }
 
+
+void update_particles_and_cell(particle_strct d, double scale)
+{
+
+	d.x*=scale;
+	d.y*=scale;
+	d.z*=scale;
+
+        /* Update the position of all particles and the source.
+	 * One update is superfluous, as particle[i] will be purged
+	 * anyway. */
+	{ int j;
+	for (j=0; j<active_particles; j++) {
+	  particle[j].x-=d.x;
+	  particle[j].y-=d.y;
+	  particle[j].z-=d.z;
+	}
+	}
+	source.x-=d.x;
+	source.y-=d.y;
+	source.z-=d.z;
+
+        printf("# Info: New source position %g %g %g, new velocity %g %g %g\n", (source.x), (source.y), (source.z), velocity.x, velocity.y, velocity.z);
+	/* The source is found if it resides within the cell. */
+        source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
+	if (source_distance2<param_sphere_radius_squared) {
+	  fprintf(fout, "HEUREKA!\n");
+	  printf("# Info: HEUREKA!\n");
+	  printf("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
+	  printf("# Info: Expecting SIGHUP.\n");
+	}
+	if (source_distance2>param_cutoff_squared) {
+	#warning "Unmitigated disaster."
+	}
+
+}
