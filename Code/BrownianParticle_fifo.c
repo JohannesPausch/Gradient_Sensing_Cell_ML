@@ -162,8 +162,10 @@ int param_protocol=0;
 
 gsl_rng *rng;
 
-#define MALLOC(a,n) if ((a=malloc(sizeof(*a)*(n)))==NULL) { fprintf(stderr, "Not enough memory for %s, requested %i bytes, %i items of size %i. %i::%s\n", #a, (int)(sizeof(*a)*n), n, (int)sizeof(*a), errno, strerror(errno)); exit(EXIT_FAILURE); } else { printf("# Info malloc(3)ed %i bytes (%i items of %i bytes) for %s.\n", (int)(sizeof(*a)*(n)), n, (int)sizeof(*a), #a); }
+#define MALLOC(a,n) if ((a=malloc(sizeof(*a)*(n)))==NULL) { fprintf(stderr, "Not enough memory for %s, requested %i bytes, %i items of size %i. %i::%s\n", #a, (int)(sizeof(*a)*n), n, (int)sizeof(*a), errno, strerror(errno)); exit(EXIT_FAILURE); } else { VERBOSE("# Info malloc(3)ed %i bytes (%i items of %i bytes) for %s.\n", (int)(sizeof(*a)*(n)), n, (int)sizeof(*a), #a); }
 
+int verbose=0;
+#define VERBOSE if (verbose) printf
 
 void postamble(void);
 void update_particles_and_cell(particle_strct d, double scale);
@@ -189,7 +191,7 @@ double tm=0.;
 
 
 setlinebuf(stdout);
-while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
+while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:vw:")) != -1) {
   switch (ch) {
     case 'c':
       param_cutoff=strtod(optarg, NULL);
@@ -226,7 +228,7 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
       for (p=buffer; *p; p++) if ((*p==',') || (*p==';')) *p=' ';
 
       if (sscanf(buffer, "%lg %lg %lg", &(source.x), &(source.y), &(source.z))!=3) {
-	printf("# Error: sscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	fprintf(stderr, "# Error: sscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	exit(EXIT_FAILURE);
       }
       }
@@ -236,6 +238,9 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
       break;
     case 't':
       param_delta_t=strtod(optarg, NULL);
+      break;
+    case 'v':
+      verbose=1;
       break;
     case 'w':
       param_warmup_time=strtod(optarg, NULL);
@@ -252,9 +257,9 @@ while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:w:")) != -1) {
 { 
 int i;
 
-printf("# Info: Command: %s", argv[0]);
-for (i=1; i<argc; i++) printf(" \"%s\"", argv[i]);
-printf("\n");
+VERBOSE("# Info: Command: %s", argv[0]);
+for (i=1; i<argc; i++) VERBOSE(" \"%s\"", argv[i]);
+VERBOSE("\n");
 }
 
 
@@ -263,20 +268,20 @@ printf("\n");
 time_t tim;
 tim=time(NULL);
 
-printf("# Info Starting at %s", ctime(&tim));
+VERBOSE("# Info Starting at %s", ctime(&tim));
 }
 
 /* For version control if present. */
-printf("# Info: Version of git_version_string to follow.\n");
-printf("%s", git_version_string);
-printf("# $Header$\n");
+VERBOSE("# Info: Version of git_version_string to follow.\n");
+VERBOSE("%s", git_version_string);
+VERBOSE("# $Header$\n");
 
 
 /* Hostname */
 { char hostname[128];
   gethostname(hostname, sizeof(hostname)-1);
   hostname[sizeof(hostname)-1]=(char)0;
-  printf("# Info: Hostname: %s\n", hostname);
+  VERBOSE("# Info: Hostname: %s\n", hostname);
 }
 
 
@@ -285,13 +290,13 @@ printf("# $Header$\n");
   cwd[0]=0;
   if(getcwd(cwd, sizeof(cwd)-1)!=NULL){
   cwd[sizeof(cwd)-1]=(char)0;
-  printf("# Info: Directory: %s\n", cwd);}
+  VERBOSE("# Info: Directory: %s\n", cwd);}
 }
 
 /* Process ID. */
-printf("# Info: PID: %i\n", (int)getpid());
+VERBOSE("# Info: PID: %i\n", (int)getpid());
 
-#define PRINT_PARAM(a,o, f) printf("# Info: %s: %s " f "\n", #a, o, a)
+#define PRINT_PARAM(a,o, f) VERBOSE("# Info: %s: %s " f "\n", #a, o, a)
 
 param_sigma=sqrt(2.*param_delta_t*param_diffusion);
 param_cutoff_squared=param_cutoff*param_cutoff;
@@ -311,7 +316,7 @@ PRINT_PARAM(param_seed, "-S", "%lu");
 PRINT_PARAM(param_input, "-i", "%s");
 PRINT_PARAM(param_output, "-o", "%s");
 
-printf("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
+VERBOSE("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
 
 if (param_output[0]) {
   if ((fout=fopen(param_output, "wt"))==NULL) {
@@ -320,7 +325,7 @@ if (param_output[0]) {
   }
   setlinebuf(fout);
 } else fout=stdout;
-printf("# Info: Output open.\n");
+VERBOSE("# Info: Output open.\n");
 
 if (param_input[0]) {
   if ((fin=fopen(param_input, "rt"))==NULL) {
@@ -328,7 +333,7 @@ if (param_input[0]) {
     exit(EXIT_FAILURE);
   }
 } else fin=stdin;
-printf("# Info: Input open.\n");
+VERBOSE("# Info: Input open.\n");
 
 rng=gsl_rng_alloc(gsl_rng_taus2);
 gsl_rng_set(rng, param_seed); 
@@ -341,7 +346,7 @@ total_particles=0;
 
 #define CREATE_NEW_PARTICLE { particle[active_particles].x=source.x; particle[active_particles].y=source.y; particle[active_particles].z=source.z; \
       particle[active_particles].release_time=tm; active_particles++; total_particles++;\
-      printf("# Info: New particle created at time %g. Active: %i, Max: %i, Total: %i\n", tm, active_particles, param_max_particles, total_particles);}
+      VERBOSE("# Info: New particle created at time %g. Active: %i, Max: %i, Total: %i\n", tm, active_particles, param_max_particles, total_particles);}
 
 
 CREATE_NEW_PARTICLE;
@@ -351,7 +356,7 @@ if (fscanf(fin, "%lg %lg %lg", &(cell.x), &(cell.y), &(cell.z))!=3) {
   fprintf(stderr, "Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
   exit(EXIT_FAILURE);
 }
-printf("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
+VERBOSE("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
 */
 
 for (tm=0.; ;tm+=param_delta_t) {
@@ -380,7 +385,7 @@ if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
 
 
     if (source_distance2>param_cutoff_squared) {
-      printf("# Info: Loss. Particle %i of %i actives (max %i total generated %i) got lost to position %g %g %g at time %g at distance %g>%g having started at time %g.\n", 
+      VERBOSE("# Info: Loss. Particle %i of %i actives (max %i total generated %i) got lost to position %g %g %g at time %g at distance %g>%g having started at time %g.\n", 
 	i, active_particles, param_max_particles, total_particles,
         particle[i].x, particle[i].y, particle[i].z, tm, sqrt(source_distance2), param_cutoff, particle[i].release_time);
       active_particles--;
@@ -392,7 +397,7 @@ if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
 
     sphere_distance2=particle[i].x*particle[i].x + particle[i].y*particle[i].y + particle[i].z*particle[i].z;
     if (sphere_distance2<param_sphere_radius_squared) {
-      printf("# Info: Arrival. Particle %i of %i actives (max %i total generated %i) arrived at the cell at position %g %g %g at time %g at distance %g<%g having started at time %g.\n", 
+      VERBOSE("# Info: Arrival. Particle %i of %i actives (max %i total generated %i) arrived at the cell at position %g %g %g at time %g at distance %g<%g having started at time %g.\n", 
         i, active_particles, param_max_particles, total_particles,
         particle[i].x, particle[i].y, particle[i].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[i].release_time);
       if (tm>param_warmup_time) {
@@ -415,7 +420,7 @@ if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
 	/* It looks like when I terminate the fscanf string by a \n then it tries to gobble as much whitespace as possible, so it waits until no-whitespace? */
 	if (param_protocol==0) {
 	  if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
-	    printf("# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	    fprintf(stderr, "# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	    exit(EXIT_FAILURE);
 	    //printf("# Warning: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	    //printf("# Warning: Exiting quietly.\n");
@@ -438,7 +443,7 @@ if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
 	  if (sscanf(buffer, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
 	    if (buffer[0]=='V') {
 	      if (sscanf(buffer+1, "%lg %lg %lg", &(velocity.x), &(velocity.y), &(velocity.z))!=3) {
-		printf("# Error: sscanf of [%s] returned without all three conversions for velocity. %i::%s\n", buffer, errno, strerror(errno));
+		fprintf(stderr, "# Error: sscanf of [%s] returned without all three conversions for velocity. %i::%s\n", buffer, errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	      } else {
 	        delta.x=0.;
@@ -447,10 +452,10 @@ if ((velocity.x!=0.) || (velocity.y!=0.) || (velocity.z!=0.))
 	      }
 	    } else {
 	      if (strcmp(buffer, "STOP")==0) {
-		printf("# Info: STOP keyword received. Good bye!\n");
+		VERBOSE("# Info: STOP keyword received. Good bye!\n");
 		exit(EXIT_SUCCESS);
 	      }
-	      printf("# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
+	      fprintf(stderr, "# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
 	      exit(EXIT_FAILURE);
 	    }
 	  } else {
@@ -490,14 +495,14 @@ struct rusage rus;
 
 tm=time(NULL);
 
-printf("# Info Terminating at %s", ctime(&tm));
+VERBOSE("# Info Terminating at %s", ctime(&tm));
 if (getrusage(RUSAGE_SELF, &rus)) {
-  printf("# Info getrusage(2) failed.\n");
+  VERBOSE("# Info getrusage(2) failed.\n");
 } else {
-printf("# Info getrusage.ru_utime: %li.%06li\n", (long int)rus.ru_utime.tv_sec, (long int)rus.ru_utime.tv_usec);
-printf("# Info getrusage.ru_stime: %li.%06li\n", (long int)rus.ru_stime.tv_sec, (long int)rus.ru_stime.tv_usec);
+VERBOSE("# Info getrusage.ru_utime: %li.%06li\n", (long int)rus.ru_utime.tv_sec, (long int)rus.ru_utime.tv_usec);
+VERBOSE("# Info getrusage.ru_stime: %li.%06li\n", (long int)rus.ru_stime.tv_sec, (long int)rus.ru_stime.tv_usec);
 
-#define GETRUSAGE_long(f) printf("# Info getrusage.%s: %li\n", #f, rus.f);
+#define GETRUSAGE_long(f) VERBOSE("# Info getrusage.%s: %li\n", #f, rus.f);
 GETRUSAGE_long(ru_maxrss);
 GETRUSAGE_long(ru_ixrss);
 GETRUSAGE_long(ru_idrss);
@@ -513,7 +518,7 @@ GETRUSAGE_long(ru_nsignals);
 GETRUSAGE_long(ru_nvcsw);
 GETRUSAGE_long(ru_nivcsw);
 }
-printf("# Info: Good bye and thanks for all the fish.\n");
+VERBOSE("# Info: Good bye and thanks for all the fish.\n");
 }
 
 
@@ -538,14 +543,14 @@ void update_particles_and_cell(particle_strct d, double scale)
 	source.y-=d.y;
 	source.z-=d.z;
 
-        printf("# Info: New source position %g %g %g new velocity %g %g %g\n", (source.x), (source.y), (source.z), velocity.x, velocity.y, velocity.z);
+        VERBOSE("# Info: New source position %g %g %g new velocity %g %g %g\n", (source.x), (source.y), (source.z), velocity.x, velocity.y, velocity.z);
 	/* The source is found if it resides within the cell. */
         source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
 	if (source_distance2<param_sphere_radius_squared) {
 	  fprintf(fout, "HEUREKA!\n");
-	  printf("# Info: HEUREKA!\n");
-	  printf("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
-	  printf("# Info: Expecting SIGHUP.\n");
+	  VERBOSE("# Info: HEUREKA!\n");
+	  VERBOSE("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
+	  VERBOSE("# Info: Expecting SIGHUP.\n");
 	}
 	if (source_distance2>param_cutoff_squared) {
 	#warning "Unmitigated disaster."
