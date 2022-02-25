@@ -11,7 +11,7 @@ from sphericaltransf import *
 # choose initial distance
 receptornum = 10
 direction_sphcoords = pick_direction(0,10)
-print(len(direction_sphcoords))
+#print(len(direction_sphcoords))
 radius = 1
 v = 0.01
 receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius,receptornum,0)
@@ -45,23 +45,26 @@ for cutoff in cutoffs:
         moving = 0
         t = []
         while(count <= max_particles):
-            theta_mol = received[0]
-            phi_mol = received[1]
-            t.append(received[2])
+            try:
+                theta_mol = received[0]
+                phi_mol = received[1]
+                t.append(received[2])
+            except:
+                print(received)
             if count==1: tm = t[0]
             else: tm = t[count-1]-t[count-2]
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 if moving ==0: 
-                    received,source = mlbi.update_BrownianParticle(brownian_pipe)
+                    received = mlbi.update_BrownianParticle(brownian_pipe)
                 else: 
                     next_pos=np.sqrt((sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0])))**2+ (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1])))**2  +(sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0])))**2)
                     if next_pos >= cutoff : 
                         failed += 1
                         break
-                    received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
+                    received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], tm * v,1)
                     
-                    if str(source[0]) == 'F':
+                    if str(received) == 'SOURCE FOUND':
                         #print('# Source found')
                         break
                     else:
@@ -82,8 +85,8 @@ for cutoff in cutoffs:
                         failed += 1
                         break
                 
-                received,source = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], step_radius=tm * v)
-                if str(source[0]) == 'F':
+                received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], tm * v,1)
+                if str(received) == 'SOURCE FOUND':
                     #print('# Source found')
                     break
                 else:

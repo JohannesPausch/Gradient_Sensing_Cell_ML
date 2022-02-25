@@ -78,7 +78,7 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_rad
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     if received[0]=='HEUREKA!':
         stop_BrownianParticle(brownian_pipe)
-        return ['SOURCE', 'FOUND']
+        return ['SOURCE FOUND']
     while received[0] == '#':
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     try: 
