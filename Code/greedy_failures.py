@@ -54,8 +54,6 @@ for cutoff in cutoffs:
                 t.append(received[2])
             except:
                 print(received)
-            if count==1: tm = t[0]
-            else: tm = t[count-1]-t[count-2]
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
                 if moving ==0: # this is a dummy value so that program always goes into else-option 
