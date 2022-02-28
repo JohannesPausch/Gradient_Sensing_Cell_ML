@@ -340,6 +340,8 @@ int main(int argc, char *argv[])
 
   VERBOSE("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
   fprintf_traj("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
+  fprintf_traj("0. %g %g %g\n", source.x, source.y, source.z);
+
 
   if (param_output[0]) {
     if ((fout=fopen(param_output, "wt"))==NULL) {
