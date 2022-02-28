@@ -17,13 +17,13 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 2 #ideally 0.1 #1 initially
-seeds = np.arange(1,201)
+seeds = np.arange(1,11)
 distances = np.arange(6,8)
-init_distance = 10
+init_distance = 5
 mean_final_counts = []
 std_final_counts = []
 cutoff = 30
-cutoffs = np.arange(30,40,5)
+cutoffs = [30]
 velocity = 0.1
 
 for cutoff in cutoffs:
@@ -58,15 +58,16 @@ for cutoff in cutoffs:
             else: tm = t[count-1]-t[count-2]
             ind = activation_Receptors(theta_mol,phi_mol,receptor_sphcoords,radius,radius*math.pi/recepsurface_ratio)
             if ind == -1: 
-                if moving ==-1: # this is a dummy value so that program always goes into else-option 
+                if moving ==0: # this is a dummy value so that program always goes into else-option 
                     received = mlbi.update_BrownianParticle(brownian_pipe)
+                    print('# cell does have direction yet')
                 else: 
                     #next_pos=np.sqrt((sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0])))**2+ (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1])))**2  +(sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0])))**2)
                     #if next_pos >= cutoff : 
                     #    failed += 1
                     #    break
                     received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1],velocity,True)
-                    
+                    print('# cell uses previous direction')
                     if str(received) == 'SOURCE FOUND':
                         print('# Source found')
                         break
@@ -74,18 +75,19 @@ for cutoff in cutoffs:
                 
                 moving =1
                 indm = ind[0][0]
-                next_pos=np.sqrt((sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0])))**2+ (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1])))**2  +(sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0])))**2)
+                #next_pos=np.sqrt((sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0])))**2+ (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1])))**2  +(sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0])))**2)
                 # print('prediction to match source',(sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0]))), (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1]))),  (sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0]))))
-                if next_pos >= cutoff: 
-                        failed += 1
-                        break
+                #if next_pos >= cutoff: 
+                #        failed += 1
+                #        break
                 
                 received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], velocity,True)
+                print('# cell has new direction')
                 if str(received) == 'SOURCE FOUND':
                     print('# Source found')
                     break
             count+=1
 
-    with open("greedy_algorithm_failed_10_testb.dat", "a") as output:
+    with open("greedy_algorithm_failed_10_testc.dat", "a") as output:
         output.write(str(cutoff)+'\t')
         output.write(str(failed)+'\n')

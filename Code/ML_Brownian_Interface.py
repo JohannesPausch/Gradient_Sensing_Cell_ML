@@ -75,7 +75,7 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_rad
     #    source_x,source_y,source_z = [float(received[5]),float(received[6]),float(received[7])]
     #    radius = np.sqrt(source_x*source_x+source_y*source_y+source_z*source_z)
     #    source_theta,source_phi=np.arccos(source_z/radius), np.mod(np.arctan2(source_y,source_x),2*np.pi)
-    received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    #received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     if received[0]=='HEUREKA!':
         stop_BrownianParticle(brownian_pipe)
         return ['SOURCE FOUND']
