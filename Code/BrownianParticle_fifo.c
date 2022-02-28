@@ -340,7 +340,9 @@ int main(int argc, char *argv[])
 
   VERBOSE("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
   fprintf_traj("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
-  fprintf_traj("0. %g %g %g\n", source.x, source.y, source.z);
+
+
+
 
 
   if (param_output[0]) {
@@ -383,6 +385,8 @@ int main(int argc, char *argv[])
      }
      VERBOSE("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
      */
+
+  fprintf_traj("0. %g %g %g\n", cell.x, cell.y, cell.z);
 
   for (tm=0.; ;tm+=param_delta_t) {
     int i;
