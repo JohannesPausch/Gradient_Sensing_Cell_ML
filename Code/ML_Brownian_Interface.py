@@ -71,14 +71,14 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_rad
             error_string += x
         print(error_string)
         return np.array([0,0,0])
-    elif received[3] == 'source':
-        source_x,source_y,source_z = [float(received[5]),float(received[6]),float(received[7])]
-        radius = np.sqrt(source_x*source_x+source_y*source_y+source_z*source_z)
-        source_theta,source_phi=np.arccos(source_z/radius), np.mod(np.arctan2(source_y,source_x),2*np.pi)
-    received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    #elif received[3] == 'source':
+    #    source_x,source_y,source_z = [float(received[5]),float(received[6]),float(received[7])]
+    #    radius = np.sqrt(source_x*source_x+source_y*source_y+source_z*source_z)
+    #    source_theta,source_phi=np.arccos(source_z/radius), np.mod(np.arctan2(source_y,source_x),2*np.pi)
+    #received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     if received[0]=='HEUREKA!':
         stop_BrownianParticle(brownian_pipe)
-        return ['SOURCE', 'FOUND']
+        return ['SOURCE FOUND']
     while received[0] == '#':
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     try: 
@@ -89,7 +89,7 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_rad
         for x in received:
             error_string += x
         print(error_string)
-    return received,[radius,source_theta,source_phi]
+    return received
 
 def update_BrownianParticle_test(brownian_pipe,step_theta=None,step_phi=None):
     return np.random.rand(3)
