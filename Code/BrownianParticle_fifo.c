@@ -9,6 +9,9 @@
 #include <sys/resource.h>
 #include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
+#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220303_222430"
+
+
 /* This code is based on BrownianParticle.c
  *  + signalling particles are released from the origin.
  *  + there might be some initial warm-up
@@ -194,6 +197,7 @@ int main(int argc, char *argv[])
 
 
   setlinebuf(stdout);
+  printf("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
   while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:T:vw:")) != -1) {
     switch (ch) {
       case 'c':
@@ -247,6 +251,10 @@ int main(int argc, char *argv[])
 	break;
       case 't':
 	param_delta_t=strtod(optarg, NULL);
+	if (param_delta_t<=0.) {
+	  fprintf(stderr, "Error: param_delta_t<=0.\n");
+	  exit(EXIT_FAILURE);
+	}
 	break;
       case 'v':
 	verbose=1;
@@ -385,7 +393,7 @@ int main(int argc, char *argv[])
      }
      VERBOSE("# Info: Initial cell position %g %g %g\n", (cell.x), (cell.y), (cell.z));
      */
-
+  fprintf_traj("# Info: START OF TRACK.\n");
   fprintf_traj("0. %g %g %g\n", cell.x, cell.y, cell.z);
 
   for (tm=0.; ;tm+=param_delta_t) {
@@ -451,6 +459,7 @@ int main(int argc, char *argv[])
 	  if (param_protocol==0) {
 	    if (fscanf(fin, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
 	      fprintf(stderr, "# Error: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
+	      fprintf_traj("# Error: Garbled message at basic protocol.\n");
 	      exit(EXIT_FAILURE);
 	      //printf("# Warning: fscanf returned without all three conversions. %i::%s\n", errno, strerror(errno));
 	      //printf("# Warning: Exiting quietly.\n");
@@ -459,6 +468,7 @@ int main(int argc, char *argv[])
 	      velocity.x=0.;
 	      velocity.y=0.;
 	      velocity.z=0.;
+	      fprintf_traj("# DELTA Displacement via basic protocol line %i: %g %g %g\n", __LINE__, delta.x , delta.y, delta.z);
 	    }
 	  } else {
 	    char buffer[2048]; // BAD STYLE, buffer overflow should be caught.
@@ -470,19 +480,23 @@ int main(int argc, char *argv[])
 	      read(STDIN_FILENO, p, 1);
 	    }
 	    *p=(char)0;
+	    fprintf_traj("# DELTA message: [%s]\n", buffer);
 	    if (sscanf(buffer, "%lg %lg %lg", &(delta.x), &(delta.y), &(delta.z))!=3) {
 	      if (buffer[0]=='V') {
 		if (sscanf(buffer+1, "%lg %lg %lg", &(velocity.x), &(velocity.y), &(velocity.z))!=3) {
+	          fprintf_traj("# Error: Garbled message at proper protocol.\n");
 		  fprintf(stderr, "# Error: sscanf of [%s] returned without all three conversions for velocity. %i::%s\n", buffer, errno, strerror(errno));
 		  exit(EXIT_FAILURE);
 		} else {
 		  delta.x=0.;
 		  delta.y=0.;
 		  delta.z=0.;
+	          fprintf_traj("# DELTA velocity via proper protocol line %i: %g %g %g\n", __LINE__, velocity.x , velocity.y, velocity.z);
 		}
 	      } else {
 		if (strcmp(buffer, "STOP")==0) {
 		  VERBOSE("# Info: STOP keyword received. Good bye!\n");
+		  fprintf_traj("# STOP received.\n");
 		  exit(EXIT_SUCCESS);
 		}
 		fprintf(stderr, "# Error: sscanf of [%s] returned without all three conversions. %i::%s\n", buffer, errno, strerror(errno));
@@ -492,6 +506,7 @@ int main(int argc, char *argv[])
 	      velocity.x=0.;
 	      velocity.y=0.;
 	      velocity.z=0.;
+	      fprintf_traj("# DELTA Displacement via proper protocol line %i: %g %g %g\n", __LINE__, delta.x , delta.y, delta.z);
 	    }
 	  }
 
