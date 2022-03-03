@@ -6,8 +6,8 @@ from scipy.stats import special_ortho_group
 import numpy as np
 separator = ' '
 
-def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,iterations=None):
-    command = './BrownianParticle_fifo.o -p 1'
+def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None,radius=1,use_seed=None,cutoff=None,events=None,iterations=None,record_trajectory=None):
+    command = './BrownianParticle_fifo.o'
     if use_seed != None:
         command += ' -S '+str(use_seed)
         np.random.seed(seed=use_seed)
@@ -30,8 +30,11 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
         command += ' -N '+str(iterations)
     if diffusion != None:
         command += ' -d '+str(diffusion)
-    if radius != 1:
+    if radius != None:
         command += ' -r '+str(radius)
+    command += ' -p 1 '
+    if record_trajectory != None:
+        command += ' -t '+str(record_trajectory)
     #print('# used command: '+command)
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
@@ -39,6 +42,7 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     try: 
         received = [float(x) for x in received]
+        #print(received)
     except:
         print('# Error: not a float')
         print(received)
@@ -52,8 +56,8 @@ def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=N
 def stop_BrownianParticle(brownian_pipe):
     brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
     brownian_pipe.stdin.flush()
-    received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
-    return '# C-PRORGAM STOPPED'
+    #received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
+    return 
 
 def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_radius=0.1,velocity=None):
     if step_theta != None and step_phi != None:
@@ -79,6 +83,9 @@ def update_BrownianParticle(brownian_pipe,step_theta=None,step_phi=None,step_rad
     if received[0]=='HEUREKA!':
         stop_BrownianParticle(brownian_pipe)
         return 'SOURCE FOUND'
+    if received[0]=='Left':
+        stop_BrownianParticle(brownian_pipe)
+        return 'Left range'
     while received[0] == '#':
         received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     try: 

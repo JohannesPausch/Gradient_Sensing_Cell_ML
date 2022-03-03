@@ -17,7 +17,7 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 2 #ideally 0.1 #1 initially
-seeds = np.arange(1,11)
+seeds = np.arange(1,10)
 distances = np.arange(6,8)
 init_distance = 5
 mean_final_counts = []
@@ -38,7 +38,7 @@ for cutoff in cutoffs:
 
         # initalize c setup
         brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff)
-        print('Pipe initiliased')
+        #print('Pipe initiliased')
         ind_list = []
         countparticle = 0
         steps = 0
@@ -47,7 +47,7 @@ for cutoff in cutoffs:
         t = []
         
         while(count <= max_particles):
-            print(count)
+            #print(count)
             try:
                 theta_mol = received[0]
                 phi_mol = received[1]
@@ -58,16 +58,20 @@ for cutoff in cutoffs:
             if ind == -1: 
                 if moving ==0: # this is a dummy value so that program always goes into else-option 
                     received = mlbi.update_BrownianParticle(brownian_pipe)
-                    print('# cell does have direction yet')
+                    #print('# cell does have direction yet')
                 else: 
                     #next_pos=np.sqrt((sourcex-((tm * v)*np.cos(direction_sphcoords[indm][1])*np.sin(direction_sphcoords[indm][0])))**2+ (sourcey-((tm * v)*np.sin(direction_sphcoords[indm][0])*np.sin(direction_sphcoords[indm][1])))**2  +(sourcez-((tm * v)*np.cos(direction_sphcoords[indm][0])))**2)
                     #if next_pos >= cutoff : 
                     #    failed += 1
                     #    break
                     received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1],velocity,True)
-                    print('# cell uses previous direction')
+                    #print('# cell uses previous direction')
                     if str(received) == 'SOURCE FOUND':
-                        print('# Source found')
+                        #print('# Source found')
+                        break
+                    if str(received) == 'Left range':
+                        #print('# Cell left range')
+                        failed += 1
                         break
             else: #same index for receptors and directions
                 
@@ -80,9 +84,13 @@ for cutoff in cutoffs:
                 #        break
                 
                 received = mlbi.update_BrownianParticle(brownian_pipe,direction_sphcoords[indm][0],direction_sphcoords[indm][1], velocity,True)
-                print('# cell has new direction')
+                #print('# cell has new direction')
                 if str(received) == 'SOURCE FOUND':
-                    print('# Source found')
+                    #print('# Source found')
+                    break
+                if str(received) == 'Left range':
+                    #print('# Cell Left range')
+                    failed += 1
                     break
             count+=1
 
