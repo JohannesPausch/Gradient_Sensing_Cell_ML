@@ -9,7 +9,7 @@
 #include <sys/resource.h>
 #include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
-#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220303_222430"
+#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220303_224030"
 
 
 /* This code is based on BrownianParticle.c
@@ -197,7 +197,6 @@ int main(int argc, char *argv[])
 
 
   setlinebuf(stdout);
-  printf("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
   while ((ch = getopt(argc, argv, "c:d:i:N:o:pR:r:s:S:t:T:vw:")) != -1) {
     switch (ch) {
       case 'c':
@@ -284,6 +283,8 @@ int main(int argc, char *argv[])
     fprintf_traj("\n");
   }
 
+  VERBOSE("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
+  fprintf_traj("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
 
   /* Some infos. */
   {
