@@ -600,13 +600,16 @@ if (traj) fprintf(traj, "%g %g %g %g\n", tm, cell.x, cell.y, cell.z);
   source_distance2=source.x*source.x + source.y*source.y + source.z*source.z;
   if (source_distance2<param_sphere_radius_squared) {
     fprintf(fout, "HEUREKA!\n");
+    fprintf_traj("# HEUREKA source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
     VERBOSE("# Info: HEUREKA!\n");
     VERBOSE("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
     VERBOSE("# Info: Expecting SIGHUP.\n");
+    pause();
   }
   if (source_distance2>param_cutoff_squared) {
-#warning "Unmitigated disaster."
+//#warning "Unmitigated disaster."
 	  fprintf(fout, "Left range\n");
+          fprintf_traj("# LEFT source_distance2=%g>param_cutoff_squared=%g\n", source_distance2, param_cutoff_squared);
 	  pause();
 	}
 
