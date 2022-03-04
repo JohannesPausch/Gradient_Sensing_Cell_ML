@@ -32,9 +32,9 @@ def init_BrownianParticle(xpos=None,ypos=None,zpos=None,rate=None,diffusion=None
         command += ' -d '+str(diffusion)
     if radius != None:
         command += ' -r '+str(radius)
-    command += ' -p 1 '
     if record_trajectory != None:
         command += ' -t '+str(record_trajectory)
+    command += ' -p 1 '
     #print('# used command: '+command)
     brownian_pipe = Popen([command], shell=True, stdout=PIPE, stdin=PIPE)
     received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
