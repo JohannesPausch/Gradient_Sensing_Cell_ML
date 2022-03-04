@@ -607,7 +607,7 @@ if (traj) fprintf(traj, "%g %g %g %g\n", tm, cell.x, cell.y, cell.z);
   if (source_distance2>param_cutoff_squared) {
 #warning "Unmitigated disaster."
 	  fprintf(fout, "Left range\n");
-	  //pause();
+	  pause();
 	}
 
 }
