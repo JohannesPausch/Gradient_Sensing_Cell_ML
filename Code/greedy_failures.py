@@ -17,13 +17,13 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 2 #ideally 0.1 #1 initially
-seeds = [10]#np.arange(1,10)
+seeds = np.arange(0,200)
 distances = np.arange(6,8)
 init_distance = 5
 mean_final_counts = []
 std_final_counts = []
 cutoff = 30
-cutoffs = [30]
+cutoffs = np.arange(20,52,2)
 velocity = 0.1
 
 for cutoff in cutoffs:
@@ -37,7 +37,7 @@ for cutoff in cutoffs:
         max_particles = 100000
 
         # initalize c setup
-        brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff,None,None,'myrecords02.txt')
+        brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff,None,None,None)#'myrecords02.txt'
         #print('Pipe initiliased')
         ind_list = []
         countparticle = 0
@@ -94,6 +94,6 @@ for cutoff in cutoffs:
                     break
             count+=1
 
-    with open("greedy_algorithm_failed_10_testc.dat", "a") as output:
+    with open("greedy_algorithm_failed_5_test.dat", "a") as output:
         output.write(str(cutoff)+'\t')
         output.write(str(failed)+'\n')
