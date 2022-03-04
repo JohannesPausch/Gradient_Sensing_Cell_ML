@@ -9,7 +9,7 @@
 #include <sys/resource.h>
 #include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
-#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220303_224030"
+#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220304_162113"
 
 
 /* This code is based on BrownianParticle.c
@@ -604,12 +604,18 @@ if (traj) fprintf(traj, "%g %g %g %g\n", tm, cell.x, cell.y, cell.z);
     VERBOSE("# Info: HEUREKA!\n");
     VERBOSE("# Info: source_distance2=%g<param_sphere_radius_squared=%g\n", source_distance2, param_sphere_radius_squared);
     VERBOSE("# Info: Expecting SIGHUP.\n");
+    if (fout) fflush(fout);
+    else if (fout!=stdout) fflush(stdout);
+    if (traj) fflush(traj); 
     pause();
   }
   if (source_distance2>param_cutoff_squared) {
 //#warning "Unmitigated disaster."
 	  fprintf(fout, "Left range\n");
           fprintf_traj("# LEFT source_distance2=%g>param_cutoff_squared=%g\n", source_distance2, param_cutoff_squared);
+    	  if (fout) fflush(fout);
+    	  else if (fout!=stdout) fflush(stdout);
+    	  if (traj) fflush(traj); 
 	  pause();
 	}
 
