@@ -17,7 +17,7 @@ receptor_sphcoords,receptor_cartcoords, activation_array = init_Receptors(radius
 recepsurface_ratio = 10
 rate = 1
 diffusion = 2 #ideally 0.1 #1 initially
-seeds = [3]#np.arange(1,10)
+seeds = [10]#np.arange(1,10)
 distances = np.arange(6,8)
 init_distance = 5
 mean_final_counts = []
@@ -37,7 +37,7 @@ for cutoff in cutoffs:
         max_particles = 100000
 
         # initalize c setup
-        brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff,None,None,'myrecords01.txt')
+        brownian_pipe, received, source = mlbi.init_BrownianParticle(sourcex,sourcey,sourcez,rate,diffusion,radius,seed,cutoff,None,None,'myrecords02.txt')
         #print('Pipe initiliased')
         ind_list = []
         countparticle = 0
