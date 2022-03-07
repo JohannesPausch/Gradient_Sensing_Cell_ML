@@ -54,7 +54,7 @@ def init_BrownianParticle_test(distance=None,rate=None,diffusion=None,use_seed=N
     return 1,np.random.rand(3)
 
 def stop_BrownianParticle(brownian_pipe):
-    brownian_pipe.stdin.write(bytes("Thanks for all the fish!\n", 'UTF-8'))
+    brownian_pipe.stdin.write(bytes("STOP\n", 'UTF-8'))
     brownian_pipe.stdin.flush()
     #received = brownian_pipe.stdout.readline().strip().decode('ascii').split(separator)
     return 
