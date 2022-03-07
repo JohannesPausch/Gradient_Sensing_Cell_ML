@@ -9,7 +9,7 @@
 #include <sys/resource.h>
 #include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
-#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220304_162113"
+#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220306_123227"
 
 
 /* This code is based on BrownianParticle.c
@@ -171,6 +171,7 @@ gsl_rng *rng;
 int verbose=0;
 #define VERBOSE if (verbose) printf
 
+int prepare_to_terminate(void);
 void postamble(FILE *out);
 void update_particles_and_cell(particle_strct d, double scale);
 int fprintf_traj(char* format, ...);
@@ -186,6 +187,7 @@ double source_distance2, sphere_distance2;
 FILE *fin=NULL, *fout=NULL, *traj=NULL;
 double tm=0.;
 particle_strct cell={0., 0., 0., 0.};
+
 
 int main(int argc, char *argv[])
 {
@@ -607,7 +609,7 @@ if (traj) fprintf(traj, "%g %g %g %g\n", tm, cell.x, cell.y, cell.z);
     if (fout) fflush(fout);
     else if (fout!=stdout) fflush(stdout);
     if (traj) fflush(traj); 
-    pause();
+    prepare_to_terminate();
   }
   if (source_distance2>param_cutoff_squared) {
 //#warning "Unmitigated disaster."
@@ -616,11 +618,38 @@ if (traj) fprintf(traj, "%g %g %g %g\n", tm, cell.x, cell.y, cell.z);
     	  if (fout) fflush(fout);
     	  else if (fout!=stdout) fflush(stdout);
     	  if (traj) fflush(traj); 
-	  pause();
+	  prepare_to_terminate();
 	}
 
 }
 
+
+int prepare_to_terminate(void) 
+{
+char buffer[2048]; // BAD STYLE, buffer overflow should be caught.
+
+if (param_protocol) {
+  char *p=buffer;
+
+  read(STDIN_FILENO, p, 1);
+  while (*p!='\n') {
+    p++;
+    read(STDIN_FILENO, p, 1);
+  }
+  *p=(char)0;
+  if (strcmp(buffer, "STOP")==0) {
+    VERBOSE("# Info: STOP keyword received. Good bye!\n");
+    fprintf_traj("# STOP received.\n");
+    exit(EXIT_SUCCESS);
+  } else {
+    VERBOSE("# Info: Unrecognised instruction received. Good bye!\n");
+    fprintf_traj("# Unrecognised instruction received.\n");
+    exit(EXIT_FAILURE);
+  }
+}
+scanf("%s", buffer);
+exit(EXIT_SUCCESS);
+}
 
 int fprintf_traj(char* format, ...)
 {
