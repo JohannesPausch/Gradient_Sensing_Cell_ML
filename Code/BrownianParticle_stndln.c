@@ -17,7 +17,7 @@
  * The cue particle might be inside the cell at that time. 
  * XXX Improvement needed: Blast all particles away that are inside the cell after warmup.
  * The cell then runs according to the cues.
- * It's trajectory is written into BrownianParticle_stndln_traj.txt and a snapshot of all coos is written into
+ * Its trajectory is written into BrownianParticle_stndln_traj.txt and a snapshot of all coos is written into
  * BrownianParticle_stndln_snapshot*.txt
  *
  * The first line in that file is the cell's position followed by the number of active particles and then the time stamp.
