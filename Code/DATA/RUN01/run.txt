@@ -1,0 +1,2 @@
+#	parallels	boost	iterations	warmup	source	maxT	gobble
+	10		0.1	10000		100	0,0,3.	1000.	
