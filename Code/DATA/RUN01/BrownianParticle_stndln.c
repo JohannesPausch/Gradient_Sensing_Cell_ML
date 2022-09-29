@@ -7,7 +7,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-//#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
+#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
 
 /*
@@ -329,7 +329,6 @@ int main(int argc, char *argv[])
   int ch;
   double boost=INITIAL_BOOST;
   double min_sphere_distance_squared;
-  int nudges;
 
   double mom_boost[2]={0.,0.};
 
@@ -453,10 +452,10 @@ int main(int argc, char *argv[])
 
   /* For version control if present. */
   VERBOSE("# Info: Version of git_version_string to follow.\n");
-  //VERBOSE("%s", git_version_string);
+  VERBOSE("%s", git_version_string);
   VERBOSE("# $Header$\n");
   fprintf_traj("# Info: Version of git_version_string to follow.\n");
-  //fprintf_traj("%s", git_version_string);
+  fprintf_traj("%s", git_version_string);
   fprintf_traj("# $Header$\n");
 
 
@@ -595,7 +594,6 @@ printf("# Info: At the beginning of %lli there are %i particles in the system. S
 
   cell.release_time=tm; /* Just for the time being */
   state=CELL_PLACED;
-  nudges=0;
   // Not allowed: velocity={0.,0.,0.,0.};
   velocity.x=0.;
   velocity.y=0.;
@@ -634,7 +632,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
     if ((tm-start_tm>param_max_tm) && (param_max_tm>0.)) {
       state=CELL_MAX_T_EXCEEDED;
-      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
+      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
       break;
     }
     if ((tm-start_tm>param_warmup_tm) && (state==CELL_PLACED)) {
@@ -648,7 +646,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
       state=update_particles_and_cell(velocity, boost*param_delta_t);
 
       if ((state==CELL_ARRIVED_AT_SOURCE) || (state==CELL_LEFT)) {
-        printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
+        printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
       	break;
       }
     }
@@ -723,7 +721,6 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 	  double theta, phi;
 
 	  state=CELL_MOVING;
-	  nudges++;
 	  //fprintf(fout, "%g %g %g %g\n", particle[ai].x, particle[ai].y, particle[ai].z, tm);
 	  // Coordinates are relative to cell, as the cell is at the origin
 	  //range theta from 0 to pi
@@ -807,6 +804,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 } /* iterations */
 
 
+  postamble(stdout);
   
   printf("# MOM_BOOST %g %i %g", tm, 2, mom_boost[0]);
   if (mom_boost[0]>0.) printf(" %g\n", mom_boost[1]/mom_boost[0]);
@@ -814,7 +812,6 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
 
 
-  postamble(stdout);
   if (traj) postamble(traj);
   return(0);
 }
