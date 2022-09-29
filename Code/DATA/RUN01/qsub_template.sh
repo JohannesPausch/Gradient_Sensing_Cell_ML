@@ -17,5 +17,5 @@ date
 
 
 #time ./RnT_mips -s seed -r -g gamma -w velocity -n POTnu -N 2 -M maxT -m 0.01 -D diff -x POTxi -l length -t deltat > RnT_mips_extension.dat
-time ./BrownianParticle_stndln -s seed -b boost -I iterations -w warmup -s source -m maxT > BrownianParticle_stndln_extension.dat
+time ./BrownianParticle_stndln -S seed -b boost -I iterations -w warmup -s source -m maxT > BrownianParticle_stndln_extension.dat
 date
