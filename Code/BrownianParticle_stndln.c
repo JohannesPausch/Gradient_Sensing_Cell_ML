@@ -7,7 +7,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
-#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
+//#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
 
 /*
@@ -452,10 +452,10 @@ int main(int argc, char *argv[])
 
   /* For version control if present. */
   VERBOSE("# Info: Version of git_version_string to follow.\n");
-  VERBOSE("%s", git_version_string);
+  //VERBOSE("%s", git_version_string);
   VERBOSE("# $Header$\n");
   fprintf_traj("# Info: Version of git_version_string to follow.\n");
-  fprintf_traj("%s", git_version_string);
+  //fprintf_traj("%s", git_version_string);
   fprintf_traj("# $Header$\n");
 
 
