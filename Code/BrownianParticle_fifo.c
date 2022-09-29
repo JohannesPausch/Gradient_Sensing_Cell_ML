@@ -9,7 +9,8 @@
 #include <sys/resource.h>
 #include "../Gradient_Sensing_Cell_ML_git_stamps.h"
 
-#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220306_123227"
+//#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220306_123227"
+#include "BrownianParticle_magic.h"
 
 
 /* This code is based on BrownianParticle.c

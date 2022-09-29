@@ -8,6 +8,8 @@
 #include <gsl/gsl_randist.h>
 #include <sys/resource.h>
 //#include "../Gradient_Sensing_Cell_ML_git_stamps.h"
+//#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220306_123227"
+#include "BrownianParticle_magic.h"
 
 
 /*
@@ -100,7 +102,6 @@
  * ./BrownianParticle_stndln -w 500 -T BrownianParticle_stndln_traj6.txt -s 0,0,6
  */
 
-#define VERSION_ACCORDING_TO_GUNNAR "MAGIC_VATG 20220306_123227"
 
 
 /* This code is based on BrownianParticle.c
@@ -439,7 +440,7 @@ int main(int argc, char *argv[])
     fprintf_traj("\n");
   }
 
-  VERBOSE("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
+  printf("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
   fprintf_traj("# Info: Version according to Gunnar: %s\n", VERSION_ACCORDING_TO_GUNNAR);
 
   /* Some infos. */
@@ -720,7 +721,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 	mom_interarrival[1]+=(tm-last_arrival_tm);
 	last_arrival_tm=tm;
 	if ((state==CELL_READY_TO_RECEIVE) || (state==CELL_MOVING)) {
-	  double theta, phi;
+	  //double theta, phi;
 
 	  state=CELL_MOVING;
 	  nudges++;
