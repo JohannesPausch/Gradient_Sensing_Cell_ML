@@ -13,6 +13,18 @@
 
 
 /*
+ * 3 Oct 2022
+ * Implemented tags for Johannes. They are now featuring in the output
+ * fprintf(f, "%i %g %g %g %g\n", particle[ai].tag, particle[ai].release_tm, particle[ai].x+cell.x, particle[ai].y+cell.y, particle[ai].z+cell.z);
+ * tag release_tm x y z
+ * 
+ * The current material still needs validating.
+ * I have also implemented HACK_2D. That turns off any diffusion of cue
+ * molecukes in the z-direction. If the source is displaced only wrt x-y,
+ * this should result in a 2D simulation. It's actually only a single line.
+ *
+ *
+ *
  * 27 Sep 2022
  * Implementing adaptive boost. It looks like that means that the cell
  * misses the source more often and there are more particles in the system.
@@ -188,7 +200,8 @@
 
 typedef struct {
 double x, y, z;
-double release_time;
+double release_tm;
+int tag;
 } particle_strct;
 
 
@@ -323,6 +336,7 @@ FILE *fin=NULL, *fout=NULL, *traj=NULL;
 double tm=0., start_tm;
 particle_strct cell={0., 0., 0., 0.};
 
+#define MAX_FILECOUNT (10000)
 int full_snapshot(void);
 
 int main(int argc, char *argv[])
@@ -561,7 +575,7 @@ for (it=1LL; it<=param_iterations; it++) {
  * moving all the cue particles and then deleting those
  * that now happen to be inside the cell.
  *
- * I this this sort of thing will need a redesign at some point.
+ * It is this sort of thing will need a redesign at some point.
  * */
 {
 particle_strct d;
@@ -594,21 +608,24 @@ printf("# Info: At the beginning of %lli there are %i particles in the system. S
 
 
 
-  cell.release_time=tm; /* Just for the time being */
+  cell.release_tm=tm; /* Just for the time being */
+  cell.tag=0;
   state=CELL_PLACED;
   nudges=0;
   // Not allowed: velocity={0.,0.,0.,0.};
   velocity.x=0.;
   velocity.y=0.;
   velocity.z=0.;
-  velocity.release_time=tm;
+  velocity.release_tm=tm;
+  velocity.tag=0;
   start_tm=tm; 
   //  active_particles=0;
 printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
-
+/* The tags start at 1. */
 #define CREATE_NEW_PARTICLE { particle[active_particles].x=source.x; particle[active_particles].y=source.y; particle[active_particles].z=source.z; \
-  particle[active_particles].release_time=tm; active_particles++; total_particles++;\
+  total_particles++;\
+  particle[active_particles].release_tm=tm; particle[active_particles].tag=total_particles; active_particles++;\
   VERBOSE("# Info: New particle created at time %g. Active: %i, Max: %i, Total: %i\n", tm, active_particles, param_max_particles, total_particles);}
 
 
@@ -635,11 +652,12 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
     if ((tm-start_tm>param_max_tm) && (param_max_tm>0.)) {
       state=CELL_MAX_T_EXCEEDED;
-      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
+      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_tm, tm-cell.release_tm, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
       break;
     }
     if ((tm-start_tm>param_warmup_tm) && (state==CELL_PLACED)) {
-      cell.release_time=tm;
+      cell.release_tm=tm;
+      cell.tag=0;
       state=CELL_READY_TO_RECEIVE;
       printf("# Info: Cell released and ready to receive at %g\n", tm);
     }
@@ -649,7 +667,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
       state=update_particles_and_cell(velocity, boost*param_delta_t);
 
       if ((state==CELL_ARRIVED_AT_SOURCE) || (state==CELL_LEFT)) {
-        printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_time, tm-cell.release_time, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
+        printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_tm, tm-cell.release_tm, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
       	break;
       }
     }
@@ -670,7 +688,9 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
     for (ai=0; ai<active_particles; ai++) {
       particle[ai].x+=gsl_ran_gaussian_ziggurat(rng, sqrt(boost)*param_sigma);
       particle[ai].y+=gsl_ran_gaussian_ziggurat(rng, sqrt(boost)*param_sigma);
+#ifndef HACK_2D
       particle[ai].z+=gsl_ran_gaussian_ziggurat(rng, sqrt(boost)*param_sigma);
+#endif
       source_distance2 = 
 	  (particle[ai].x-source.x)*(particle[ai].x-source.x) 
 	+ (particle[ai].y-source.y)*(particle[ai].y-source.y) 
@@ -691,11 +711,11 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
 
       if (source_distance2>param_cutoff_squared) {
-	VERBOSE("# Info: Loss. Particle %i of %i actives (max %i total generated %i) got lost to position %g %g %g (source at %g %g %g) at time %g at distance %g>%g having started at time %g. (%g-%g)^2+(%g-%g)^2+(%g-%g)^2=%g\n", 
-	    ai, active_particles, param_max_particles, total_particles,
+	VERBOSE("# Info: Loss. Particle %i tag %i of %i actives (max %i total generated %i) got lost to position %g %g %g (source at %g %g %g) at time %g at distance %g>%g having started at time %g. (%g-%g)^2+(%g-%g)^2+(%g-%g)^2=%g\n", 
+	    ai, particle[ai].tag, active_particles, param_max_particles, total_particles,
 	    particle[ai].x, particle[ai].y, particle[ai].z, 
 	    source.x, source.y, source.z, 
-	    tm, sqrt(source_distance2), param_cutoff, particle[ai].release_time,
+	    tm, sqrt(source_distance2), param_cutoff, particle[ai].release_tm,
 	    particle[ai].x, source.x,
 	    particle[ai].y, source.y,
 	    particle[ai].x, source.x,
@@ -716,7 +736,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
       if (sphere_distance2<param_sphere_radius_squared) {
 	VERBOSE("# Info: Arrival. Particle %i of %i actives (max %i total generated %i) arrived at the cell at position %g %g %g at time %g at distance %g<%g having started at time %g.\n", 
 	    ai, active_particles, param_max_particles, total_particles,
-	    particle[ai].x, particle[ai].y, particle[ai].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[ai].release_time);
+	    particle[ai].x, particle[ai].y, particle[ai].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[ai].release_tm);
 	mom_interarrival[0]++;
 	mom_interarrival[1]+=(tm-last_arrival_tm);
 	last_arrival_tm=tm;
@@ -737,7 +757,11 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 	  velocity.x=param_w0*particle[ai].x/plen;
 	  velocity.y=param_w0*particle[ai].y/plen;
 	  velocity.z=param_w0*particle[ai].z/plen;
-	  velocity.release_time=tm;
+#ifdef HACK_2D
+if (velocity.z!=0.) printf("# Error: velocity.z=%g despite HACK_2D\n", velocity.z);
+#endif
+
+	  velocity.release_tm=tm;
 	  }
 	  fprintf_traj("# New velocity %g %g %g\n", velocity.x, velocity.y, velocity.z);
 	  fprintf(stdout, "# Info: New velocity at tm=%g is %g %g %g distance %g particles %i %i boost %g\n", tm, velocity.x, velocity.y, velocity.z, sqrt(source.x*source.x + source.y*source.y + source.z*source.z), active_particles, total_particles, boost);
@@ -979,7 +1003,7 @@ static int count;
 FILE *f;
 char filename[PATH_MAX+1];
 
-if (count>5000) return(-2);
+if (count>MAX_FILECOUNT) return(-2);
 printf("# Info: Writing file %i at time %g\n", count, tm);
 snprintf(filename, PATH_MAX, "BrownianParticle_stndln_snapshot%05i.txt", count);
 filename[PATH_MAX]=(char)0;
@@ -989,7 +1013,7 @@ fprintf(f, "%g %g %g %i %g\n", cell.x, cell.y, cell.z, active_particles, tm);
 fprintf(f, "%g %g %g\n", velocity.x, velocity.y, velocity.z);
 fprintf(f, "%g %g %g\n", source.x+cell.x, source.y+cell.y, source.z+cell.z);
 for (ai=0; ai<active_particles; ai++) {
-  fprintf(f, "%g %g %g\n", particle[ai].x+cell.x, particle[ai].y+cell.y, particle[ai].z+cell.z);
+  fprintf(f, "%i %g %g %g %g\n", particle[ai].tag, particle[ai].release_tm, particle[ai].x+cell.x, particle[ai].y+cell.y, particle[ai].z+cell.z);
 }
 fclose(f);
 return(count++);
