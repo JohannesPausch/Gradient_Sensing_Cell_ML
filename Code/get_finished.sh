@@ -7,7 +7,7 @@ do
   do
     extension=`echo $key | tr '[:upper:]' '[:lower:]'`
     file=`echo $f | sed 's/\(.*\)\..../\1/'`
-    echo $key $file $extension
+    echo '#' $key $file $extension
     cat $f | grep ${key} | sed 's/.*'${key}' //' > ${file}.txt_${extension}
     # m1 is time
     # n1 is nudges
