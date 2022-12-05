@@ -503,6 +503,11 @@ int main(int argc, char *argv[])
   param_sigma=sqrt(2.*param_delta_t*param_diffusion);
   param_cutoff_squared=param_cutoff*param_cutoff;
   param_sphere_radius_squared=param_sphere_radius*param_sphere_radius;
+  #ifdef HACK_2D
+  printf("# Info: ***** HACK_2D is defined. ***** \n");
+  #else
+  printf("# Info: HACK_2D is not defined.\n");
+  #endif
   PRINT_PARAM(param_protocol, "-p", "%i");
   PRINT_PARAM(param_delta_t, "-t", "%g");
   PRINT_PARAM(param_diffusion, "-d", "%g");
@@ -577,6 +582,7 @@ for (it=1LL; it<=param_iterations; it++) {
  *
  * It is this sort of thing will need a redesign at some point.
  * */
+printf("# Info: Adjusting coordinates of %i particles by %g,%g,%g.\n", active_particles, cell.x, cell.y, cell.z);
 {
 particle_strct d;
 
