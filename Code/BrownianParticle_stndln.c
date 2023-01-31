@@ -212,11 +212,42 @@ long long int param_iterations=1000;
 /* State of the particle */
 #define CELL_NO_STATE (0)
 #define CELL_PLACED (1)
+int cell_placed=CELL_PLACED;
 #define CELL_MAX_T_EXCEEDED (2)
 #define CELL_READY_TO_RECEIVE (3)
 #define CELL_ARRIVED_AT_SOURCE (4)
 #define CELL_LEFT (5)
 #define CELL_MOVING (6)
+
+#define CELL_PLACED_BUT_TRANSPARENT (7)
+#define CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD (8)
+
+/*
+ * initial state CELL_NO_STATE
+ * 
+ * Once a cell is placed, at the beginning of the warm-up, it's CELL_PLACED
+ * At end of warm-up, it goes from CELL_PLACED to CELL_READY_TO_RECEIVE;
+ * When the first cue arrives, it switches to CELL_MOVING.
+ * 
+ * When it arrives at the source, the state changes to CELL_ARRIVED_AT_SOURCE
+ * When it leaves the cutoff, the state changes to CELL_LEFT.
+ *
+ * As of 30 Jan 2023 I will have a new state, CELL_PLACED_BUT_TRANSPARENT,
+ * which is an alternative to CELL_PLACED, with the difference that particles
+ * arriving at the surface are not discarded.
+ *
+ * I could also CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD to not discard any 
+ * cue particles upon making the cell ready to receive.
+ *
+ * We think that by the cell being constantly killing cue particles while
+ * waiting for the warm-up to complete or (as I though after our meeting)
+ * by discarding particles inside the cell, we bias the cell to have higher
+ * contrast.
+ */
+
+
+
+
 
 int state=CELL_NO_STATE;
 
@@ -328,7 +359,7 @@ int fprintf_traj(char* format, ...);
  * There are at most N signalling particles.
  */
 
-int ai, active_particles, total_particles, left_particles, absorbed_particles;
+int ai, active_particles, total_particles, left_particles, absorbed_particles, discarded_particles;
 particle_strct *particle;
 particle_strct delta, velocity;
 double source_distance2, sphere_distance2;
@@ -356,7 +387,7 @@ int main(int argc, char *argv[])
 
 
   setlinebuf(stdout);
-  while ((ch = getopt(argc, argv, "b:c:d:h:i:I:m:N:o:pR:r:s:S:t:T:vw:")) != -1) {
+  while ((ch = getopt(argc, argv, "b:c:d:h:i:I:m:N:o:pP:R:r:s:S:t:T:vw:")) != -1) {
     switch (ch) {
       case 'b':
       	param_adaptive_dt=strtod(optarg, NULL);
@@ -387,6 +418,16 @@ int main(int argc, char *argv[])
 	break;
       case 'p':
 	param_protocol=1;
+	break;
+      case 'P':
+        cell_placed=-1;
+	if (optarg[0]=='0'+CELL_PLACED) cell_placed=CELL_PLACED;
+	else if (optarg[0]=='0'+CELL_PLACED_BUT_TRANSPARENT) cell_placed=CELL_PLACED_BUT_TRANSPARENT;
+	else if (optarg[0]=='0'+CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD) cell_placed=CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD;
+	if (cell_placed==-1) {
+	  fprintf(stderr, "# Error: cell_placed %s not recognised, allowed values %i, %i and %i.\n", optarg, CELL_PLACED, CELL_PLACED_BUT_TRANSPARENT, CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD);
+	  exit(EXIT_FAILURE);
+	}
 	break;
       case 'R':
 	param_release_rate=strtod(optarg, NULL);
@@ -508,6 +549,9 @@ int main(int argc, char *argv[])
   #else
   printf("# Info: HACK_2D is not defined.\n");
   #endif
+  PRINT_PARAM(cell_placed, "", "%i");
+  printf("# Info: cell_placed=%i compared to CELL_PLACED=%i CELL_PLACED_BUT_TRANSPARENT=%i CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD=%i\n",
+  	cell_placed, CELL_PLACED, CELL_PLACED_BUT_TRANSPARENT, CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD);
   PRINT_PARAM(param_protocol, "-p", "%i");
   PRINT_PARAM(param_delta_t, "-t", "%g");
   PRINT_PARAM(param_diffusion, "-d", "%g");
@@ -571,6 +615,7 @@ total_particles=0;
 active_particles=0;
 left_particles=0;
 absorbed_particles=0;
+discarded_particles=0;
 last_arrival_tm=0.;
 for (it=1LL; it<=param_iterations; it++) {
   
@@ -616,7 +661,7 @@ printf("# Info: At the beginning of %lli there are %i particles in the system. S
 
   cell.release_tm=tm; /* Just for the time being */
   cell.tag=0;
-  state=CELL_PLACED;
+  state=cell_placed;
   nudges=0;
   // Not allowed: velocity={0.,0.,0.,0.};
   velocity.x=0.;
@@ -658,12 +703,32 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
     if ((tm-start_tm>param_max_tm) && (param_max_tm>0.)) {
       state=CELL_MAX_T_EXCEEDED;
-      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_tm, tm-cell.release_tm, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
+      printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_tm, tm-cell.release_tm, nudges, active_particles, left_particles, absorbed_particles, total_particles, discarded_particles, active_particles+left_particles+absorbed_particles+discarded_particles);
       break;
     }
-    if ((tm-start_tm>param_warmup_tm) && (state==CELL_PLACED)) {
+    if ((tm-start_tm>param_warmup_tm) && (state==cell_placed)) {
       cell.release_tm=tm;
       cell.tag=0;
+      if (state==CELL_PLACED_BUT_TRANSPARENT) {
+        /* Remove cue particles inside the cell. 
+	 * This is not to be done when the state is
+	 * CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD */
+        for (ai=active_particles-1; ai>=0; ai--) {
+          sphere_distance2=particle[ai].x*particle[ai].x + particle[ai].y*particle[ai].y + particle[ai].z*particle[ai].z;
+          if (sphere_distance2<param_sphere_radius_squared) {
+	    /* Overwrite current particle ai with the one at the end.
+	     * Maybe ai==--active_particles, but then 
+	     * active_particles is reduced by one.
+	     * For example active_particles=15, then ai=14
+	     * and I do ai[14]=ai[14] with active_particles now
+	     * reduced to 14. */
+	    particle[--active_particles]=particle[ai];
+	    discarded_particles++;
+	  }
+	}
+        printf("# Info: discarded_particles=%i\n", discarded_particles);
+
+      }
       state=CELL_READY_TO_RECEIVE;
       printf("# Info: Cell released and ready to receive at %g\n", tm);
     }
@@ -739,7 +804,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
       sphere_distance2=particle[ai].x*particle[ai].x + particle[ai].y*particle[ai].y + particle[ai].z*particle[ai].z;
       if (sphere_distance2<min_sphere_distance_squared) min_sphere_distance_squared=sphere_distance2;
-      if (sphere_distance2<param_sphere_radius_squared) {
+      if ((sphere_distance2<param_sphere_radius_squared) && (state!=CELL_PLACED_BUT_TRANSPARENT) && (state!=CELL_PLACED_BUT_TRANSPARENT_DONT_DISCARD)) {
 	VERBOSE("# Info: Arrival. Particle %i of %i actives (max %i total generated %i) arrived at the cell at position %g %g %g at time %g at distance %g<%g having started at time %g.\n", 
 	    ai, active_particles, param_max_particles, total_particles,
 	    particle[ai].x, particle[ai].y, particle[ai].z, tm, sqrt(sphere_distance2), param_sphere_radius, particle[ai].release_tm);
