@@ -676,8 +676,6 @@ int main(int argc, char *argv[])
   }
   }
 
-  next_snapshot=param_warmup_tm;
-  next_probe=param_warmup_tm;
   next_moments_tm=0.;
   start_moment_tm=-1.;
 
@@ -770,6 +768,8 @@ printf("# Info: At the beginning of %lli there are %i particles in the system. S
   start_tm=tm; 
   //  active_particles=0;
 printf("# Info: Not starting from scratch, but allowing for warmup.\n");
+next_snapshot=tm+param_warmup_tm;
+next_probe=tm+param_warmup_tm;
 
 /* The tags start at 1. */
 #define CREATE_NEW_PARTICLE { particle[active_particles].x=source.x; particle[active_particles].y=source.y; particle[active_particles].z=source.z; \
@@ -844,7 +844,7 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
 
       if ((state==CELL_ARRIVED_AT_SOURCE) || (state==CELL_LEFT)) {
         printf("# FINISHED %lli %i %g %g %g %g %i %i %i %i %i %i\n", it, state, start_tm, tm, cell.release_tm, tm-cell.release_tm, nudges, active_particles, left_particles, absorbed_particles, total_particles, active_particles+left_particles+absorbed_particles);
-      	break;
+      	break; /* Breaks out of time-loop. */
       }
     }
 
