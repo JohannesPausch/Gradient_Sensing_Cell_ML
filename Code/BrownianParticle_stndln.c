@@ -243,8 +243,87 @@ int cell_placed=CELL_PLACED;
  * waiting for the warm-up to complete or (as I though after our meeting)
  * by discarding particles inside the cell, we bias the cell to have higher
  * contrast.
+ *
+ *
+ *
+ * 6 Feb 2023
+ * We still get a mismatch between what we expect to see as first
+ * velocities and the numerics.
+ *
+ * We now have probes all over the place, at which we measure occasionally,
+ * at every param_delta_probe_tm.
+ * particle_strct
+ *
+typedef struct {
+double x, y, z;
+double release_tm;
+int tag;
+} particle_strct;
  */
 
+
+
+particle_strct probe[]={
+{1.,0.,0.,0.,0},
+{2.,0.,0.,0.,0},
+{3.,0.,0.,0.,0},
+{4.,0.,0.,0.,0},
+{5.,0.,0.,0.,0},
+{6.,0.,0.,0.,0},
+{7.,0.,0.,0.,0},
+{8.,0.,0.,0.,0},
+{9.,0.,0.,0.,0},
+{10.,0.,0.,0.,0},
+{15.,0.,0.,0.,0},
+{20.,0.,0.,0.,0},
+{25.,0.,0.,0.,0},
+{30.,0.,0.,0.,0},
+{35.,0.,0.,0.,0},
+{40.,0.,0.,0.,0},
+{45.,0.,0.,0.,0},
+{50.,0.,0.,0.,0},
+{0.,1.,0.,0.,0},
+{0.,2.,0.,0.,0},
+{0.,3.,0.,0.,0},
+{0.,4.,0.,0.,0},
+{0.,5.,0.,0.,0},
+{0.,6.,0.,0.,0},
+{0.,7.,0.,0.,0},
+{0.,8.,0.,0.,0},
+{0.,9.,0.,0.,0},
+{0.,10.,0.,0.,0},
+{0.,15.,0.,0.,0},
+{0.,20.,0.,0.,0},
+{0.,25.,0.,0.,0},
+{0.,30.,0.,0.,0},
+{0.,35.,0.,0.,0},
+{0.,40.,0.,0.,0},
+{0.,45.,0.,0.,0},
+{0.,50.,0.,0.,0},
+{0.,0.,1.,0.,0},
+{0.,0.,2.,0.,0},
+{0.,0.,3.,0.,0},
+{0.,0.,4.,0.,0},
+{0.,0.,5.,0.,0},
+{0.,0.,6.,0.,0},
+{0.,0.,7.,0.,0},
+{0.,0.,8.,0.,0},
+{0.,0.,9.,0.,0},
+{0.,0.,10.,0.,0},
+{0.,0.,15.,0.,0},
+{0.,0.,20.,0.,0},
+{0.,0.,25.,0.,0},
+{0.,0.,30.,0.,0},
+{0.,0.,35.,0.,0},
+{0.,0.,40.,0.,0},
+{0.,0.,45.,0.,0},
+{0.,0.,50.,0.,0}};
+
+#define PROBE_BOX_LENGTH (0.5)
+double param_delta_probe_tm=5.;
+double next_probe=0.;
+int num_probes;
+double *probe_mom0, *probe_mom1, *probe_mom2;
 
 
 
@@ -311,7 +390,7 @@ int param_max_particles=MAX_PARTICLES;
 /* Time that needs to pass since the last traj output. */
 #define DELTA_TRAJ (0.05)
 double next_traj=0.;
-double param_delta_snapshot=-1.0;
+double param_delta_snapshot_tm=-1.0;
 double next_snapshot=0.;;
 
 #define MAX_MOM_DISTANCE (4)
@@ -369,6 +448,8 @@ particle_strct cell={0., 0., 0., 0.};
 
 #define MAX_FILECOUNT (10000)
 int full_snapshot(void);
+int full_probe(void);
+
 
 int main(int argc, char *argv[])
 {
@@ -376,6 +457,7 @@ int main(int argc, char *argv[])
   double boost=INITIAL_BOOST;
   double min_sphere_distance_squared;
   int nudges;
+  int total_probe_count=0;
 
   double mom_boost[2]={0.,0.};
 
@@ -399,7 +481,7 @@ int main(int argc, char *argv[])
 	param_diffusion=strtod(optarg, NULL);
 	break;
       case 'h':
-      	param_delta_snapshot=strtod(optarg, NULL);
+      	param_delta_snapshot_tm=strtod(optarg, NULL);
 	break;
       case 'i':
 	STRCPY(param_input, optarg);
@@ -572,14 +654,30 @@ int main(int argc, char *argv[])
   PRINT_PARAM(INITIAL_BOOST, "", "%g");
   PRINT_PARAM(param_sphere_radius, "", "%g");
   PRINT_PARAM(param_w0, "", "%g");
-  PRINT_PARAM(param_delta_snapshot, "-h", "%g");
+  PRINT_PARAM(param_delta_snapshot_tm, "-h", "%g");
+  PRINT_PARAM(param_delta_probe_tm, "", "%g");
+  num_probes=sizeof(probe)/sizeof(*probe);
+  PRINT_PARAM(num_probes, "", "%i");
+  PRINT_PARAM(PROBE_BOX_LENGTH, "", "%g");
   PRINT_PARAM(param_delta_moments_tm , "", "%g");
   PRINT_PARAM(param_iterations, "-I", "%lli");
   PRINT_PARAM(verbose, "-v", "%i");
   VERBOSE("# Info: source: -s: %g %g %g\n", source.x, source.y, source.z);
 
+  MALLOC(probe_mom0, num_probes);
+  MALLOC(probe_mom1, num_probes);
+  MALLOC(probe_mom2, num_probes);
+  {
+  int i;
+  for (i=0; i<num_probes; i++) {
+    probe_mom0[i]=0.;
+    probe_mom1[i]=0.;
+    probe_mom2[i]=0.;
+  }
+  }
 
   next_snapshot=param_warmup_tm;
+  next_probe=param_warmup_tm;
   next_moments_tm=0.;
   start_moment_tm=-1.;
 
@@ -696,9 +794,16 @@ printf("# Info: Not starting from scratch, but allowing for warmup.\n");
   for (; ;tm+=(boost*param_delta_t)) {
     mom_boost[0]++;
     mom_boost[1]+=boost;
-    if ((tm>=next_snapshot) && (param_delta_snapshot>=0.)) {
+    if ((tm>=next_snapshot) && (param_delta_snapshot_tm>=0.)) {
       full_snapshot();
-      next_snapshot+=param_delta_snapshot;
+      next_snapshot+=param_delta_snapshot_tm;
+    }
+    if ((tm>=next_probe) && (param_delta_probe_tm>=0.)) {
+      int probe_count;
+      probe_count=full_probe();
+      total_probe_count+=probe_count;
+      printf("# Info: full_probe() at tm=%g found %i, total %i. Active are %i.\n", tm, probe_count, total_probe_count, active_particles);
+      next_probe+=param_delta_probe_tm;
     }
 
     if ((tm-start_tm>param_max_tm) && (param_max_tm>0.)) {
@@ -848,6 +953,7 @@ if (velocity.z!=0.) printf("# Error: velocity.z=%g despite HACK_2D\n", velocity.
       }
     } /* particles */
     
+#warning "The below amounts to writing a long of stuff to stdout. Maybe having an estimated end-time here etc, is CPU time more wisely spent."
     if ((start_moment_tm>0.) && (tm>start_moment_tm+param_moment_window)) {
       printf("# MOM_DISTANCE %g %g %g %i %i %g", tm, start_moment_tm, param_moment_window, MAX_MOM_DISTANCE, active_particles, mom_distance[0]);
       if (mom_distance[0]==0.0) mom_distance[0]=-1.;
@@ -908,8 +1014,15 @@ if (velocity.z!=0.) printf("# Error: velocity.z=%g despite HACK_2D\n", velocity.
   if (mom_boost[0]>0.) printf(" %g\n", mom_boost[1]/mom_boost[0]);
   else printf(" %g\n", -mom_boost[1]);
 
-
-
+  { int i;
+  printf("# Info: total_probe_count=%i for %i probes box size %g.\n", total_probe_count, num_probes, PROBE_BOX_LENGTH);
+  for (i=0; i<num_probes; i++) {
+    printf("#PROBE %i %g %g %g %g %g %g\n", i, probe[i].x, probe[i].y, probe[i].z, 
+      probe_mom0[i], 
+      probe_mom1[i]/( (probe_mom0[i]<=0.) ? (-1.) : probe_mom0[i]),
+      probe_mom2[i]/( (probe_mom0[i]<=0.) ? (-1.) : probe_mom0[i]) );
+  }
+  }
   postamble(stdout);
   if (traj) postamble(traj);
   return(0);
@@ -978,6 +1091,8 @@ int update_particles_and_cell(particle_strct d, double scale)
   source.y-=d.y;
   source.z-=d.z;
 
+/* This is just for keeping track of the whole displacement,
+ * so that it can later be added to all particles. */
 cell.x+=d.x;
 cell.y+=d.y;
 cell.z+=d.z;
@@ -1088,4 +1203,35 @@ for (ai=0; ai<active_particles; ai++) {
 }
 fclose(f);
 return(count++);
+}
+
+#define IN_PROBE(a,b) ( (IN_PROBE_COMPO(a,b,x)) && (IN_PROBE_COMPO(a,b,y)) && (IN_PROBE_COMPO(a,b,z)) )
+#define IN_PROBE_COMPO(a,b,c) IN_PROBE_RANGE(a.c-(b.c+cell.c) )
+#define IN_PROBE_RANGE(d) (fabs(d)<PROBE_BOX_LENGTH/2.)
+
+int full_probe(void)
+{
+int i, j;
+int count;
+int total_count=0;
+
+
+for (i=0; i<num_probes; i++) {
+  for (count=j=0; j<active_particles; j++) {
+    /* particle[j]'s position is at
+     * particle[j]+cell,
+     * as the coordinates that are being maintained are relative 
+     * to the cell. The cell is at the origin (but its total discplavcement
+     * is kept track of in cell */
+    
+    if ( IN_PROBE(probe[i],particle[j]) ) count++;
+    }
+  probe_mom0[i]++;
+  probe_mom1[i]+=count;
+  probe_mom2[i]+=(count*count);
+  total_count+=count;
+}
+
+
+return(total_count);
 }
