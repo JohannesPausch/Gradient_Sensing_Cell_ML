@@ -460,6 +460,7 @@ int main(int argc, char *argv[])
   int total_probe_count=0;
 
   double mom_boost[2]={0.,0.};
+  double next_release=0.; /* First release always right at the beginning. Hm. Na. Corrected below. */
 
 
 
@@ -713,6 +714,7 @@ left_particles=0;
 absorbed_particles=0;
 discarded_particles=0;
 last_arrival_tm=0.;
+next_release=(-log(1.-gsl_ran_flat(rng, 0., 1.))/param_release_rate);
 for (it=1LL; it<=param_iterations; it++) {
   
 /* This is copied from update_particles_and_cell.
@@ -848,6 +850,7 @@ next_probe=tm+param_warmup_tm;
       }
     }
 
+/* Old version of Poissonian realease
     if (param_release_rate*boost*param_delta_t>gsl_ran_flat(rng, 0., 1.)) {
       if (active_particles>=param_max_particles) {
 	fprintf(stderr, "Warning: particle creation suppressed because active_particles=%i >= param_max_particles=%i.\n", active_particles, param_max_particles);
@@ -855,7 +858,26 @@ next_probe=tm+param_warmup_tm;
 	CREATE_NEW_PARTICLE;
       }
     }
+*/
+  while (tm>=next_release) {
+      if (active_particles>=param_max_particles) {
+	fprintf(stderr, "Warning: particle creation suppressed because active_particles=%i >= param_max_particles=%i.\n", active_particles, param_max_particles);
+      } else {
+	CREATE_NEW_PARTICLE;
+      }
+      /* gsl_ran_flat gives 0...0.99999
+       * t=-log(1-u)/gamma has distribution gamma exp(-t gamma)
+       * if u is uniform.
+       * exp(-gamma t)=1-u 
+       * so du/dt=gamma exp(-gamma t) and 
+       * P(u) du = P(t) dt,
+       * so with P(u)=1 
+       * P(t) = gamma exp(-gamma t) 
+       * as expected.
+       */
+      next_release+=(-log(1.-gsl_ran_flat(rng, 0., 1.))/param_release_rate);
 
+  }
     //warning "Using i here as some sort of global object is poor style. The variable i is really one that is too frequently used..."
 
 
@@ -1206,9 +1228,22 @@ return(count++);
 }
 
 #define IN_PROBE(a,b) ( (IN_PROBE_COMPO(a,b,x)) && (IN_PROBE_COMPO(a,b,y)) && (IN_PROBE_COMPO(a,b,z)) )
-#define IN_PROBE_COMPO(a,b,c) IN_PROBE_RANGE(a.c-(b.c+cell.c) )
+#define IN_PROBE_COMPO(a,b,c) IN_PROBE_RANGE((a.c+source.c)-(b.c+cell.c) )
 #define IN_PROBE_RANGE(d) (fabs(d)<PROBE_BOX_LENGTH/2.)
 
+/* The coordinates of everything are relative to the cell.
+ * The cell has in principle position (0,0,0), but cell.x,y,z
+ * are a record of the total thus far. 
+ * The probes are meant to be relative to the source. The source
+ * is located at source.x,y,z.
+ * In RUN12 I have used the macro
+ * #define IN_PROBE_COMPO(a,b,c) IN_PROBE_RANGE(a.c-(b.c+cell.c) )
+ * but I really think of the probe coordinate as to be read relative
+ * to the source,
+ * #define IN_PROBE_COMPO(a,b,c) IN_PROBE_RANGE((a.c+source.c)-(b.c+cell.c) )
+ *
+ *
+ */
 int full_probe(void)
 {
 int i, j;
