@@ -859,6 +859,7 @@ next_probe=tm+param_warmup_tm;
       }
     }
 */
+
   while (tm>=next_release) {
       if (active_particles>=param_max_particles) {
 	fprintf(stderr, "Warning: particle creation suppressed because active_particles=%i >= param_max_particles=%i.\n", active_particles, param_max_particles);
