@@ -396,7 +396,7 @@ double next_snapshot=0.;;
 #define MAX_MOM_DISTANCE (4)
 int mom;
 double next_moments_tm;
-double param_delta_moments_tm=10.;
+double param_delta_moments_tm=100.;
 double param_moment_window=0.1;
 double start_moment_tm;
 double mom_distance[MAX_MOM_DISTANCE+1];
@@ -963,7 +963,8 @@ if (velocity.z!=0.) printf("# Error: velocity.z=%g despite HACK_2D\n", velocity.
 	  velocity.release_tm=tm;
 	  }
 	  fprintf_traj("# New velocity %g %g %g\n", velocity.x, velocity.y, velocity.z);
-	  fprintf(stdout, "# Info: New velocity at tm=%g is %g %g %g distance %g particles %i %i boost %g\n", tm, velocity.x, velocity.y, velocity.z, sqrt(source.x*source.x + source.y*source.y + source.z*source.z), active_particles, total_particles, boost);
+	  if (0)
+	    fprintf(stdout, "# Info: New velocity at tm=%g is %g %g %g distance %g particles %i %i boost %g\n", tm, velocity.x, velocity.y, velocity.z, sqrt(source.x*source.x + source.y*source.y + source.z*source.z), active_particles, total_particles, boost);
 
 
 	}
